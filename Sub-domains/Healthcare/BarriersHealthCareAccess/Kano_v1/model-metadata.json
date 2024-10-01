@@ -1,16 +1,16 @@
 {
     "name": "Barriers to Healthcare Access",
-    "notes": "This model aims to represent the number of barriers to health access care the population faces. In its crude version, the model considers the places that provide health services. We will assess (/model) distances (/ travel times) for every slum and neighbourhood across the city. We will consider how people move and the time it takes.",
-    "city": "Example City",
-    "subdomain": "Example Subdomain",
+    "notes": "This model represents the barriers communities face when accessing health care. The model estimates the areas from where a person can walk (less than 10min) or need a motorised vehicle (10min or more) to reach a healthcare facility.",
+    "city": "Kano",
+    "subdomain": "Barriers to Healthcare Access",
     "output_keys": {
         "0": "Low",
         "1": "Medium",
         "2": "High"
     },
     "features": [
-        "Population Density",
-        "Roads",
-        "Buildings"
+        "Health care facilities",
+        "travel distance",
+        "Accessibility"
     ]
 }
