@@ -1,0 +1,16 @@
+{
+    "name": "Example Model",
+    "notes": "This is an example model.",
+    "city": "Example City",
+    "subdomain": "Example Subdomain",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "features": [
+        "Population Density",
+        "Roads",
+        "Buildings"
+    ]
+}
