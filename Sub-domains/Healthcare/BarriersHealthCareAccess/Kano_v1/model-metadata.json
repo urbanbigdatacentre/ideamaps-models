@@ -1,6 +1,6 @@
 {
     "name": "Barriers to Healthcare Access",
-    "notes": "This is an example model. ",
+    "notes": "This model aims to represent the number of barriers to health access care the population faces. In its crude version, the model considers the places that provide health services. We will assess (/model) distances (/ travel times) for every slum and neighbourhood across the city. We will consider how people move and the time it takes.",
     "city": "Example City",
     "subdomain": "Example Subdomain",
     "output_keys": {
