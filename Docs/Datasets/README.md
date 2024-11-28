@@ -1,4 +1,4 @@
-# Platform Datasets 
+# Directory of Resources for Platform Datasets 
 
 Datasets describing different aspects of urban deprivation or assets can be put forward for presentation and validation on the IDEAMAPS Data Ecosystem platform.
 

@@ -29,9 +29,9 @@ We identified the following criteria in line with the main principles of our “
 
 #### Transferable
 
-5. (Optional/desirable criteria) Can be comparable across cities (e.g. through standardised indicators such as the SDGs, following FAIR principles, and using reproducible methodology). This will be an optional criteria, as we may still allow city-specific datasets which fulfil particularly well the other criteria.
+5. (Desirable criteria) Can be comparable across cities (e.g. through standardised indicators such as the SDGs, following FAIR principles, and using reproducible methodology). This will be an optional criteria, as we may still allow city-specific datasets which fulfil particularly well the other criteria.
 
-#### Feasible:
+#### Feasible
 
 6. The data can be gridded in the chosen reference grid and coordinate system for the pilot cities. Documentation about the grid system and coordinate reference systems are openly available in the [Study Areas directory](../StudyArea).
 
