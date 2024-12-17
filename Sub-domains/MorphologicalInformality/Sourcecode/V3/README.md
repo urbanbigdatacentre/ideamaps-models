@@ -32,10 +32,40 @@ We refer to our publication for a detailed description of the methodology: [prep
 
 ## 🏚️ Prepare Building Footprint Data
 
+Our model requires building footprints as input data. There are several providers for open building footprint data. We recommend using data from the [Overture Map Foundation](https://overturemaps.org/).
 
 
 ## ⚙️ Run Model
 
+Follow these steps to obtain clusters of similar urban form types.
+
+1. **Create the basic urban form elements**
+
+   ```
+   python geoelements.py -e *path to the file* -b *path to the builidng footprints file* -o *path the the output dir*
+   ```
+
+2. **Create the basic urban form elements**
+
+   ```
+   python morphometrics.py -b *path to building footprints file* -t *path to tessellation file* -o *path the the output dir*
+   ```
+
+3. **Create the basic urban form elements**
+
+   The morphometrics dir corresponds to the output dir used in step 2.
+
+   ```
+   python aggregation.py -m *path to the morphometrics dir* -b *path to the builidng footprints file* -g *path to the grid file* -o *path the the output dir*
+   ```
+      
+4. **Create the basic urban form elements**
+
+   ```
+   python clustering.py -m *path to the morphometrics file* -o *path the the output dir*
+   ```
+
+The resulting urban form clusters can be linked to morphological informality.
 
 
 ## 📝 Reference
