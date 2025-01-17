@@ -34,7 +34,8 @@ Our model outputs can also be validated using the [IDEAMAPS Data Ecosystem platf
 
 
 
-
+## ✏️ Contributing
+We appreciate all contributions. Please refer to Contributing Guidelines.
 
 
 ## 📝 References
