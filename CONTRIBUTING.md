@@ -10,18 +10,13 @@ If you encounter any issues or have suggestions for improvements, please open an
 
 ### Submitting Pull Requests
 
-1. **Clone the Repository**: Clone your fork to your local machine.
-   ```sh
-   git clone https://github.com/your-username/ideamaps-models.git
-   ```
+1. **Clone the Repository**: Clone the repository to your local machine.
+   `git clone https://github.com/your-username/ideamaps-models.git`
 2. **Open an Issue**: Discuss the changes you would like to make in an issue. This helps us understand your proposed changes and provide feedback.
-3. **Create a Branch**: Create a new branch for your changes. Branch names should be in the following format - `<issue-number>-<issue-name>`. For example: 
-   `git checkout -b 123-my-feature-name`
+3. **Create a Branch**: Create a new branch for your changes. Branch names should be in the following format - `<issue-number>-<issue-name>`. For example: `git checkout -b 123-my-feature-name`
 4. **Make Changes**: Make your changes to the codebase.
-5. **Commit Changes**: Commit your changes with a descriptive commit message.
-   `git commit -m "Description of your changes"`
-6. **Push Changes**: Push your changes to your fork.
-   `git push origin feature/your-feature-name`
+5. **Commit Changes**: Commit your changes with a descriptive commit message. `git commit -m "Description of your changes"`
+6. **Push Changes**: Push your changes to your fork.`git push origin feature/your-feature-name`
 7. **Open a Pull Request**: Open a pull request to the main repository - `dev`. Provide a clear description of your changes and any related issues.
 8. **Request Review**: After opening a pull request, request the approval of a maintainer. The maintainer will review your changes and provide feedback.
    
