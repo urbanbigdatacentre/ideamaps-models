@@ -53,7 +53,7 @@ In contrast, FUAs reflects the actual urban concentrations and patterns, based o
 
 *Visual representation of FUA, Admin boundaries and Buffer areaas to define the study areas for the IDEAMAPS Data Ecosystem.*
 
-![i](/Docs/images/studyarea.jpg)
+![i](/docs/study-areas/images/study-area-visual.jpg)
 
 ## Coordinate Reference System and Cartographic projections
 

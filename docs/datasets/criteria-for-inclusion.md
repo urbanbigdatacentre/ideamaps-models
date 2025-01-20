@@ -33,9 +33,9 @@ We identified the following criteria in line with the main principles of our “
 
 #### Feasible
 
-6. The data can be gridded in the chosen reference grid and coordinate system for the pilot cities. Documentation about the grid system and coordinate reference systems are openly available in the [Study Areas directory](../StudyArea).
+6. The data can be gridded in the chosen reference grid and coordinate system for the pilot cities. Documentation about the grid system and coordinate reference systems are openly available in the [Study Areas directory](../study-areas).
 
-7. The dataset covers the whole reference urban area (i.e., at the moment defined by a combination of functional urban area and admin boundary for each pilot city). Reference area boundaries and further information are openly available in the [Study Areas directory](../StudyArea).
+7. The dataset covers the whole reference urban area (i.e., at the moment defined by a combination of functional urban area and admin boundary for each pilot city). Reference area boundaries and further information are openly available in the [Study Areas directory](../study-areas).
 
 8. The dataset uses 3-point (e.g., Low, Medium, High) or binary categories (e.g., 0,1). More information about the format of the data is available in the [dataset-format.md](dataset-format.md) file. 
 
