@@ -34,3 +34,12 @@ dataset-name
 ```
 
 You can see an example of this folder structure in the [example-folder-structure](/models/example-folder-structure) directory.
+
+- `dataset-name`: Top level folders should be named after the dataset they pertain to
+- `scripts`: The scripts folder contains all source code used to generate the dataset
+- `city`: The city folder should be named after the city in question. It contains all dataset related files (aside from those in the scripts folder).
+- `dataset-outputs.csv`: The file that contains the dataset itself. Must be in `.csv` format.
+- `dataset-metadata.json`: A file containing strict metadata information about the dataset. Must be in `.json` format
+- `dataset-interpretability.md`: A non-technical document to be shown on the platform as a guide for users on how to intepret the results. An example is provided in this folder. Must be in `.md` format and can contain images and other linked content.
+- `licensing.md`: A file that determines the dataset's terms of use. This must be in line with the terms of use set out by IDEAMAPS Data Ecosystem (see [dataset-licensing.md](dataset-licensing.md))
+- `image-examples`: A folder containing square images that demonstrate or represent the dataset categories in some way. Must follow naming convention listed in folder example.
