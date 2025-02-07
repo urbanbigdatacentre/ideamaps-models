@@ -4,62 +4,24 @@ import momepy as mm
 from libpysal import graph
 from pathlib import Path
 from shapely.geometry import Point, LineString
-from parsers import morphometrics_parser as argument_parser
+import argparse
 
 
-def pre_check(blg: GeoDataFrame, tess: GeoDataFrame):
-    # This should be moved to the generation of the urban form elements
-    blg_uids = set(blg['uID'])
-    tess_uids = set(tess['uID'])
-    common_uids = blg_uids.intersection(tess_uids)
+def argument_parser():
+    # https://docs.python.org/3/library/argparse.html#the-add-argument-method
+    parser = argparse.ArgumentParser(description="Experiment Args")
+    parser.add_argument('-b', "--building-file", dest='building_file', required=True)
+    parser.add_argument('-t', "--tessellation-file", dest='tessellation_file', required=True)
+    parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
+                        help="path to output directory")
 
-    blg_only_uids = blg_uids - common_uids
-    tess_only_uids = tess_uids - common_uids
-
-    print(f"Unique uIDs in blg only: {len(blg_only_uids)}")
-    print(f"Unique uIDs in tess only: {len(tess_only_uids)}")
-
-    blg_cleaned = blg[blg['uID'] != 412867]
-    tess_cleaned = tess[~tess['uID'].isin(tess_only_uids)]
-    tess_cleaned = tess_cleaned.drop_duplicates(subset='uID', keep='first')
-
-    blg_duplicates = blg_cleaned[blg_cleaned['uID'].duplicated()]['uID']
-    tess_duplicates = tess_cleaned[tess_cleaned['uID'].duplicated()]['uID']
-
-    print(f"Duplicate uIDs in blg: {blg_duplicates}")
-    print(f"Duplicate uIDs in tess: {tess_duplicates}")
-
-    common_uids = set(blg_cleaned['uID']).intersection(set(tess_cleaned['uID']))
-
-    blg = blg_cleaned[blg_cleaned['uID'].isin(common_uids)].sort_values('uID')
-    tess = tess_cleaned[tess_cleaned['uID'].isin(common_uids)].sort_values('uID')
-
-    print(f"Aligned blg length: {len(blg)}")
-    print(f"Aligned tess length: {len(tess)}")
-
-    blg_uids_sorted = blg['uID'].tolist()
-    tess_uids_sorted = tess['uID'].tolist()
-
-    if blg_uids_sorted == tess_uids_sorted:
-        print("uID match confirmed.")
-    else:
-        print("uID mismatch detected.")
-
-
-# Function to check and clean invalid geometries
-def check_and_clean_geometries(gdf):
-    invalid_geometries = gdf[gdf.is_empty | gdf['geometry'].isnull()]
-    print(f"Invalid geometries in {gdf.name if hasattr(gdf, 'name') else 'GeoDataFrame'}:")
-    print(invalid_geometries)
-
-    # Remove invalid geometries
-    gdf_cleaned = gdf[~(gdf.is_empty | gdf['geometry'].isnull())]
-
-    # Ensure all geometries are Shapely objects
-    gdf_cleaned['geometry'] = gdf_cleaned['geometry'].apply(
-        lambda geom: geom if isinstance(geom, (Point, LineString)) else None)
-
-    return gdf_cleaned
+    parser.add_argument(
+        "opts",
+        help="Modify config options using the command-line",
+        default=None,
+        nargs=argparse.REMAINDER,
+    )
+    return parser
 
 
 if __name__ == '__main__':
@@ -67,69 +29,81 @@ if __name__ == '__main__':
 
     blg = gpd.read_parquet(args.building_file)
     tess = gpd.read_parquet(args.tessellation_file)
+    tess.index = tess['uID']
+    tess['geometry'] = tess['geometry'].buffer(0)  # Fix invalid geometries
+    invalid_geometries = tess[~tess.is_valid]
+    print(f'Invalid geometries: {len(invalid_geometries)}')
 
-    pre_check(blg, tess)
+    indices = [335307, 336555, 842121]
+    for index in indices:
+        tess = tess.drop(index=index)
+        blg = blg.drop(index=index)
+
+    # Reassign primary keys (indices) after dropping rows
+    blg.index.name = None
+    tess.index.name = None
+    assert blg['uID'].is_unique and tess['uID'].is_unique
+    blg = blg.sort_values(by='uID').reset_index(drop=True)
+    tess = tess.sort_values(by='uID').reset_index(drop=True)
+
+    blg.to_parquet(Path(args.output_dir) / 'buildings_clean.parquet')
 
     blg['sdbAre'] = blg.geometry.area  # Used for SDS (Sum & Mdn)
-    blg[['uID', 'sdbAre']].to_parquet(Path(args.output_dir) / 'sdbAre.pq')
+    blg[['uID', 'sdbAre']].to_parquet(Path(args.output_dir) / 'sdbAre.parquet')
 
     blg['ssbElo'] = mm.elongation(blg)  # Used for SDS (Mdn)
-    blg[['uID', 'ssbElo']].to_parquet(Path(args.output_dir) / 'ssbElo.pq')
+    blg[['uID', 'ssbElo']].to_parquet(Path(args.output_dir) / 'ssbElo.parquet')
 
     blg['stbOri'] = mm.orientation(blg)  # Used for ISL (SD)
-    blg[['uID', 'stbOri']].to_parquet(Path(args.output_dir) / 'stbOri.pq')
+    blg[['uID', 'stbOri']].to_parquet(Path(args.output_dir) / 'stbOri.parquet')
 
     tess['stcOri'] = mm.orientation(tess)  # Used for ISL (SD)
-    tess[['uID', 'stcOri']].to_parquet(Path(args.output_dir) / 'stcOri.pq')
+    tess[['uID', 'stcOri']].to_parquet(Path(args.output_dir) / 'stcOri.parquet')
 
     cencon = mm.centroid_corner_distance(blg)
     blg['ssbCCD'] = cencon['std']  # Used for ISL (Mdn)
-    blg[['uID', 'ssbCCD']].to_parquet(Path(args.output_dir) / 'ssbCCD.pq')
+    blg[['uID', 'ssbCCD']].to_parquet(Path(args.output_dir) / 'ssbCCD.parquet')
 
     tess['sdcAre'] = tess.geometry.area  # Used for SDS (Mdn)
-    tess[['uID', 'sdcAre']].to_parquet(Path(args.output_dir) / 'sdcAre.pq')
+    tess[['uID', 'sdcAre']].to_parquet(Path(args.output_dir) / 'sdcAre.parquet')
 
     tess['sscERI'] = mm.equivalent_rectangular_index(tess)  # Used for SDS (Mdn)
-    tess[['uID', 'sscERI']].to_parquet(Path(args.output_dir) / 'sscERI.pq')
+    tess[['uID', 'sscERI']].to_parquet(Path(args.output_dir) / 'sscERI.parquet')
 
     tess = tess.merge(blg[['uID', 'sdbAre']], how='left', on='uID')
     tess['sicCAR'] = tess['sdbAre'] / tess['sdcAre']
-    tess[['uID', 'sicCAR']].to_parquet(Path(args.output_dir) / 'sicCAR.pq')
+    tess[['uID', 'sicCAR']].to_parquet(Path(args.output_dir) / 'sicCAR.parquet')
 
     queen_1 = graph.Graph.build_contiguity(tess).higher_order(k=1)
 
     blg["mtbAli"] = mm.alignment(blg['stbOri'], queen_1)
-    blg[['uID', 'mtbAli']].to_parquet(Path(args.output_dir) / 'mtbAli.pq')
+    blg[['uID', 'mtbAli']].to_parquet(Path(args.output_dir) / 'mtbAli.parquet')
 
     blg["mtbNDi"] = mm.neighbor_distance(blg, queen_1)  # Used for SDS (Mdn)
-    blg[['uID', 'mtbNDi']].to_parquet(Path(args.output_dir) / 'mtbNDi.pq')
+    blg[['uID', 'mtbNDi']].to_parquet(Path(args.output_dir) / 'mtbNDi.parquet')
 
     tess["mtcWNe"] = mm.neighbors(tess, queen_1, weighted=True)  # Used for both (Mdn)
-    tess[['uID', 'mtcWNe']].to_parquet(Path(args.output_dir) / 'mtcWNe.pq')
+    tess[['uID', 'mtcWNe']].to_parquet(Path(args.output_dir) / 'mtcWNe.parquet')
 
-    # TODO: update API
-    tess["mdcAre"] = mm.CoveredArea(tess, queen_1, "uID").series  # Used for SDS (Mdn)
-    tess[['uID', 'mdcAre']].to_parquet(Path(args.output_dir) / 'mdcAre.pq')
+    # Compute CoveredArea using the .describe() method
+    tess["mdcAre"] = queen_1.describe(tess['sdcAre'], statistics=['sum']) # Used for SDS (Mdn)
+    tess[['uID', 'mdcAre']].to_parquet(Path(args.output_dir) / 'mdcAre.parquet')
 
     queen_3 = graph.Graph.build_contiguity(tess).higher_order(k=3)
 
     blg['ltbIBD'] = mm.mean_interbuilding_distance(blg, queen_1, queen_3)  # Used for SDS (Mdn)
-    blg[['uID', 'ltbIBD']].to_parquet(Path(args.output_dir) / 'ltbIBD.pq')
+    blg[['uID', 'ltbIBD']].to_parquet(Path(args.output_dir) / 'ltbIBD.parquet')
 
     blg_q1 = graph.Graph.build_contiguity(blg).higher_order(k=1)
 
     blg['ltcBuA'] = mm.building_adjacency(queen_3, blg_q1)  # Used for both (Mdn)
-    blg[['uID', 'ltcBuA']].to_parquet(Path(args.output_dir) / 'ltcBuA.pq')
+    blg[['uID', 'ltcBuA']].to_parquet(Path(args.output_dir) / 'ltcBuA.parquet')
 
-    # TODO update to new API
-    tess = tess.drop_duplicates(subset=['uID'])
-    queen_3 = mm.sw_high(k=3, gdf=tess, ids='uID')
-    # queen_3 = graph.Graph.build_contiguity(tess).higher_order(k=3)
-    tess['ltcWRB'] = mm.BlocksCount(tess, 'bID', queen_3, 'uID', verbose=True).series
-    tess[['uID', 'ltcWRB']].to_parquet(Path(args.output_dir) / 'ltcWRB.pq')
+    # Compute BlocksCount using the .describe() method
+    block_count = queen_3.describe(tess['bID'], statistics=['count']).squeeze()
+    neighborhood_area = queen_3.describe(tess['sdcAre'], statistics=['sum']).squeeze()
+    tess['ltcWRB'] = block_count / neighborhood_area
+    tess[['uID', 'ltcWRB']].to_parquet(Path(args.output_dir) / 'ltcWRB.parquet')
 
-    # Clean and validate geometries
-    blg = check_and_clean_geometries(blg)
-
-    primary = tess.merge(blg, on='uID')
-    primary.to_parquet(Path(args.output_dir) / 'primary.pq')
+    primary = blg.merge(tess.drop(columns='geometry'), on='uID')
+    primary.to_parquet(Path(args.output_dir) / 'primary.parquet')

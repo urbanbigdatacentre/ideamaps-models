@@ -2,10 +2,25 @@ import geopandas as gpd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from pathlib import Path
+import argparse
 
-from parsers import clustering_parser as argument_parser
 
-SEED = 7
+def argument_parser():
+    # https://docs.python.org/3/library/argparse.html#the-add-argument-method
+    parser = argparse.ArgumentParser(description="Experiment Args")
+    parser.add_argument('-m', "--morphometrics-file", dest='morphometrics_file', required=True)
+    parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
+                        help="path to output directory")
+    parser.add_argument('-s', "--seed", dest='seed', default=7, required=False, help="seed for clustering")
+
+    parser.add_argument(
+        "opts",
+        help="Modify config options using the command-line",
+        default=None,
+        nargs=argparse.REMAINDER,
+    )
+    return parser
+
 
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
@@ -37,7 +52,7 @@ if __name__ == '__main__':
     # Calculating sum of squared distances for k in range 1 to 20
     ssd = []
     for k in [6, 8, 10]:
-        km = KMeans(n_clusters=k, random_state=SEED)
+        km = KMeans(n_clusters=k, random_state=int(args.seed))
         km = km.fit(data_isl)
         ssd.append(km.inertia_)
         gdf[f'isl_c{k}'] = km.labels_
@@ -48,7 +63,7 @@ if __name__ == '__main__':
     # Calculating sum of squared distances for k in range 1 to 20
     ssd = []
     for k in [6, 8, 10]:
-        km = KMeans(n_clusters=k, random_state=SEED)
+        km = KMeans(n_clusters=k, random_state=int(args.seed))
         km = km.fit(data_sds)
         ssd.append(km.inertia_)
         gdf[f'sds_c{k}'] = km.labels_
