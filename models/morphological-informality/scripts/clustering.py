@@ -25,15 +25,14 @@ def argument_parser():
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
 
-    gdf = gpd.read_parquet(args.morphometrics_file)
+    mm_file = Path(args.morphometrics_file)
+    gdf = gpd.read_parquet(mm_file) if mm_file.suffix == '.parquet' else gpd.read_file(mm_file)
     print(gdf.columns)
     gdf.head()
     #TODO: only cluster cells with buildings
 
-    #TODO: add md_ltcWRB
     morph_isl = ['md_ssbCCD', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'md_ltcWRB', 'sd_stbOri', 'sd_stcOri']
 
-    #TODO add md_ltcWRB and md_ltbIBD
     morph_sds = ['md_sdcAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdbAre', 'md_sscERI', 'md_sicCAR',
                  'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB', 'sum_sdcAre']
 
@@ -58,7 +57,6 @@ if __name__ == '__main__':
         gdf[f'isl_c{k}'] = km.labels_
 
 
-
     # elbo Small, Dense Structures
     # Calculating sum of squared distances for k in range 1 to 20
     ssd = []
@@ -68,5 +66,5 @@ if __name__ == '__main__':
         ssd.append(km.inertia_)
         gdf[f'sds_c{k}'] = km.labels_
 
-    gdf.to_parquet(Path(args.output_dir) / 'clustering.pq')
+    gdf.to_parquet(Path(args.output_dir) / 'clustering.parquet')
 
