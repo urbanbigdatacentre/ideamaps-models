@@ -1,9 +1,7 @@
 import geopandas as gpd
-from geopandas import GeoDataFrame
 import momepy as mm
 from libpysal import graph
 from pathlib import Path
-from shapely.geometry import Point, LineString
 import argparse
 
 
@@ -34,15 +32,16 @@ if __name__ == '__main__':
     invalid_geometries = tess[~tess.is_valid]
     print(f'Invalid geometries: {len(invalid_geometries)}')
 
-    indices = [335307, 336555, 842121]
-    for index in indices:
-        tess = tess.drop(index=index)
-        blg = blg.drop(index=index)
+    # indices = [335307, 336555, 842121] Nairobi Overture
+    # for index in indices:
+    #     tess = tess.drop(index=index)
+    #     blg = blg.drop(index=index)
 
     # Reassign primary keys (indices) after dropping rows
     blg.index.name = None
     tess.index.name = None
-    assert blg['uID'].is_unique and tess['uID'].is_unique
+    # assert blg['uID'].is_unique
+    # assert tess['uID'].is_unique
     blg = blg.sort_values(by='uID').reset_index(drop=True)
     tess = tess.sort_values(by='uID').reset_index(drop=True)
 

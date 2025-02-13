@@ -59,6 +59,12 @@ def preprocess_buildings(buildings: GeoDataFrame, extent: GeoDataFrame, identifi
     extent_utm = extent.to_crs(utm_epsg).unary_union
     buildings = buildings[buildings.intersects(extent_utm)]
 
+    # Dropping duplicates
+    buildings['geometry'] = buildings.normalize()
+    n_duplicate_geometries = len(buildings) - len(buildings.drop_duplicates('geometry'))
+    print(f'Number of duplicate geometries in buildings: {n_duplicate_geometries}')
+    buildings = buildings.drop_duplicates('geometry')
+
     # Clean geometries of buildings
     buildings.geometry = buildings.buffer(0)
 
@@ -151,23 +157,10 @@ if __name__ == '__main__':
     print(f'Unique uIDs in blg only: {len(building_ids - common_ids)}')
     print(f'Unique uIDs in tess only: {len(tess_ids - common_ids)}')
 
-    # buildings = buildings[buildings['tempID'].isin(common_ids)].drop_duplicates(subset='tempID', keep='first')
-    # tess = tess[tess['tempID'].isin(common_ids)].drop_duplicates(subset='tempID', keep='first')
-
-    # Assigning IDs
-    # buildings = buildings.reset_index()
-    # buildings['uID'] = range(len(buildings))
     buildings = buildings[['uID', 'geometry']]
-    # buildings = buildings.set_index('uID')
-    # tess.index = tess.set_index('uID')
-
-    # tess = tess.join(buildings[['uID']], on='tempID', how='left')
-
-    # tess = tess.reset_index()
-    # buildings = buildings.drop(columns='tempID')
-    # tess = tess.drop(columns='tempID')
-
+    buildings.index.name = None
     buildings.to_parquet(Path(args.output_dir) / 'buildings.parquet')
+    tess.index.name = None
     tess.to_parquet(Path(args.output_dir) / 'tessellation.parquet')
 
     # Roads
