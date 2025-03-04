@@ -170,8 +170,7 @@ gdf = gpd.GeoDataFrame(
     geometry=gpd.points_from_xy(EmOC_kano.longitude, EmOC_kano.latitude)
 )
 gdf.crs = 'EPSG:4326'
-output_path = data_inputs + 'EmOC_kano.gpkg'
-gdf.to_file("output_path", driver="GPKG")
+gdf.to_file(data_inputs + 'new_combination_facilities.gpkg', driver="GPKG")
 
 # ## Analysis
 # We will follow these steps:
@@ -179,6 +178,6 @@ gdf.to_file("output_path", driver="GPKG")
 # * Perform Spatial Join
 # * Save output as GeoPackage file and CSV file
 
-# ### Get Duration Matrix from OpenRouteService
+# ### Get Duration Matrix from OpenRouteService/GoogleMap
 
 # ### Save Output as CSV file
