@@ -37,9 +37,9 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
     # Load roads data
     roads_file = Path(roads_file)
     roads = gpd.read_parquet(str(roads_file)) if roads_file.suffix == '.parquet' else gpd.read_file(str(roads_file))
-    roads = roads[['geometry', args.road_type_attribute]]
+    roads = roads[['geometry', road_type_attribute]]
     roads['nID'] = range(len(roads))
-    roads['paved'] = roads[args.road_type_attribute].apply(lambda x: 0 if x == args.road_type_key else 1)
+    roads['paved'] = roads[road_type_attribute].apply(lambda x: 0 if x == road_type_key else 1)
 
     # Reproject to UTM zone
     roads = roads.to_crs(epsg=4326)
