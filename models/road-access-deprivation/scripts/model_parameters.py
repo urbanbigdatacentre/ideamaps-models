@@ -100,12 +100,12 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
         buildings_batch = ddf.compute()
         buildings_batch = buildings_batch[['uID', 'buildings_in_between', 'paved', 'geometry']]
         batches.append(buildings_batch)
-        print(f'Processed batch: {i_batch} - {i_batch + batch_size} ({len(buildings)}.')
+        print(f'Processed batch: {i_batch} - {i_batch + batch_size} ({len(buildings)}).')
     buildings = pd.concat(batches)
 
     # Save the parameters
-    buildings.set_geometry('geometry')[
-    buildings['uID', 'buildings_in_between', 'paved', 'geometry']].to_parquet(out_file)
+    buildings.set_geometry('geometry')
+    buildings[['uID', 'buildings_in_between', 'paved', 'geometry']].to_parquet(out_file)
 
 
 if __name__ == '__main__':
