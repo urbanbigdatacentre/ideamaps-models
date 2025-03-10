@@ -53,7 +53,7 @@ This section provides additional information on the definition of road accessibi
 
 In our model, we measure road accessibility using the number of buildings intersecting lines connecting buildings to their nearest motorable roads.
 
-First, the model determines the nearest point on the nearest motorable road and connects this point to the middle point (i.e., centroid) of the building. Then, the number of buildings intersecting the line between the middle point of the building the nearest motorable road point is measured (see illustration below).
+First, the model determines the nearest point on the nearest motorable road and connects this point to the middle point (i.e., centroid) of the building. Then, the number of buildings intersecting the line between the middle point of the building and the nearest motorable road point is measured (see illustration below).
 
 <img src="image-examples/road-accessibility-insights-elements.png" alt="accessibility-elements" width="420"/>
 
@@ -79,7 +79,7 @@ The model relies on three datasets:
 - Road surface type data
 - Building footprints data
 
-Road network data was obtained from [OpenStreetMap](https://www.openstreetmap.org/), and []() provide road surface type data for OpenStreetMap data in Nairobi. For building footprints, we used data from the [Overture Maps Foundation](https://overturemaps.org/).
+Road network data was obtained from [OpenStreetMap](https://www.openstreetmap.org/), and surface type data for the roads in Nairobi was leveraged from [Zhou et al. (2024)](https://doi.org/10.1038/s41597-024-03158-7). For building footprints, we used data from the [Overture Maps Foundation](https://overturemaps.org/).
 
 The satellite images used as examples for the road access deprivation levels were obtained from [Google Map](https://www.google.com/maps) (Google, Maxar Technologies).
 
