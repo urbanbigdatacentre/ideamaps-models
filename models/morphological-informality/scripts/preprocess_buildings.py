@@ -37,7 +37,6 @@ def argument_parser():
     parser = argparse.ArgumentParser(description="Experiment Args")
     parser.add_argument('-r', '--roi-file', dest='roi_file', required=True)
     parser.add_argument('-b', '--building-file', dest='building_file', required=True)
-    parser.add_argument('-e', '--edge-file', dest='edge_file', required=True)
     parser.add_argument('-o', '--output-dir', dest='output_dir', default='outputs/', required=False,
                         help="path to output directory")
 
@@ -78,7 +77,7 @@ def preprocess_buildings(buildings: GeoDataFrame, extent: GeoDataFrame, identifi
     # Reset indices
     # buildings = buildings.reset_index(drop=True).explode(index_parts=False).reset_index(drop=True)
     buildings = buildings.reset_index()
-    # buildings = mm.preprocess(buildings, size=10, compactness=0.2, islands=True)
+    buildings = mm.preprocess(buildings, size=10, compactness=0.2, islands=True)
 
     # Check morphological tessellation
     check = mm.CheckTessellationInput(buildings)
@@ -93,50 +92,6 @@ def preprocess_buildings(buildings: GeoDataFrame, extent: GeoDataFrame, identifi
     return buildings
 
 
-def get_morphological_tessellation(buildings: GeoDataFrame, identifier: str) -> GeoDataFrame:
-    limit = mm.buffered_limit(buildings, 100)
-    tess = mm.morphological_tessellation(buildings, clip=limit, segment=2)
-
-    # Verification of tessellation
-    excluded, multipolygons = mm.verify_tessellation(tess, buildings)
-    print(excluded, multipolygons)
-
-    tess = tess.join(buildings[[identifier]], how='left')
-
-    return tess
-
-
-def preprocess_edges(edges: GeoDataFrame, extent: GeoDataFrame) -> GeoDataFrame:
-    extent = extent.to_crs(4326)
-    utm_epsg = get_utm_epsg(extent)
-    edges = edges.to_crs(utm_epsg)
-    extent_utm = extent.to_crs(utm_epsg)
-
-    # Subset roads to only roads that intersect with region of interest
-    edges = edges[edges.geometry.intersects(extent_utm.unary_union)]
-
-    edges = mm.remove_false_nodes(edges.explode(index_parts=False).reset_index(drop=True))
-
-    # Generate ids for the edges and assign them to the closest building
-    edges = edges.reset_index()
-    edges['nID'] = range(len(edges))
-
-    return edges
-
-
-def get_blocks(buildings: GeoDataFrame, tess: GeoDataFrame, edges: GeoDataFrame) -> GeoDataFrame:
-    # Extend the edges if necessary to avoid issues
-    snapped = mm.extend_lines(edges, tolerance=40, target=tess, barrier=buildings)
-
-    # Generate blocks
-    blocks, _ = mm.generate_blocks(tess, snapped, buildings)
-
-    # Assign block ID
-    blocks['bID'] = range(len(blocks))
-
-    return blocks
-
-
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
 
@@ -148,45 +103,10 @@ if __name__ == '__main__':
     buildings = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
     buildings = preprocess_buildings(buildings, roi, 'uID')
 
-    # Morphological tessellation
-    tess = get_morphological_tessellation(buildings, 'uID')
-
-    # Establish a 1:1 correspondence between buildings and tessellation
-    building_ids = set(buildings['uID'])
-    tess_ids = set(tess['uID'])
-    common_ids = building_ids.intersection(tess_ids)
-
-    print(f'Unique uIDs in blg only: {len(building_ids - common_ids)}')
-    print(f'Unique uIDs in tess only: {len(tess_ids - common_ids)}')
-
     buildings = buildings[['uID', 'geometry']]
     buildings.index.name = None
     buildings.to_parquet(Path(args.output_dir) / 'buildings.parquet')
-    tess.index.name = None
-    tess.to_parquet(Path(args.output_dir) / 'tessellation.parquet')
 
-    # Roads
-    edge_file = Path(args.edge_file)
-    edges = gpd.read_parquet(edge_file) if edge_file.suffix == '.parquet' else gpd.read_file(edge_file)
-    edges = preprocess_edges(edges, roi)
-    edges = edges[['nID', 'geometry']]
-    edges.to_parquet(Path(args.output_dir) / 'edges.parquet')
-
-    # Add network ID of closest road to buildings
-    buildings['nID'] = mm.get_nearest_street(buildings, edges, max_distance=500)
-
-    # Blocks
-    blocks = get_blocks(buildings, tess, edges)
-    blocks.to_parquet(Path(args.output_dir) / 'blocks.parquet')
-
-    # Add IDs
-    buildings = buildings[['uID', 'nID', 'geometry']]
-    buildings_with_block_id = gpd.sjoin(buildings, blocks[['bID', 'geometry']], how='left', predicate='within')
-    buildings_with_block_id = buildings_with_block_id.drop(columns='index_right')
-    buildings_with_block_id.to_parquet(Path(args.output_dir) / 'buildings.parquet')
-
-    tess_with_block_id = tess.merge(buildings_with_block_id[['uID', 'bID']], how='left', on='uID')
-    tess_with_block_id.to_parquet(Path(args.output_dir) / 'tessellation.parquet')
 
 
 
