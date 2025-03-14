@@ -119,6 +119,7 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
 
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
+    assert Path(args.output_dir).exists()
 
     blg = gpd.read_parquet(args.building_file)
     tess = gpd.read_parquet(args.tessellation_file)

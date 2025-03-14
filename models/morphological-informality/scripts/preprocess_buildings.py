@@ -94,6 +94,7 @@ def preprocess_buildings(buildings: GeoDataFrame, extent: GeoDataFrame, identifi
 
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
+    assert Path(args.output_dir).exists()
 
     # Region of interest
     roi = gpd.read_file(args.roi_file)

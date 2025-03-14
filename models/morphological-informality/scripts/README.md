@@ -46,22 +46,35 @@ Follow these steps to obtain clusters of similar urban form types.
 
 1. **Creation of urban form elements**
 
-   ```
-   python geoelements.py -r *path to region of interest file* -b *path to building footprints file*  -r *path to edges file* -o *path the output dir*
-   ```
+    Preprocess the building footprints:
+    ```
+    python preprocess_buildings.py -r *region of interest file* -b *building footprints file* -o *output dir*
+    ```
+   
+    Generate tessellation cells for the building footprints:
+    ```
+    python morphological_tessellation.py -b *building footprints file* -o *output dir*
+    ```
+   
+     Generate the building blocks:
+     ```
+     python building_blocks.py -r *region of interest file* -b *building footprints file* -t *tessellation file* -e *roads file* -o *output dir*
+     ```
+   
 
 2. **Morphometrics computation**
 
-   ```
-   python morphometrics.py -b *path to building footprints file* -t *path to tessellation file* -o *path the the output dir*
-   ```
+    ```
+    python morphometrics.py -m *metric or "all" to compute all metrics*-b *path to building footprints file* -t *path to tessellation file* -o *path the the output dir*
+    ```
+    Once all metrics are computed, they can be combined using ``morphometrics.py -m combine`` which will create the file ``primary.parquet``.
 
 3. **Aggregation of morphometrics**
 
    The morphometrics dir corresponds to the output dir used in step 2.
 
    ```
-   python aggregation.py -m *path to the morphometrics dir* -b *path to the builidng footprints file* -g *path to the grid file* -o *path the the output dir*
+   python aggregation.py -m *morphometrics dir* -b *builidng footprints file* -g *grid file* -o *output dir*
    ```
       
 4. **Clustering of morphometrics**

@@ -25,6 +25,7 @@ def argument_parser():
 
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
+    assert Path(args.output_dir).exists()
 
     building_file = Path(args.building_file)
     umm = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
