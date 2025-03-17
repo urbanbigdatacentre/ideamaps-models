@@ -34,10 +34,10 @@ if __name__ == '__main__':
     mm_file = Path(args.morphometrics_file)
     gdf = gpd.read_parquet(mm_file) if mm_file.suffix == '.parquet' else gpd.read_file(mm_file)
 
-    morph_isl = ['md_ssbCCD', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'md_ltcWRB', 'sd_stbOri', 'sd_stcOri']
+    morph_isl = ['md_ssbCCD', 'sd_stbOri', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'sd_stcOri', 'md_ltcWRB']
 
-    morph_sds = ['md_sdcAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdbAre', 'md_sscERI', 'md_sicCAR',
-                 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB', 'sum_sdcAre']
+    morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
+                 'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
 
     gdf_isl = gdf[morph_isl]
     gdf_sds = gdf[morph_sds]
