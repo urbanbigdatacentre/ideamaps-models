@@ -67,10 +67,10 @@ def preprocess_buildings(buildings: GeoDataFrame, extent: GeoDataFrame, identifi
     # Reset indices
     # buildings = buildings.reset_index(drop=True).explode(index_parts=False).reset_index(drop=True)
     buildings = buildings.reset_index()
-    buildings = mm.preprocess(buildings, size=10, compactness=0.2, islands=True)
+    buildings = mm.preprocess(buildings, size=10, compactness=0, islands=True)
 
     # Check morphological tessellation
-    check = mm.CheckTessellationInput(buildings)
+    check = mm.CheckTessellationInput(buildings, shrink=1)
 
     # Drop problematic buildings
     buildings = buildings.drop(check.collapse.index.union(check.overlap.index).union(check.split.index))
