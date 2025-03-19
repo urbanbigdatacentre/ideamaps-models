@@ -44,9 +44,14 @@ if __name__ == '__main__':
     morph_sds = ['sum_sdbAre', 'md_sdbAre', 'max_sdbAre', 'md_mtbNDi', 'md_ltbIBD', 'md_sdcAre',
                  'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
 
-    morph_standard = ['sum_sdbAre', 'max_sdbAre', 'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
-    morph_up = ['entropy_stbOri', 'md_mtbAli', 'entropy_stcOri']
-    morph_down = ['md_mtbNDi', 'md_ltbIBD', 'md_sdbAre', 'md_sdcAre', 'md_mdcAre']
+    # morph_standard = ['sum_sdbAre', 'max_sdbAre', 'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
+    # morph_up = ['entropy_stbOri', 'md_mtbAli', 'entropy_stcOri']
+    # morph_down = ['md_mtbNDi', 'md_ltbIBD', 'md_sdbAre', 'md_sdcAre', 'md_mdcAre']
+    gdf.loc[gdf['bcount'] <= 3, morph_isl + morph_sds] = 0
+    morph_standard = morph_isl + morph_sds
+    morph_up = morph_down = []
+
+
 
     # Initialize scalers
     standard_scaler = StandardScaler()
