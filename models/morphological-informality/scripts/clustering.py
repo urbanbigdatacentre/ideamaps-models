@@ -4,7 +4,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 from pathlib import Path
 import argparse
 
@@ -34,20 +34,44 @@ if __name__ == '__main__':
     mm_file = Path(args.morphometrics_file)
     gdf = gpd.read_parquet(mm_file) if mm_file.suffix == '.parquet' else gpd.read_file(mm_file)
 
-    morph_isl = ['md_ssbCCD', 'sd_stbOri', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'sd_stcOri', 'md_ltcWRB']
+    # morph_isl = ['md_ssbCCD', 'sd_stbOri', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'sd_stcOri', 'md_ltcWRB']
+    #
+    # morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
+    #              'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
 
-    morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
-                 'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
+    morph_isl = ['entropy_stbOri', 'md_mtbAli', 'entropy_stcOri']
 
-    gdf_isl = gdf[morph_isl]
-    gdf_sds = gdf[morph_sds]
+    morph_sds = ['sum_sdbAre', 'md_sdbAre', 'max_sdbAre', 'md_mtbNDi', 'md_ltbIBD', 'md_sdcAre',
+                 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
 
-    # Initialize the StandardScaler object
-    scaler = StandardScaler()
+    morph_standard = ['sum_sdbAre', 'max_sdbAre', 'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
+    morph_up = ['entropy_stbOri', 'md_mtbAli', 'entropy_stcOri']
+    morph_down = ['md_mtbNDi', 'md_ltbIBD', 'md_sdbAre', 'md_sdcAre', 'md_mdcAre']
 
-    # Scale the data
-    data_isl = scaler.fit_transform(gdf_isl)
-    data_sds = scaler.fit_transform(gdf_sds)
+    # Initialize scalers
+    standard_scaler = StandardScaler()
+    robust_scaler_up = RobustScaler(quantile_range=(25, 100))
+    robust_scaler_down = RobustScaler(quantile_range=(0, 75))
+
+    # Apply scaling
+    scaled_data = {}
+
+    if morph_standard:
+        scaled_data.update(dict(zip(morph_standard, standard_scaler.fit_transform(gdf[morph_standard]).T)))
+
+    if morph_up:
+        scaled_data.update(dict(zip(morph_up, robust_scaler_up.fit_transform(gdf[morph_up]).T)))
+
+    if morph_down:
+        scaled_data.update(dict(zip(morph_down, robust_scaler_down.fit_transform(gdf[morph_down]).T)))
+
+    # Convert scaled data to DataFrame and merge into gdf
+    gdf_scaled = pd.DataFrame(scaled_data, index=gdf.index)
+    gdf.update(gdf_scaled)  # Update the original gdf with scaled values
+
+    # Extract scaled data for clustering
+    data_isl = gdf_scaled[morph_isl]
+    data_sds = gdf_scaled[morph_sds]
 
     # Define cluster values
     cluster_range = range(1, 16)
@@ -66,7 +90,7 @@ if __name__ == '__main__':
         if k in cluster_selection:
             gdf[f'isl_c{k}'] = km_isl.labels_
             # Save centroids as CSV
-            centroids_isl = pd.DataFrame(km_isl.cluster_centers_, columns=gdf_isl.columns)
+            centroids_isl = pd.DataFrame(km_isl.cluster_centers_, columns=data_isl.columns)
             centroids_isl.to_csv(output_dir / f'centroids_isl_k{k}.csv', index=False)
 
         # Small, Dense Structures
@@ -76,7 +100,7 @@ if __name__ == '__main__':
         if k in cluster_selection:
             gdf[f'sds_c{k}'] = km_sds.labels_
             # Save centroids as CSV
-            centroids_sds = pd.DataFrame(km_sds.cluster_centers_, columns=gdf_sds.columns)
+            centroids_sds = pd.DataFrame(km_sds.cluster_centers_, columns=data_sds.columns)
             centroids_sds.to_csv(output_dir / f'centroids_sds_k{k}.csv', index=False)
 
     # Plot the elbow curves
@@ -95,5 +119,5 @@ if __name__ == '__main__':
     axes[1].set_ylabel("Sum of Squared Distances (SSD)")
     plt.savefig(Path(args.output_dir) / 'elbow.png', dpi=300, bbox_inches='tight')
 
-    gdf.to_parquet(Path(args.output_dir) / 'clustering.parquet')
+    gdf.to_parquet(Path(args.output_dir) / 'clusters_v2.parquet')
 
