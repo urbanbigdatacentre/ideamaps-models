@@ -73,8 +73,9 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         sdcAre = compute_metric('sdcAre', buildings, tessellation, out_path)
         values = pd.merge(sdbAre, sdcAre, on='uID')
         values = values['sdbAre'] / values['sdcAre']
-    elif metric == 'mtbAli':  # TODO: fix
+    elif metric == 'mtbAli':
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
+        # TODO: Key error with 'all' when running it for the first time
         stbOri = compute_metric('stbOri', buildings, tessellation, out_path)
         buildings = buildings.merge(stbOri, on='uID')
         values = mm.alignment(buildings['stbOri'], queen_1)
