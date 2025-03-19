@@ -119,7 +119,8 @@ if __name__ == '__main__':
     merge_stats['max_sdbAre'] = merge_stats['max_sdbAre'].fillna(0)
 
     for metric in variation:
-        merge_stats[f'nentropy_{metric}'] = merge_stats[f'entropy_{metric}'] / np.log1p(merge_stats['bcount'])
+        merge_stats[f'nentropy_{metric}'] = merge_stats[f'entropy_{metric}'] / merge_stats['bcount']
+        merge_stats[f'nentropy_{metric}'] = merge_stats[f'nentropy_{metric}'].fillna(0)
 
     if grid.index.name != 'grid_id':
         grid = grid.set_index('grid_id')
