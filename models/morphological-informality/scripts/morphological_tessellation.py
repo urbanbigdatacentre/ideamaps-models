@@ -87,7 +87,7 @@ if __name__ == '__main__':
         tess = tess.reset_index()
         buildings['uID'] = range(len(buildings))
         tess['uID'] = range(len(tess))
-        buildings['uID'].to_parquet(Path(args.output_dir) / 'buildings_clean.parquet')
+        buildings[['uID', 'geometry']].to_parquet(Path(args.output_dir) / 'buildings.parquet')
 
     tess.index.name = None
     tess.to_parquet(Path(args.output_dir) / 'tessellation.parquet')
