@@ -6,3 +6,7 @@ fiona
 shapely
 geopandas
 numpy 
+rasterio
+rasterstats
+math
+time
