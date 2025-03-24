@@ -33,13 +33,15 @@ if __name__ == '__main__':
 
     mm_file = Path(args.morphometrics_file)
     gdf = gpd.read_parquet(mm_file) if mm_file.suffix == '.parquet' else gpd.read_file(mm_file)
+    print(gdf.isna().sum())
+    gdf = gdf.fillna(0)
 
     # morph_isl = ['md_ssbCCD', 'sd_stbOri', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'sd_stcOri', 'md_ltcWRB']
     #
     # morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
     #              'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
 
-    morph_isl = ['entropy_stbOri', 'md_mtbAli', 'entropy_stcOri']
+    morph_isl = ['kdes_stbOri', 'md_mtbAli', 'kdes_stcOri', 'kdes_strOri']
 
     morph_sds = ['sum_sdbAre', 'md_sdbAre', 'max_sdbAre', 'md_mtbNDi', 'md_ltbIBD', 'md_sdcAre',
                  'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
@@ -50,8 +52,6 @@ if __name__ == '__main__':
     gdf.loc[gdf['bcount'] <= 3, morph_isl + morph_sds] = 0
     morph_standard = morph_isl + morph_sds
     morph_up = morph_down = []
-
-
 
     # Initialize scalers
     standard_scaler = StandardScaler()
@@ -124,5 +124,5 @@ if __name__ == '__main__':
     axes[1].set_ylabel("Sum of Squared Distances (SSD)")
     plt.savefig(Path(args.output_dir) / 'elbow.png', dpi=300, bbox_inches='tight')
 
-    gdf.to_parquet(Path(args.output_dir) / 'clusters_v2.parquet')
+    gdf.to_parquet(Path(args.output_dir) / 'clusters_v3.parquet')
 

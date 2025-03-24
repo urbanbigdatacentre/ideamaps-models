@@ -142,6 +142,6 @@ if __name__ == '__main__':
         for metric in metrics:
             values = compute_metric(metric, blg, tess, Path(args.output_dir))
             blg = blg.merge(values, on='uID')
-        blg[metrics + ['geometry']].to_parquet(Path(args.output_dir) / 'primary.parquet')
+        blg[metrics + ['geometry']].to_parquet(Path(args.output_dir) / 'buildings_primary.parquet')
     else:
         compute_metric(args.metric, blg, tess, Path(args.output_dir))
