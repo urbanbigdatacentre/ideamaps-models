@@ -72,6 +72,9 @@ def kde_entropy(series, areas=None, bandwidth='scott', num_bins=100):
             return 0
         series = series[areas >= 50]
 
+        if series.isna().sum() == len(series) or series.nunique() < 2:
+            return 0  # Return 0 if there's not enough unique data
+
     # Convert to NumPy array
     angles_deg = series.dropna().to_numpy()
 
@@ -140,8 +143,8 @@ if __name__ == '__main__':
     median_values = grouped_bmm_grid[median].median().add_prefix('md_')
     sd_values = grouped_bmm_grid[variation].std().fillna(0).add_prefix('sd_')
 
-    # variation_measures = ['kdes', 'kdesr']
-    variation_measures = ['kdes']
+    variation_measures = ['kdes', 'kdesr']
+    # variation_measures = ['kdes']
     variation_dict = {f'{measure}_{metric}': [] for metric in variation for measure in variation_measures}
     variation_dict['grid_id'] = []
     for grid_id, values in tqdm(grouped_bmm_grid):
@@ -149,8 +152,8 @@ if __name__ == '__main__':
         for metric in variation:
             skde_value = kde_entropy(values[metric])
             variation_dict[f'kdes_{metric}'].append(skde_value)
-            # skder_value = kde_entropy(values[metric], areas=values['sdbAre'])
-            # variation_dict[f'kdesr_{metric}'].append(skder_value)
+            skder_value = kde_entropy(values[metric], areas=values['sdbAre'])
+            variation_dict[f'kdesr_{metric}'].append(skder_value)
 
     variation_values = pd.DataFrame(variation_dict)
     building_counts = grouped_bmm_grid.size().rename('bcount')
@@ -209,8 +212,24 @@ if __name__ == '__main__':
     df_stats = pd.merge(building_stats, road_stats, on='grid_id', how='left')
     gdf_stats = gpd.GeoDataFrame(df_stats, geometry='geometry', crs=utm_epsg)
 
+    # Combine Roads and Buildings
+    bmm = bmm[['stbOri', 'centroid']].rename(columns={'stbOri': 'objOri', 'centroid': 'geometry'})
+    bmm = bmm.set_geometry('geometry')
+    rmm = rmm[['strOri', 'geometry']].rename(columns={'strOri': 'objOri'})
+    cmm = pd.concat([bmm, rmm])
+    cmm_grid = gpd.sjoin(grid, cmm, how='inner', predicate='intersects')
+    cmm_grid = cmm_grid.dropna()
+    grouped_cmm_grid = cmm_grid.groupby('grid_id')
+    grid_ids, skde_values = [], []
+    for grid_id, values in tqdm(grouped_cmm_grid):
+        grid_ids.append(grid_id)
+        skde_values.append(kde_entropy(values['objOri']))
+    var_values_combined = pd.DataFrame({'kdes_objOri': skde_values, 'grid_id': grid_ids})
+
+    gdf_stats = gdf_stats.merge(var_values_combined, on='grid_id', how='left')
+
     gdf_stats = gdf_stats.loc[:, ~gdf_stats.columns.duplicated()]
     gdf_stats = gdf_stats.to_crs(grid_crs)
 
     # Export to a new gpkg
-    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid_v3.parquet')
+    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid_v4.parquet')

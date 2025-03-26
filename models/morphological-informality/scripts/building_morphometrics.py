@@ -83,6 +83,9 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         # TODO: UserWarning: The indices of the two GeoSeries are different. (geoms.distance(geometry.geometry, align=True)).groupby(level=0).mean()
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
         values = mm.neighbor_distance(buildings, queen_1)  # Used for SDS (Mdn)
+    elif metric == 'mtbNDi3':
+        queen_3 = compute_queen_graph(tessellation, 3, out_path)
+        values = mm.neighbor_distance(buildings, queen_3)  # Used for SDS (Mdn)
     elif metric == 'mtcWNe':
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
         values = mm.neighbors(tessellation, queen_1, weighted=True)  # Used for both (Mdn)
