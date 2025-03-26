@@ -22,21 +22,21 @@ The dataset groups places into three levels based on how likely you are to find 
 - But low does not always mean clean—it might also mean **no data** was available for this place.
 - **Your feedback** is still very important! If you know there is waste in an area marked as "Low," telling us helps improve the data.
 
-![Low Waste Accumulation Probability](/Users/wenlanzhang/PycharmProjects/ideamaps-models/models/waste-piles/nairobi/image-examples/Ideamaps_L.png)
+![Low Waste Accumulation Probability](image-examples/L_NB.png)
 
 ### **🟡 Medium (2.5% – 16.4%):**  
 - **Some chance** of seeing waste on the street.  
 - Waste may be there, but **not always in large amounts**.  
-- This type of waste is more likely to be **temporary**. People may pile waste near the street on purpose so that **waste collection companies can pick it up** for proper management.
+- This type of waste is more likely to be **temporary**. People may pile waste near the street on purpose so that **waste collection companies can pick it up** for proper management.  
 
-![Medium Waste Accumulation Probability](/Users/wenlanzhang/PycharmProjects/ideamaps-models/models/waste-piles/nairobi/image-examples/Ideamaps_M.png)
+![Medium Waste Accumulation Probability](image-examples/M_NB.png)
 
 ### **🔴 High (16.4% – 100%):**  
 - **Very likely** to see waste piles.  
 - This might mean waste is **not collected properly** or people dump waste near the main road.  
 - Waste is **often** dumped without proper collection, leading to constant piles that turn into informal dumping sites with **little to no management**.
 
-![High Waste Accumulation Probability](/Users/wenlanzhang/PycharmProjects/ideamaps-models/models/waste-piles/nairobi/image-examples/Ideamaps_H.png)
+![High Waste Accumulation Probability](image-examples/H_NB.png)
 
 --------------
 
