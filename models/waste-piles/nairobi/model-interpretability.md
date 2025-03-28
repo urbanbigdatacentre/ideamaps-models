@@ -1,7 +1,7 @@
 ---
 title: Accumulated Waste Piles  
 author: wenlan.zhang.21@ucl.ac.uk  
-category: ？  
+category: Our Data
 tags: [deprivation, datasets]  
 ---
 
