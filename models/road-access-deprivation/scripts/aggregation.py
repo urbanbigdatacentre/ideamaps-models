@@ -40,6 +40,9 @@ def aggregate_parameters(buildings_file: str, grid_file: str, out_file: str):
     # Drop buildings with no grid id
     buildings = buildings[buildings['grid_id'].notna()]
 
+    # Use in between building count 10 for large distances to nearest road (250 m)
+    buildings.loc[buildings['nearest_road_distance'] > 250, 'buildings_in_between'] = 10
+
     # Compute grid cell mean for number of buildings between a building and its nearest road
     mean_buildings_in_between = buildings.groupby('grid_id')[['buildings_in_between']].mean().add_prefix('mean_')
     # Compute grid cell mode for road type (paved/unpaved)
