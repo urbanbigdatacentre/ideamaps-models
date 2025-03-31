@@ -103,8 +103,8 @@ if __name__ == '__main__':
     bmm = bmm[['uID', 'geometry']]
 
     # Loading Urban Morphometrics (UMM)
-    building_metrics = ['sdbAre', 'ssbElo', 'ssbCCD', 'stbOri', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre',
-                        'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri',  'ltcWRB']
+    building_metrics = ['sdbAre', 'ssbElo', 'ssbCCD', 'stbOri', 'mtbAli', 'mtbNDi', 'mtbNDi3', 'mtbNDi_log', 'ltbIBD', 'ltcBuA', 'sdcAre',
+                        'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri', 'ltcWRB', 'strAli']
 
     for metric in building_metrics:
         metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.parquet')
@@ -130,9 +130,8 @@ if __name__ == '__main__':
 
     # 'variables' is a list of the variable names you want to aggregate by median and standard deviation
     median = ['sdbAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'sscERI', 'sicCAR',
-              'mtcWNe', 'mdcAre', 'ltcWRB']
-    mean = ['sdbAre']
-    maximum = ['sdbAre']
+              'mtcWNe', 'mdcAre', 'ltcWRB', 'mtbNDi_log', 'mtbNDi3', 'strAli']
+    mean = ['sicCAR', 'mtbNDi', 'strAli']
     variation = ['stbOri', 'stcOri']
 
     # Set the grid geometry as the active geometry
@@ -141,6 +140,7 @@ if __name__ == '__main__':
 
     # Group by 'grid_id' and calculate median and std
     median_values = grouped_bmm_grid[median].median().add_prefix('md_')
+    mean_values = grouped_bmm_grid[mean].mean().add_prefix('mn_')
     sd_values = grouped_bmm_grid[variation].std().fillna(0).add_prefix('sd_')
 
     variation_measures = ['kdes', 'kdesr']
@@ -160,6 +160,7 @@ if __name__ == '__main__':
 
     # Merge all statistics
     merge_stats = pd.merge(median_values, sd_values, on='grid_id', how='inner')
+    merge_stats = pd.merge(merge_stats, mean_values, on='grid_id', how='inner')
     merge_stats = pd.merge(merge_stats, variation_values, on='grid_id', how='inner')
     merge_stats = pd.merge(merge_stats, building_counts, on='grid_id', how='inner')
 
@@ -172,13 +173,6 @@ if __name__ == '__main__':
     merge_stats = merge_stats.rename(columns={'intersected_area': 'sum_sdbAre'})
     # Fill NaN values with 0 (cells with no buildings)
     merge_stats['sum_sdbAre'] = merge_stats['sum_sdbAre'].fillna(0)
-
-    # Maximum area covered by single building within grid cell
-    grid_max_building_area = intersections.groupby('grid_id')['intersected_area'].max().reset_index()
-    merge_stats = pd.merge(merge_stats, grid_max_building_area, on='grid_id', how='left')
-    merge_stats = merge_stats.rename(columns={'intersected_area': 'max_sdbAre'})
-    # Fill NaN values with 0 (cells with no buildings)
-    merge_stats['max_sdbAre'] = merge_stats['max_sdbAre'].fillna(0)
 
     if grid.index.name != 'grid_id':
         grid = grid.set_index('grid_id')
@@ -232,4 +226,4 @@ if __name__ == '__main__':
     gdf_stats = gdf_stats.to_crs(grid_crs)
 
     # Export to a new gpkg
-    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid_v4.parquet')
+    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid.parquet')

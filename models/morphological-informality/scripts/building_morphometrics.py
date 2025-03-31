@@ -7,6 +7,7 @@ from libpysal import graph
 from pathlib import Path
 import argparse
 import pickle
+import numpy as np
 
 
 def argument_parser():
@@ -15,6 +16,7 @@ def argument_parser():
     parser.add_argument('-m', "--metric", dest='metric', required=True)
     parser.add_argument('-b', "--building-file", dest='building_file', required=True)
     parser.add_argument('-t', "--tessellation-file", dest='tessellation_file', required=True)
+    parser.add_argument('-e', "--edge-file", dest='edge_file', required=False, default=None)
     parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
                         help="path to output directory")
 
@@ -40,7 +42,7 @@ def compute_queen_graph(tessellation: GeoDataFrame, order: int, out_path: Path):
 
 
 def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFrame, out_path: Path) -> DataFrame:
-    building_metrics = ['sdbAre', 'ssbElo', 'stbOri', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA']
+    building_metrics = ['sdbAre', 'ssbElo', 'stbOri', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'mtbNDi3', 'ltbIBD3', 'mtbNDi_log', 'strAli']
     tessellation_metrics = ['sdcAre', 'stcOri', 'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'ltcWRB']
     assert metric in building_metrics or metric in tessellation_metrics
     building_metric = True if metric in building_metrics else False
@@ -77,12 +79,16 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
         # TODO: Key error with 'all' when running it for the first time
         stbOri = compute_metric('stbOri', buildings, tessellation, out_path)
-        buildings = buildings.merge(stbOri, on='uID')
+        buildings = buildings.merge(stbOri[['stbOri', 'uID']], on='uID')
         values = mm.alignment(buildings['stbOri'], queen_1)
     elif metric == 'mtbNDi':
         # TODO: UserWarning: The indices of the two GeoSeries are different. (geoms.distance(geometry.geometry, align=True)).groupby(level=0).mean()
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
         values = mm.neighbor_distance(buildings, queen_1)  # Used for SDS (Mdn)
+    elif metric == 'mtbNDi_log':
+        mtbNDi = compute_metric('mtbNDi', buildings, tessellation, out_path)
+        values = np.where(mtbNDi['mtbNDi'] <= 0, 0, np.log(mtbNDi['mtbNDi']))
+        values[values < -5] = -5
     elif metric == 'mtbNDi3':
         queen_3 = compute_queen_graph(tessellation, 3, out_path)
         values = mm.neighbor_distance(buildings, queen_3)  # Used for SDS (Mdn)
@@ -98,6 +104,10 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
         queen_3 = compute_queen_graph(tessellation, 3, out_path)
         values = mm.mean_interbuilding_distance(buildings, queen_1, queen_3)  # Used for SDS (Mdn)
+    elif metric == 'ltbIBD3':
+        # TODO: RuntimeWarning: invalid value encountered in scalar divide mean_distances[i] = sub_matrix.sum() / sub_matrix.nnz
+        queen_3 = compute_queen_graph(tessellation, 3, out_path)
+        values = mm.mean_interbuilding_distance(buildings, queen_3, queen_3)  # Used for SDS (Mdn)
     elif metric == 'ltcBuA':
         # TODO: Fix this metric - all values are 1
         buildings_q1 = graph.Graph.build_contiguity(buildings).higher_order(k=1)
@@ -109,6 +119,17 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         sdcAre = compute_metric('sdcAre', buildings, tessellation, out_path)
         neighborhood_area = queen_3.describe(sdcAre['sdcAre'], statistics=['sum']).squeeze()
         values = block_count / neighborhood_area
+    elif metric == 'strAli':
+        assert args.edge_file is not None
+        roads = gpd.read_parquet(args.edge_file)
+        roads_orient = mm.orientation(roads)
+        blg_orient = compute_metric('stbOri', buildings, tessellation, out_path)
+        buildings = buildings.merge(blg_orient[['uID', 'stbOri']], on='uID', how='left')
+        notna = buildings['nID'].notna()
+        buildings['strAli'] = 45.
+        buildings.loc[notna, 'strAli'] = mm.street_alignment(buildings.loc[notna, 'stbOri'], roads_orient,
+                                                             buildings.loc[notna, 'nID']).astype(float)
+        values = buildings['strAli']
     else:
         raise Exception('Unkown metric.')
 
@@ -134,8 +155,8 @@ if __name__ == '__main__':
     assert tess['uID'].is_unique
     tess = tess.sort_values(by='uID')
 
-    metrics = ['sdbAre', 'ssbElo', 'stbOri', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'stcOri',
-               'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'ltcWRB']
+    metrics = ['sdbAre', 'ssbElo', 'stbOri', 'ssbCCD', 'mtbNDi', 'mtbNDi3', 'mtbNDi_log', 'ltbIBD', 'ltcBuA',
+               'sdcAre', 'stcOri', 'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'ltcWRB', 'strAli', 'mtbAli']
 
     if args.metric == 'all':
         for metric in metrics:

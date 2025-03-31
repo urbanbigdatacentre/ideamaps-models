@@ -41,10 +41,9 @@ if __name__ == '__main__':
     # morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
     #              'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
 
-    morph_isl = ['kdes_stbOri', 'md_mtbAli', 'kdes_stcOri', 'kdes_strOri', 'kdes_objOri']
+    morph_isl = ['kdes_stbOri', 'md_mtbAli', 'kdes_stcOri', 'kdes_strOri', 'md_strAli']
 
-    morph_sds = ['sum_sdbAre', 'md_sdbAre', 'max_sdbAre', 'md_mtbNDi', 'md_ltbIBD', 'md_sdcAre',
-                 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
+    morph_sds = ['sum_sdbAre', 'bcount', 'md_sdbAre', 'md_mtbNDi_log', 'md_sicCAR', 'md_mtcWNe']
 
     # morph_standard = ['sum_sdbAre', 'max_sdbAre', 'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
     # morph_standard = []
@@ -52,7 +51,7 @@ if __name__ == '__main__':
     #             'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
     # morph_down = ['md_mtbNDi', 'md_ltbIBD', 'md_sdbAre', 'md_sdcAre', 'md_mdcAre']
     # gdf.loc[gdf['bcount'] <= 3, morph_isl + morph_sds] = 0
-    criterion = gdf['bcount'] >= 5
+    criterion = gdf['bcount'] >= 3
     gdf_train = gdf[criterion]
     morph_standard = morph_isl + morph_sds
     morph_up = morph_down = []
@@ -131,5 +130,5 @@ if __name__ == '__main__':
     axes[1].set_ylabel("Sum of Squared Distances (SSD)")
     plt.savefig(Path(args.output_dir) / 'elbow.png', dpi=300, bbox_inches='tight')
 
-    gdf.to_parquet(Path(args.output_dir) / 'clusters_v5.parquet')
+    gdf.to_parquet(Path(args.output_dir) / 'clusters.parquet')
 
