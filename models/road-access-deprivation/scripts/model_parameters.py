@@ -76,6 +76,7 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
     # Create a straight line from each building centroid to the closest road point
     buildings['nearest_road_line'] = buildings.apply(
         lambda row: LineString([row['centroid'], row['nearest_road_point']]), axis=1)
+    buildings['nearest_road_distance'] = buildings['nearest_road_line'].length
 
     # Intermediate save of nearest road points and nearest road lines
     out_file = Path(out_file)
@@ -98,14 +99,14 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
             lambda df: df.apply(lambda row: count_buildings_dask(row, buildings), axis=1))
 
         buildings_batch = ddf.compute()
-        buildings_batch = buildings_batch[['uID', 'buildings_in_between', 'paved', 'geometry']]
+        buildings_batch = buildings_batch[['uID', 'buildings_in_between', 'nearest_road_distance', 'paved', 'geometry']]
         batches.append(buildings_batch)
         print(f'Processed batch: {i_batch} - {i_batch + batch_size} ({len(buildings)}).')
     buildings = pd.concat(batches)
 
     # Save the parameters
     buildings.set_geometry('geometry')
-    buildings[['uID', 'buildings_in_between', 'paved', 'geometry']].to_parquet(out_file)
+    buildings[['uID', 'buildings_in_between', 'nearest_road_distance', 'paved', 'geometry']].to_parquet(out_file)
 
 
 if __name__ == '__main__':
