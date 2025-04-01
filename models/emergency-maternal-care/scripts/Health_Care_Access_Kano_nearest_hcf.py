@@ -142,6 +142,8 @@ data_outputs = '../scripts/data_outputs/'
 
 healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities_validated_Mar2025.geojson')
 
+healthcare_facilities_validated
+
 # ### Population Grid Data (1km resolution) from WorldPop
 # note: explain the rational for female population between 15-49 years old
 
@@ -278,25 +280,20 @@ matrix_df = pd.read_csv(data_temp +'OD_matrix_healthcare_pop_grid.csv')
 
 matrix_df
 
-# NAN to be deleted after we process the OD matrix
-matrix_df = matrix_df.dropna(subset=['origin_id'])
-
-matrix_df
-
 # We will select one facility for each gird cell
 
 # +
 # 1. Calculate the minimum duration_seconds for each destination_id
-shortest_times = matrix_df.groupby("destination_id")["duration_seconds"].min().reset_index()
+shortest_times = matrix_df.groupby("destination_rowid_id")["duration_seconds"].min().reset_index()
 
 # 2. Use idxmin() to ensure each destination_id only keeps the row with the shortest duration_seconds
-idx_min_duration = matrix_df.groupby('destination_id')['duration_seconds'].idxmin()
+idx_min_duration = matrix_df.groupby('destination_rowid_id')['duration_seconds'].idxmin()
 
 # 3. Keep only the rows with the shortest duration_seconds for each destination_id
 matrix_df_min = matrix_df.loc[idx_min_duration]
 
 # 4. Merge the shortest times with matrix_df
-matrix_df = matrix_df_min.merge(shortest_times, on=["destination_id", "duration_seconds"], how="inner")
+matrix_df = matrix_df_min.merge(shortest_times, on=["destination_rowid_id", "duration_seconds"], how="inner")
 # -
 
 matrix_df
@@ -305,7 +302,7 @@ centroids_df = gpd.read_file(data_temp + 'population_centroids_ROWID.geojson')
 
 centroids_df
 
-pop_centroids_closest_hcf = centroids_df.merge(matrix_df, left_on="rowid", right_on="destination_id", how="left")
+pop_centroids_closest_hcf = centroids_df.merge(matrix_df, left_on="rowid", right_on="destination_rowid_id", how="left")
 
 pop_centroids_closest_hcf
 
@@ -313,15 +310,15 @@ pop_centroids_closest_hcf = pop_centroids_closest_hcf.rename(columns={
     "longitude": "origin_lon",
     "latitude": "origin_lat",
     "rowid": "grid_id",
-    "origin_id": "hcf_uid"
+    "origin_hcf_id": "hcf_uid"
 })
 columns_to_keep = ["origin_lon", "origin_lat", "population", "grid_id", "geometry", "hcf_uid", "duration_seconds", "distance_km"]
 pop_centroids_closest_hcf = pop_centroids_closest_hcf[columns_to_keep]
 
 pop_centroids_closest_hcf
 
-distances_duration_matrix = pd.merge(pop_centroids_closest_hcf, healthcare_facilities_validated[['uid', 'facility_name', 'longitude', 'latitude']], 
-                     left_on='hcf_uid', right_on='uid', how='left')
+distances_duration_matrix = pd.merge(pop_centroids_closest_hcf, healthcare_facilities_validated[['hcf_id', 'facility_name', 'longitude', 'latitude']], 
+                     left_on='hcf_uid', right_on='hcf_id', how='left')
 
 distances_duration_matrix = distances_duration_matrix.rename(columns={
     "longitude": "dest_lon",
@@ -369,12 +366,12 @@ origin_dest_acc['Pop_W'] = origin_dest_acc['population'] * origin_dest_acc['Weig
 origin_dest_acc
 
 # Sum the Weighted Population
-origin_dest_sum = origin_dest_acc.groupby(by='hcf_uid')['Pop_W'].sum().reset_index()
+origin_dest_sum = origin_dest_acc.groupby(by='hcf_id')['Pop_W'].sum().reset_index()
 
-origin_dest_sum 
+origin_dest_sum
 
 # Merge the Sum of Weighted Population Back into the Original Data
-origin_dest_acc = origin_dest_acc.merge(origin_dest_sum, on='hcf_uid')
+origin_dest_acc = origin_dest_acc.merge(origin_dest_sum, on='hcf_id')
 
 origin_dest_acc
 
@@ -409,5 +406,8 @@ max(origin_dest_acc.Accessibility_standard)
 geometry = [Point(xy) for xy in zip(origin_dest_acc['origin_lon'], origin_dest_acc['origin_lat'])]
 gdf = gpd.GeoDataFrame(origin_dest_acc, geometry=geometry, crs="EPSG:4326")
 
-gpkg_path = data_outputs + 'origin_dest_acc.gpkg'
-gdf.to_file(gpkg_path, layer="origin_dest_acc", driver="GPKG")
+gpkg_path = data_outputs + 'acc_score_closest.gpkg'
+gdf.to_file(gpkg_path, layer="acc_score_closest", driver="GPKG")
+# -
+
+
