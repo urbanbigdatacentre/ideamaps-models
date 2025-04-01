@@ -36,21 +36,9 @@ if __name__ == '__main__':
     print(gdf.isna().sum())
     gdf = gdf.fillna(0)
 
-    # morph_isl = ['md_ssbCCD', 'sd_stbOri', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'sd_stcOri', 'md_ltcWRB']
-    #
-    # morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
-    #              'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
-
     morph_isl = ['kdes_stbOri', 'md_mtbAli', 'kdes_stcOri', 'kdes_strOri', 'md_strAli']
-
     morph_sds = ['sum_sdbAre', 'bcount', 'md_sdbAre', 'md_mtbNDi_log', 'md_sicCAR', 'md_mtcWNe']
 
-    # morph_standard = ['sum_sdbAre', 'max_sdbAre', 'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
-    # morph_standard = []
-    # morph_up = ['kdes_stbOri', 'md_mtbAli', 'kdes_stcOri', 'kdes_strOri', 'kdes_objOri', 'sum_sdbAre', 'max_sdbAre',
-    #             'md_sicCAR', 'md_mtcWNe', 'md_ltcWRB']
-    # morph_down = ['md_mtbNDi', 'md_ltbIBD', 'md_sdbAre', 'md_sdcAre', 'md_mdcAre']
-    # gdf.loc[gdf['bcount'] <= 3, morph_isl + morph_sds] = 0
     criterion = gdf['bcount'] >= 3
     gdf_train = gdf[criterion]
     morph_standard = morph_isl + morph_sds
