@@ -95,13 +95,7 @@ def dissolve_roads_into_points(gdf, interval=10):
 
 def compute_metric(metric: str, roads: GeoDataFrame, out_path: Path) -> GeoDataFrame:
 
-    # Load from file if already exists
     out_file = out_path / f'{metric}.parquet'
-    # if out_file.exists():
-    #     print(f'{metric} has already been computed. Loading data from {out_file}.')
-    #     values = pd.read_parquet(out_file)
-    #     return values
-
     if metric == 'strOri':
         # Convert roads into points with orientation
         values = dissolve_roads_into_points(roads, interval=10)

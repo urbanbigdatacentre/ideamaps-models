@@ -103,8 +103,7 @@ if __name__ == '__main__':
     bmm = bmm[['uID', 'geometry']]
 
     # Loading Urban Morphometrics (UMM)
-    building_metrics = ['sdbAre', 'ssbElo', 'ssbCCD', 'stbOri', 'mtbAli', 'mtbNDi', 'mtbNDi3', 'mtbNDi_log', 'ltbIBD', 'ltcBuA', 'sdcAre',
-                        'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri', 'ltcWRB', 'strAli']
+    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi_log', 'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri', 'strAli']
 
     for metric in building_metrics:
         metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.parquet')
@@ -129,9 +128,7 @@ if __name__ == '__main__':
     bmm_grid = bmm_grid.dropna()
 
     # 'variables' is a list of the variable names you want to aggregate by median and standard deviation
-    median = ['sdbAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'sscERI', 'sicCAR',
-              'mtcWNe', 'mdcAre', 'ltcWRB', 'mtbNDi_log', 'mtbNDi3', 'strAli']
-    mean = ['sicCAR', 'mtbNDi', 'strAli']
+    median = ['sdbAre', 'mtbAli', 'sicCAR', 'mtcWNe', 'mtbNDi_log', 'strAli']
     variation = ['stbOri', 'stcOri']
 
     # Set the grid geometry as the active geometry
@@ -140,11 +137,8 @@ if __name__ == '__main__':
 
     # Group by 'grid_id' and calculate median and std
     median_values = grouped_bmm_grid[median].median().add_prefix('md_')
-    mean_values = grouped_bmm_grid[mean].mean().add_prefix('mn_')
-    sd_values = grouped_bmm_grid[variation].std().fillna(0).add_prefix('sd_')
 
-    variation_measures = ['kdes', 'kdesr']
-    # variation_measures = ['kdes']
+    variation_measures = ['kdes']
     variation_dict = {f'{measure}_{metric}': [] for metric in variation for measure in variation_measures}
     variation_dict['grid_id'] = []
     for grid_id, values in tqdm(grouped_bmm_grid):
@@ -154,14 +148,11 @@ if __name__ == '__main__':
             variation_dict[f'kdes_{metric}'].append(skde_value)
             skder_value = kde_entropy(values[metric], areas=values['sdbAre'])
             variation_dict[f'kdesr_{metric}'].append(skder_value)
-
     variation_values = pd.DataFrame(variation_dict)
     building_counts = grouped_bmm_grid.size().rename('bcount')
 
     # Merge all statistics
-    merge_stats = pd.merge(median_values, sd_values, on='grid_id', how='inner')
-    merge_stats = pd.merge(merge_stats, mean_values, on='grid_id', how='inner')
-    merge_stats = pd.merge(merge_stats, variation_values, on='grid_id', how='inner')
+    merge_stats = pd.merge(median_values, variation_values, on='grid_id', how='inner')
     merge_stats = pd.merge(merge_stats, building_counts, on='grid_id', how='inner')
 
     # Compute sum of built-up area 'sum_sdbAre'
@@ -205,22 +196,6 @@ if __name__ == '__main__':
 
     df_stats = pd.merge(building_stats, road_stats, on='grid_id', how='left')
     gdf_stats = gpd.GeoDataFrame(df_stats, geometry='geometry', crs=utm_epsg)
-
-    # Combine Roads and Buildings
-    bmm = bmm[['stbOri', 'centroid']].rename(columns={'stbOri': 'objOri', 'centroid': 'geometry'})
-    bmm = bmm.set_geometry('geometry')
-    rmm = rmm[['strOri', 'geometry']].rename(columns={'strOri': 'objOri'})
-    cmm = pd.concat([bmm, rmm])
-    cmm_grid = gpd.sjoin(grid, cmm, how='inner', predicate='intersects')
-    cmm_grid = cmm_grid.dropna()
-    grouped_cmm_grid = cmm_grid.groupby('grid_id')
-    grid_ids, skde_values = [], []
-    for grid_id, values in tqdm(grouped_cmm_grid):
-        grid_ids.append(grid_id)
-        skde_values.append(kde_entropy(values['objOri']))
-    var_values_combined = pd.DataFrame({'kdes_objOri': skde_values, 'grid_id': grid_ids})
-
-    gdf_stats = gdf_stats.merge(var_values_combined, on='grid_id', how='left')
 
     gdf_stats = gdf_stats.loc[:, ~gdf_stats.columns.duplicated()]
     gdf_stats = gdf_stats.to_crs(grid_crs)

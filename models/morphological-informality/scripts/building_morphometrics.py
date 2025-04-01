@@ -42,8 +42,8 @@ def compute_queen_graph(tessellation: GeoDataFrame, order: int, out_path: Path):
 
 
 def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFrame, out_path: Path) -> DataFrame:
-    building_metrics = ['sdbAre', 'ssbElo', 'stbOri', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'mtbNDi3', 'ltbIBD3', 'mtbNDi_log', 'strAli']
-    tessellation_metrics = ['sdcAre', 'stcOri', 'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'ltcWRB']
+    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi', 'ltbIBD', 'mtbNDi_log', 'strAli']
+    tessellation_metrics = ['sdcAre', 'stcOri', 'sicCAR', 'mtcWNe']
     assert metric in building_metrics or metric in tessellation_metrics
     building_metric = True if metric in building_metrics else False
 
@@ -53,23 +53,15 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         print(f'{metric} has already been computed. Loading data from {out_file}.')
         values = pd.read_parquet(out_file)
         return values
-        # return buildings.merge(values, on='uID') if building_metric else tessellation.merge(values, on='uID')
 
     if metric == 'sdbAre':
-        values = buildings.geometry.area  # Used for SDS (Sum & Mdn)
+        values = buildings.geometry.area
     elif metric == 'sdcAre':
-        values = tessellation.geometry.area  # Used for SDS (Mdn)
-    elif metric == 'ssbElo':
-        values = mm.elongation(buildings)  # Used for SDS (Mdn)
+        values = tessellation.geometry.area
     elif metric == 'stbOri':
-        values = mm.orientation(buildings)  # Used for ISL (SD)
+        values = mm.orientation(buildings)
     elif metric == 'stcOri':
-        values = mm.orientation(tessellation)  # Used for ISL (SD)
-    elif metric == 'ssbCCD':
-        cencon = mm.centroid_corner_distance(buildings)
-        values = cencon['std']  # Used for ISL (Mdn)
-    elif metric == 'sscERI':
-        values = mm.equivalent_rectangular_index(tessellation)  # Used for SDS (Mdn)
+        values = mm.orientation(tessellation)
     elif metric == 'sicCAR':
         sdbAre = compute_metric('sdbAre', buildings, tessellation, out_path)
         sdcAre = compute_metric('sdcAre', buildings, tessellation, out_path)
@@ -84,41 +76,14 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
     elif metric == 'mtbNDi':
         # TODO: UserWarning: The indices of the two GeoSeries are different. (geoms.distance(geometry.geometry, align=True)).groupby(level=0).mean()
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
-        values = mm.neighbor_distance(buildings, queen_1)  # Used for SDS (Mdn)
+        values = mm.neighbor_distance(buildings, queen_1)
     elif metric == 'mtbNDi_log':
         mtbNDi = compute_metric('mtbNDi', buildings, tessellation, out_path)
         values = np.where(mtbNDi['mtbNDi'] <= 0, 0, np.log(mtbNDi['mtbNDi']))
         values[values < -5] = -5
-    elif metric == 'mtbNDi3':
-        queen_3 = compute_queen_graph(tessellation, 3, out_path)
-        values = mm.neighbor_distance(buildings, queen_3)  # Used for SDS (Mdn)
     elif metric == 'mtcWNe':
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
-        values = mm.neighbors(tessellation, queen_1, weighted=True)  # Used for both (Mdn)
-    elif metric == 'mdcAre':
-        queen_1 = compute_queen_graph(tessellation, 1, out_path)
-        tessellation['sdcAre'] = tessellation.geometry.area
-        values = queen_1.describe(tessellation['sdcAre'], statistics=['sum'])  # Used for SDS (Mdn)
-    elif metric == 'ltbIBD':
-        # TODO: RuntimeWarning: invalid value encountered in scalar divide mean_distances[i] = sub_matrix.sum() / sub_matrix.nnz
-        queen_1 = compute_queen_graph(tessellation, 1, out_path)
-        queen_3 = compute_queen_graph(tessellation, 3, out_path)
-        values = mm.mean_interbuilding_distance(buildings, queen_1, queen_3)  # Used for SDS (Mdn)
-    elif metric == 'ltbIBD3':
-        # TODO: RuntimeWarning: invalid value encountered in scalar divide mean_distances[i] = sub_matrix.sum() / sub_matrix.nnz
-        queen_3 = compute_queen_graph(tessellation, 3, out_path)
-        values = mm.mean_interbuilding_distance(buildings, queen_3, queen_3)  # Used for SDS (Mdn)
-    elif metric == 'ltcBuA':
-        # TODO: Fix this metric - all values are 1
-        buildings_q1 = graph.Graph.build_contiguity(buildings).higher_order(k=1)
-        queen_3 = compute_queen_graph(tessellation, 3, out_path)
-        values = mm.building_adjacency(queen_3, buildings_q1)  # Used for both (Mdn)
-    elif metric == 'ltcWRB':
-        queen_3 = compute_queen_graph(tessellation, 3, out_path)
-        block_count = queen_3.describe(tessellation['bID'], statistics=['count']).squeeze()
-        sdcAre = compute_metric('sdcAre', buildings, tessellation, out_path)
-        neighborhood_area = queen_3.describe(sdcAre['sdcAre'], statistics=['sum']).squeeze()
-        values = block_count / neighborhood_area
+        values = mm.neighbors(tessellation, queen_1, weighted=True)
     elif metric == 'strAli':
         assert args.edge_file is not None
         roads = gpd.read_parquet(args.edge_file)
@@ -155,8 +120,7 @@ if __name__ == '__main__':
     assert tess['uID'].is_unique
     tess = tess.sort_values(by='uID')
 
-    metrics = ['sdbAre', 'ssbElo', 'stbOri', 'ssbCCD', 'mtbNDi', 'mtbNDi3', 'mtbNDi_log', 'ltbIBD', 'ltcBuA',
-               'sdcAre', 'stcOri', 'sscERI', 'sicCAR', 'mtcWNe', 'mdcAre', 'ltcWRB', 'strAli', 'mtbAli']
+    metrics = ['sdbAre', 'stbOri', 'mtbNDi_log', 'sdcAre', 'stcOri', 'sicCAR', 'mtcWNe', 'strAli', 'mtbAli']
 
     if args.metric == 'all':
         for metric in metrics:

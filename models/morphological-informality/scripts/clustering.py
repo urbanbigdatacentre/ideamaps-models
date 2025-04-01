@@ -41,34 +41,15 @@ if __name__ == '__main__':
 
     criterion = gdf['bcount'] >= 3
     gdf_train = gdf[criterion]
-    morph_standard = morph_isl + morph_sds
-    morph_up = morph_down = []
+    gdf_isl = gdf_train[morph_isl]
+    gdf_sds = gdf_train[morph_sds]
 
-    # Initialize scalers
-    standard_scaler = StandardScaler()
-    # standard_scaler = RobustScaler(quantile_range=(5, 95))
-    robust_scaler_up = RobustScaler(quantile_range=(5, 100))
-    robust_scaler_down = RobustScaler(quantile_range=(0, 95))
+    # Initialize the StandardScaler object
+    scaler = StandardScaler()
 
-    # Apply scaling
-    scaled_data = {}
-
-    if morph_standard:
-        scaled_data.update(dict(zip(morph_standard, standard_scaler.fit_transform(gdf_train[morph_standard]).T)))
-
-    if morph_up:
-        scaled_data.update(dict(zip(morph_up, robust_scaler_up.fit_transform(gdf_train[morph_up]).T)))
-
-    if morph_down:
-        scaled_data.update(dict(zip(morph_down, robust_scaler_down.fit_transform(gdf_train[morph_down]).T)))
-
-    # Convert scaled data to DataFrame and merge into gdf
-    gdf_scaled = pd.DataFrame(scaled_data, index=gdf_train.index)
-    gdf.update(gdf_scaled)  # Update the original gdf with scaled values
-
-    # Extract scaled data for clustering
-    data_isl = gdf_scaled[morph_isl]
-    data_sds = gdf_scaled[morph_sds]
+    # Scale the data
+    data_isl = scaler.fit_transform(gdf_isl)
+    data_sds = scaler.fit_transform(gdf_sds)
 
     # Define cluster values
     cluster_range = range(1, 16)
@@ -88,7 +69,7 @@ if __name__ == '__main__':
             gdf[f'isl_c{k}'] = -1
             gdf.loc[criterion, f'isl_c{k}'] = km_isl.labels_
             # Save centroids as CSV
-            centroids_isl = pd.DataFrame(km_isl.cluster_centers_, columns=data_isl.columns)
+            centroids_isl = pd.DataFrame(km_isl.cluster_centers_, columns=gdf_isl.columns)
             centroids_isl.to_csv(output_dir / f'centroids_isl_k{k}.csv', index=False)
 
         # Small, Dense Structures
@@ -99,7 +80,7 @@ if __name__ == '__main__':
             gdf[f'sds_c{k}'] = -1
             gdf.loc[criterion, f'sds_c{k}'] = km_sds.labels_
             # Save centroids as CSV
-            centroids_sds = pd.DataFrame(km_sds.cluster_centers_, columns=data_sds.columns)
+            centroids_sds = pd.DataFrame(km_sds.cluster_centers_, columns=gdf_sds.columns)
             centroids_sds.to_csv(output_dir / f'centroids_sds_k{k}.csv', index=False)
 
     # Plot the elbow curves
