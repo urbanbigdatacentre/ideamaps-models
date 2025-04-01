@@ -1,3 +1,6 @@
+# IDEAMAPS Models 
+[![DOI](https://zenodo.org/badge/774337168.svg)](https://doi.org/10.5281/zenodo.14699939)
+
 ## 📚 About IDEAMAPS Data Ecosystem
 
 The [IDEAMAPS Data Ecosystem project](https://www.ideamapsnetwork.org/project/ideamaps-data-ecosystem) is co-designing and developing a participatory data-modelling ecosystem to produce deprived area maps routinely and accurately at scale across cities in lower and middle-income countries to support multiple local stakeholders in their decision-making.
@@ -23,9 +26,9 @@ The following is a list of our active datasets. These datasets are available for
 
 |     Dataset Name     |      City       | Version |
 |:--------------------:|:---------------:|:-------:|
-| Morphological Informality | Nairobi (Kenya) |   V3    |
-| Morphological Informality | Lagos (Nigeria)  |   V3    |
-| Morphological Informality | Kano (Nigeria)   |   V3    |
+| Morphological Informality | Nairobi (Kenya) |   V1    |
+| Morphological Informality | Lagos (Nigeria)  |   V1    |
+| Morphological Informality | Kano (Nigeria)   |   V1    |
 |  Barriers to Healthcare   | Kano (Nigeria)   |  V1.1   |
 
 

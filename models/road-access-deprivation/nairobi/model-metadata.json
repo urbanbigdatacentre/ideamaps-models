@@ -1,0 +1,16 @@
+{
+    "name": "Nairobi_v0",
+    "notes": "This dataset represents the accessibility of motorable roads from buildings and their quality in terms of surface type (paved/unpaved) as an indicator of urban deprivation. Motorable roads in areas with higher deprivation levels are generally unpaved but directly accessible from most buildings (medium) or motorable roads are sparse and only accessible via footpaths from most buildings (high).",
+    "city": "Nairobi",
+    "subdomain": "Road Access Deprivation",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "features": [
+        "Road network",
+        "Road surface types (paved/unpaved)",
+        "Building footprints"
+    ]
+}

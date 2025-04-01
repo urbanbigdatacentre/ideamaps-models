@@ -2,24 +2,42 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 from pathlib import Path
+import argparse
 
-from parsers import aggregation_parser as argument_parser
+
+def argument_parser():
+    # https://docs.python.org/3/library/argparse.html#the-add-argument-method
+    parser = argparse.ArgumentParser(description="Experiment Args")
+    parser.add_argument('-m', "--morphometrics-dir", dest='morphometrics_dir', required=True)
+    parser.add_argument('-b', "--building-file", dest='building_file', required=True)
+    parser.add_argument('-g', "--grid-file", dest='grid_file', required=True)
+    parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
+                        help="path to output directory")
+
+    parser.add_argument(
+        "opts",
+        help="Modify config options using the command-line",
+        default=None,
+        nargs=argparse.REMAINDER,
+    )
+    return parser
 
 
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
-    # TODO: add ltcWRB
+    assert Path(args.output_dir).exists()
 
-    umm = gpd.read_parquet(args.building_file)
+    building_file = Path(args.building_file)
+    umm = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
     umm = umm[['uID', 'geometry']]
     assert np.all(umm.is_valid)
 
     # Loading Urban Morphometrics (UMM)
-    metrics = ['sdbAre', 'ssbElo', 'stbOri', 'stcOri', 'ssbCCD', 'sdcAre', 'sscERI', 'sicCAR', 'mtbAli', 'mtbNDi',
-               'mtcWNe', 'mdcAre', 'ltcBuA', 'ltbIBD', 'ltcWRB']
+    metrics = ['sdbAre', 'ssbElo', 'ssbCCD', 'stbOri', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'sscERI',
+               'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri',  'ltcWRB']
 
     for metric in metrics:
-        metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.pq')
+        metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.parquet')
         umm = pd.merge(umm, metric_values, on='uID', how='inner')
 
     umm = gpd.GeoDataFrame(umm, geometry='geometry')
@@ -28,9 +46,11 @@ if __name__ == '__main__':
     umm = gpd.GeoDataFrame(umm, geometry='centroid').drop(columns='geometry')
 
     #Aggregation to the grid
-    grid = gpd.read_file(args.grid_file)
+    grid_file = Path(args.grid_file)
+    grid = gpd.read_parquet(grid_file) if grid_file.suffix == '.parquet' else gpd.read_file(grid_file)
     grid = grid[['geometry']]
     grid['grid_id'] = range(1, len(grid) + 1)  # create column containing an unique raw numbering for each grid
+    grid_crs = grid.crs
     grid = grid.to_crs("EPSG:4326")
     assert np.all(grid.is_valid)
 
@@ -47,10 +67,10 @@ if __name__ == '__main__':
     # 'grid_id' is the identifier for each grid cell
 
     # 'variables' is a list of the variable names you want to aggregate by mean and median
-    median = ['sdcAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltcBuA', 'sdbAre', 'sscERI', 'sicCAR', 'mtcWNe',
-              'mdcAre', 'ltbIBD', 'ltcWRB']
+    median = ['sdbAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'sscERI', 'sicCAR',
+              'mtcWNe', 'mdcAre', 'ltcWRB']
     sd = ['stbOri', 'stcOri']
-    sum = ['sdcAre']
+    sum = ['sdbAre']
 
     # Set the grid geometry as the active geometry
     print(umm_grid.columns)
@@ -89,6 +109,7 @@ if __name__ == '__main__':
     print(duplicate_columns)
 
     gdf_stats = gdf_stats.loc[:, ~gdf_stats.columns.duplicated()]
+    gdf_stats = gdf_stats.to_crs(grid_crs)
 
     # Export to a new gpkg
-    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid.pq')
+    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid.parquet')
