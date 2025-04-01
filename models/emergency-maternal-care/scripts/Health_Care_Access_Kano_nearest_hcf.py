@@ -95,7 +95,6 @@ import rasterio
 from rasterio.transform import xy
 from rasterio.mask import mask
 import rasterstats as rs
-
 import math
 # -
 
