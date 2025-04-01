@@ -19,3 +19,4 @@ You may not apply legal terms or technological measures that legally restrict ot
 ---
 
 This is a summary of the [full license](https://creativecommons.org/licenses/by-nc/4.0/legalcode).
+

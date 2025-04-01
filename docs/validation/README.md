@@ -1,18 +1,46 @@
-# IDEAMAPS Platform Validation Data
-This document describes the validation
+# IDEAMAPS Platform Validation Datasets
+This document describes the validation dataset exports that the IDEAMAPS Data Ecosystem publishes for public access on Zenodo at the completion points of platform validation campaigns. 
 
 ##### Table of Contents
+- [About Validation Datasets](#about-validation-datasets)
 - [Accessing the Data](#accessing-the-data)
 - [Pre-Processing](#pre-processing)
 - [About Validation](#about-validation)
 - [Structure of the Data](#structure-of-the-data)
 - [Variable Descriptions](#variable-descriptions)
 
+## About Validation Datasets
+Users of the IDEAMAPS Data Ecosystem create validation datasets as they provide quantitative feedback on the platform's dataset. By exploring the datasets and reclassifying grid cells they believe are incorrectly classified, our community of users build up a validation dataset. These reclassifications are captured by the platform in order to provide a resource to improve the original data. The structure of the validation dataset export can be seen below - [Structure of the Data](#structure-of-the-data).
+
+To give an example - gridded datasets on the IDEAMAPS Data Ecosystem platform typically consist of 100x100m grid cells classified as either Low (0) - Medium (1) - High (2). A user's validation of each grid cell means that the key value offering from the validation datasets is the reclassification of the grid cells value of Low (0) - Medium (1) - High (2) as per the user's validation.
+
+Each validation dataset is created at its most granular level - meaning one row represents one validation. This is done so that our export packages can cater for the broadest use cases possible. The validation dataset also comes with enriched information about the user making each validation and of course links to the original value from the presented dataset.
+
+## Contributors
+Each user that contributed to a validation dataset will be listed in a CONTRIBUTORS file that is part of the dataset entry on Zenodo. Consent for this is granted in the process of creating an account wherein the user agrees to the terms and conditions of the platform. 
+
+## License
+Each validation dataset will be licensed using the CC BY-NC-SA 2.0 license - https://creativecommons.org/licenses/by-nc-sa/2.0/deed.en. This will be published as part of the Zenodo dataset entry in markdown format.
+
+## Metadata
+Each validation dataset will be published alongside a unique metadata file that describes the validation dataset and provides a link to the original dataset that was being validated. The format of the metadata file is described below:
+
+```json
+{
+  "number-validations": 405,
+  "campaign-start": "01/01/2025",
+  "campaign-end": "01/01/2026", 
+  "reason-for-campaign-end": "Focus Area Completion",
+  "study-dataset-name": "Example Dataset",
+  "study-dataset-city": "Lagos",
+  "study-dataset-DOI": "https://doi.org/10.5281/zenodo.14699940"
+}
+```
 
 ## Accessing the Data
-Access to the raw validation data is not permitted outside of the University of Glasgow. This is due to the sensitive nature of the certain variables within the data.
+Access to the raw validation data is not permitted outside of the University of Glasgow. This is due to the sensitive nature of certain variables within the data.
 
-A non-sensitive version of the validation data is currently available from the Google Drive location here - [IDEAMAPS Validation Data](https://drive.google.com/drive/folders/1S2XXCmg9oRiFMWHympz830HNe-TD69sY)
+Non-sensitive validation dataset exports are published on Zenodo as dataset entries at the completion point of validation campaigns. Links to these entries will be published on the platform as soon as the Zenodo entry has been created.
 
 ## Pre-Processing
 The validation data is pre-processed to remove any sensitive information. This includes the exclusion of the following variables:

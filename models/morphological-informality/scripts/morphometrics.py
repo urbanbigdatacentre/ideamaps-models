@@ -95,6 +95,7 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         queen_3 = compute_queen_graph(tessellation, 3, out_path)
         values = mm.mean_interbuilding_distance(buildings, queen_1, queen_3)  # Used for SDS (Mdn)
     elif metric == 'ltcBuA':
+        # TODO: Fix this metric - all values are 1
         buildings_q1 = graph.Graph.build_contiguity(buildings).higher_order(k=1)
         queen_3 = compute_queen_graph(tessellation, 3, out_path)
         values = mm.building_adjacency(queen_3, buildings_q1)  # Used for both (Mdn)

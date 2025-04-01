@@ -33,8 +33,8 @@ if __name__ == '__main__':
     assert np.all(umm.is_valid)
 
     # Loading Urban Morphometrics (UMM)
-    metrics = ['sdbAre', 'ssbElo', 'stbOri', 'stcOri', 'ssbCCD', 'sdcAre', 'sscERI', 'sicCAR', 'mtbAli', 'mtbNDi',
-               'mtcWNe', 'mdcAre', 'ltcBuA', 'ltbIBD', 'ltcWRB']
+    metrics = ['sdbAre', 'ssbElo', 'ssbCCD', 'stbOri', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'sscERI',
+               'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri',  'ltcWRB']
 
     for metric in metrics:
         metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.parquet')
@@ -67,10 +67,10 @@ if __name__ == '__main__':
     # 'grid_id' is the identifier for each grid cell
 
     # 'variables' is a list of the variable names you want to aggregate by mean and median
-    median = ['sdcAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltcBuA', 'sdbAre', 'sscERI', 'sicCAR', 'mtcWNe',
-              'mdcAre', 'ltbIBD', 'ltcWRB']
+    median = ['sdbAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltbIBD', 'ltcBuA', 'sdcAre', 'sscERI', 'sicCAR',
+              'mtcWNe', 'mdcAre', 'ltcWRB']
     sd = ['stbOri', 'stcOri']
-    sum = ['sdcAre']
+    sum = ['sdbAre']
 
     # Set the grid geometry as the active geometry
     print(umm_grid.columns)

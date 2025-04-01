@@ -1,12 +1,8 @@
-#  Deploying the Morphological Informality Model (V3)
+#  Deploying the Morphological Informality Model (Version 1)
 
 
 
 This folder contains all required code to model morphological informality based on building footprint data.
-
-We refer to our publication for a detailed description of the methodology: [preprint](). 
-
-
 
 
 ## 🛠️ Setup
@@ -84,12 +80,3 @@ Follow these steps to obtain clusters of similar urban form types.
    ```
 
 The resulting urban form clusters can be linked to irregular settlement layout and small, dense structures. These subdomains of unplanned urbanization constitute the indicators for morphological informality in our model.
-
-
-## 📝 Reference
-
-If you find this work useful, please cite:
-
-```
-
-```
