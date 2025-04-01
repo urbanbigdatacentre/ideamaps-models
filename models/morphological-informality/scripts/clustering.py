@@ -4,7 +4,7 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 from pathlib import Path
 import argparse
 
@@ -33,14 +33,16 @@ if __name__ == '__main__':
 
     mm_file = Path(args.morphometrics_file)
     gdf = gpd.read_parquet(mm_file) if mm_file.suffix == '.parquet' else gpd.read_file(mm_file)
+    print(gdf.isna().sum())
+    gdf = gdf.fillna(0)
 
-    morph_isl = ['md_ssbCCD', 'sd_stbOri', 'md_mtbAli', 'md_ltcBuA', 'md_mtcWNe', 'sd_stcOri', 'md_ltcWRB']
+    morph_isl = ['kdes_stbOri', 'md_mtbAli', 'kdes_stcOri', 'kdes_strOri', 'md_strAli']
+    morph_sds = ['sum_sdbAre', 'bcount', 'md_sdbAre', 'md_mtbNDi_log', 'md_sicCAR', 'md_mtcWNe']
 
-    morph_sds = ['sum_sdbAre', 'md_sdbAre', 'md_ssbElo', 'md_mtbNDi', 'md_ltbIBD', 'md_ltcBuA', 'md_sdcAre',
-                 'md_sscERI', 'md_sicCAR', 'md_mtcWNe', 'md_mdcAre', 'md_ltcWRB']
-
-    gdf_isl = gdf[morph_isl]
-    gdf_sds = gdf[morph_sds]
+    criterion = gdf['bcount'] >= 3
+    gdf_train = gdf[criterion]
+    gdf_isl = gdf_train[morph_isl]
+    gdf_sds = gdf_train[morph_sds]
 
     # Initialize the StandardScaler object
     scaler = StandardScaler()
@@ -64,7 +66,8 @@ if __name__ == '__main__':
         km_isl = km_isl.fit(data_isl)
         ssd_isl.append(km_isl.inertia_)
         if k in cluster_selection:
-            gdf[f'isl_c{k}'] = km_isl.labels_
+            gdf[f'isl_c{k}'] = -1
+            gdf.loc[criterion, f'isl_c{k}'] = km_isl.labels_
             # Save centroids as CSV
             centroids_isl = pd.DataFrame(km_isl.cluster_centers_, columns=gdf_isl.columns)
             centroids_isl.to_csv(output_dir / f'centroids_isl_k{k}.csv', index=False)
@@ -74,7 +77,8 @@ if __name__ == '__main__':
         km_sds = km_sds.fit(data_sds)
         ssd_sds.append(km_sds.inertia_)
         if k in cluster_selection:
-            gdf[f'sds_c{k}'] = km_sds.labels_
+            gdf[f'sds_c{k}'] = -1
+            gdf.loc[criterion, f'sds_c{k}'] = km_sds.labels_
             # Save centroids as CSV
             centroids_sds = pd.DataFrame(km_sds.cluster_centers_, columns=gdf_sds.columns)
             centroids_sds.to_csv(output_dir / f'centroids_sds_k{k}.csv', index=False)
@@ -95,5 +99,5 @@ if __name__ == '__main__':
     axes[1].set_ylabel("Sum of Squared Distances (SSD)")
     plt.savefig(Path(args.output_dir) / 'elbow.png', dpi=300, bbox_inches='tight')
 
-    gdf.to_parquet(Path(args.output_dir) / 'clustering.parquet')
+    gdf.to_parquet(Path(args.output_dir) / 'clusters.parquet')
 

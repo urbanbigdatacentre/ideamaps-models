@@ -57,6 +57,14 @@ def preprocess_edges(edges: GeoDataFrame, extent: GeoDataFrame) -> GeoDataFrame:
     edges = edges.to_crs(utm_epsg)
     extent_utm = extent.to_crs(utm_epsg)
 
+    if 'subtype' in edges.columns:
+        edges = edges[edges['subtype'] == 'road']
+
+    if 'class' in edges.columns:
+        road_classes = ['living_street', 'motorway', 'primary', 'residential', 'secondary', 'service', 'tertiary',
+                        'trunk', 'unclassified', 'unknown', ]
+        edges = edges[edges['class'].isin(road_classes)]
+
     # Subset roads to only roads that intersect with region of interest
     edges = edges[edges.geometry.intersects(extent_utm.unary_union)]
 
@@ -104,15 +112,15 @@ if __name__ == '__main__':
     edges = edges[['nID', 'geometry']]
     edges.to_parquet(Path(args.output_dir) / 'edges.parquet')
 
-    # Add network ID of closest road to buildings
-    # buildings['nID'] = mm.get_nearest_street(buildings, edges, max_distance=500)
-
     # Blocks
     blocks = get_blocks(buildings, tess, edges)
     blocks.to_parquet(Path(args.output_dir) / 'blocks.parquet')
 
     # Reload buildings
     buildings = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
+
+    # Add network ID of closest road to buildings
+    buildings['nID'] = mm.get_nearest_street(buildings, edges, max_distance=500)
 
     # Determining the block id for each building based on their location
     n_buildings = len(buildings)
@@ -125,13 +133,14 @@ if __name__ == '__main__':
     # Handeling buildings located outside of blocks by assigning the nearest block id
     if buildings['bID'].isna().sum() > 0:
         buildings_out = buildings[buildings['bID'].isna()]
-        buildings_nearest_block = gpd.sjoin_nearest(buildings_out[['uID', 'centroid']], blocks[['bID', 'geometry']],
+        buildings_nearest_block = gpd.sjoin_nearest(buildings_out[['uID', 'nID', 'centroid']],
+                                                    blocks[['bID', 'geometry']],
                                                     how='left', distance_col='distance')
         for index, row in buildings_nearest_block.iterrows():
             buildings.loc[index, 'bID'] = row['bID']
     assert buildings['bID'].isna().sum() == 0
 
-    buildings[['uID', 'bID', 'geometry']].to_parquet(Path(args.output_dir) / 'buildings.parquet')
+    buildings[['uID', 'nID', 'bID', 'geometry']].to_parquet(Path(args.output_dir) / 'buildings.parquet')
 
     tess = gpd.read_parquet(tess_file) if tess_file.suffix == '.parquet' else gpd.read_file(tess_file)
     tess = tess.merge(buildings[['uID', 'bID']], on='uID', how='left')
