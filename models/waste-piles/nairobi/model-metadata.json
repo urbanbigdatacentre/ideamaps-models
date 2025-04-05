@@ -1,0 +1,18 @@
+{
+    "name": "Nairobi_waste",
+    "notes": "This dataset shows the chance of finding piles of waste in different places. Waste piles can mean that waste collection services are not working well. Areas with more waste piles are often more disadvantaged and may not have regular waste collection.",
+    "city": "Nairobi",
+    "subdomain": "Accumulated Waste Piles",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "focused": {
+        "0": "Low priority",
+        "1": "High priority"
+    },
+    "features": [
+        "waste"
+    ]
+}

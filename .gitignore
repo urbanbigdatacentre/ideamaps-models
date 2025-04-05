@@ -5,4 +5,10 @@ models/.DS_Store
 models/Healthcare/.DS_Store
 models/Healthcare/BarriersHealthCareAccess/.DS_Store
 models/barriers-to-healthcare-access/scripts/.env
+<<<<<<< waste-branch
+.DS_Store
+*.Rhistory
+*.ipynb_checkpoints/
+=======
 .idea
+>>>>>>> dev
