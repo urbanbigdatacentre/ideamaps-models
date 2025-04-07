@@ -5,3 +5,5 @@ models/.DS_Store
 models/Healthcare/.DS_Store
 models/Healthcare/BarriersHealthCareAccess/.DS_Store
 models/barriers-to-healthcare-access/scripts/.env
+models/emergency-maternal-care/scripts/.Rhistory
+models/emergency-maternal-care/scripts/.RData
