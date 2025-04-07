@@ -7,3 +7,10 @@ models/Healthcare/BarriersHealthCareAccess/.DS_Store
 models/barriers-to-healthcare-access/scripts/.env
 models/emergency-maternal-care/scripts/.Rhistory
 models/emergency-maternal-care/scripts/.RData
+# Removing temporary files for geopackage
+.gpkg-wal
+.gpkg-hhm
+# Removing temporary files for R and RStudio
+.Rhistory
+.Rproj.user
+.Rproj
