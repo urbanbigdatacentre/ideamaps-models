@@ -46,7 +46,7 @@ To learn more about how you can help improve the accuracy of these classificatio
 
 Different morphological areas may be present within a single grid cell due to the spatial resolution (100 x 100 m) of the IDEAMAPS grid. In particular, these *mixed* grid cells can appear around the borders of settlements.
 
-For their validation of mixed grid cells, the predominant morphological area within the cell should be considered. In the example below, the lower left and upper right cells contain mixtures of formal and informal morphologies. For the lower left pixel, the largest morphological area within the cell is informal; consequently, the predominant morphological informality level is high. On the other hand, the informal area in the upper right cell smaller than the formal area; consequently, the predominant morphological informality level is low. 
+For their validation of mixed grid cells, the predominant morphological area within the cell should be considered. In the example below, the lower left and upper right cells contain mixtures of formal and informal morphologies. For the lower left pixel, the largest morphological area within the cell is informal; consequently, the predominant morphological informality level is high. On the other hand, the informal area in the upper right cell is smaller than the formal area; consequently, the predominant morphological informality level is low. 
 
 <img src="image-examples/mixed-grid-cells-example.png" alt="accessibility-elements"/>
 
