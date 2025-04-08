@@ -261,7 +261,7 @@ centroids_df = gpd.read_file(data_temp + 'kano-pop-grid.gpkg')
 centroids_df
 
 pop_centroids_hcf = pd.merge(matrix_df, centroids_df[['rowid', 'longitude', 'latitude','bcount','pop_grid_bcount', 'pop_grid_pop', 'pop', 'geometry']], 
-                     left_on='', right_on='rowid', how='left')
+                     left_on='destination_id', right_on='rowid', how='left')
 
 pop_centroids_hcf
 
@@ -269,24 +269,26 @@ pop_centroids_hcf = pop_centroids_hcf.rename(columns={
     "longitude": "origin_lon",
     "latitude": "origin_lat",
     "rowid": "grid_id",
-    "origin_hcf_id": "hcf_uid"
+    "origin_id": "hcf_uid",
+    "pop": "population"
 })
-columns_to_keep = ["origin_lon", "origin_lat", "population", "grid_id", "geometry", "hcf_uid", "duration_seconds", "distance_km"]
+columns_to_keep = ["grid_id", "origin_lon", "origin_lat", "population", "bcount","pop_grid_bcount", "pop_grid_pop","geometry", "hcf_uid", "duration_seconds", "distance_km"]
 pop_centroids_hcf = pop_centroids_hcf[columns_to_keep]
 
 pop_centroids_hcf
 
-# +
-# distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude', 'Validation of HCFs Categorization']], 
-                     # left_on='hcf_uid', right_on='hcf_id', how='inner')
-    
-distances_duration_matrix = pd.merge(matrix_df, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude', 'Validation of HCFs Categorization']], 
-                     left_on='origin_id', right_on='hcf_id', how='inner')
-# -
+distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude', 'Local_Validation']], 
+                     left_on='hcf_uid', right_on='hcf_id', how='inner')
+
+distances_duration_matrix = distances_duration_matrix.rename(columns={
+    "longitude": "dest_lon",
+    "latitude": "dest_lat"
+})
+distances_duration_matrix = distances_duration_matrix.drop(columns=['hcf_uid'])
 
 distances_duration_matrix
 
-category_counts = healthcare_facilities_validated['Validation of HCFs Categorization'].value_counts()
+category_counts = healthcare_facilities_validated['Local_Validation'].value_counts()
 print(category_counts)
 
 # +
@@ -294,7 +296,7 @@ selected_categories = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC'
                        'Private Basic EmOC', 'Public Basic EmOC']
 
 distances_duration_matrix = distances_duration_matrix[
-    distances_duration_matrix['Validation of HCFs Categorization'].isin(selected_categories)
+    distances_duration_matrix['Local_Validation'].isin(selected_categories)
 ]
 
 distances_duration_matrix
@@ -310,7 +312,7 @@ categories = {
 
 subsets = {
     key: distances_duration_matrix[
-        distances_duration_matrix['Validation of HCFs Categorization'].str.contains('|'.join(values), na=False)
+        distances_duration_matrix['Local_Validation'].str.contains('|'.join(values), na=False)
     ]
     for key, values in categories.items()
 }
@@ -327,8 +329,8 @@ public_CEmOC
 # +
 # Step 2: Define a function to get 3 smallest duration_seconds per grid_id for each category
 def get_closest_3(df, n=3):
-    return df.groupby('destination_id').apply(lambda x: x.nsmallest(n, 'duration_seconds')).reset_index(drop=True)
-                      # grid_id
+    return df.groupby('grid_id').apply(lambda x: x.nsmallest(n, 'duration_seconds')).reset_index(drop=True)
+                      
 # If the subsets are already created for each category, we apply the function to each subset:
 public_CEmOC_closest_3 = get_closest_3(public_CEmOC)
 private_CEmOC_closest_3 = get_closest_3(private_CEmOC)
@@ -347,15 +349,6 @@ distances_duration_matrix = pd.concat([
 
 distances_duration_matrix
 
-distances_duration_matrix = distances_duration_matrix.rename(columns={
-    "longitude": "dest_lon",
-    "latitude": "dest_lat",
-    "destination_id": "grid_id"
-})
-distances_duration_matrix = distances_duration_matrix.drop(columns=['origin_id'])
-
-distances_duration_matrix
-
 # +
 geometry = [Point(xy) for xy in zip(distances_duration_matrix['dest_lon'], distances_duration_matrix['dest_lat'])]
 gdf = gpd.GeoDataFrame(distances_duration_matrix, geometry=geometry, crs="EPSG:4326")
@@ -371,8 +364,8 @@ origin_dest = distances_duration_matrix
 
 # Function
 from math import *
-d = 20 * 60 # try max duration 5/10mins/15mins/20 car, under estimation of travel time and traffic condition realted to the selected data sourse 
-W = 0.05 # try 0.1, 0.05, 0.01, 0.75
+d = 10 * 60 # try max duration 5/10mins/15mins/20 car, under estimation of travel time and traffic condition realted to the selected data sourse 
+W = 0.5 # try 0.1, 0.05, 0.01, 0.75
 beta = - d ** 2 / log(W)
 print(beta)
 
@@ -386,7 +379,7 @@ origin_dest['duration_seconds'] = pd.to_numeric(origin_dest['duration_seconds'],
 origin_dest = origin_dest.dropna(subset=['duration_seconds'])
 origin_dest['grid_id'] = pd.to_numeric(origin_dest['grid_id'], errors='coerce')
 
-origin_dest_acc = origin_dest  # Backup
+origin_dest_acc = origin_dest
 # -
 
 # Apply Gaussian decay function to calculate the weight of each grid to healthcare 
@@ -416,6 +409,20 @@ origin_dest_acc
 supply = 1
 # in the future, we will link supply with ownership and EmOC service level
 origin_dest_acc = origin_dest_acc.rename(columns={'Pop_W_y': 'Pop_W_S'})  # Pop_W_S: Population Weight Sum
+
+supply_map = {
+    'Public Comprehensive EmOC': 1,
+    'Private Comprehensive EmOC': 0.7,
+    'Public Basic EmOC': 0.5,
+    'Private Basic EmOC': 0.35
+}
+
+# +
+
+origin_dest_acc['supply'] = origin_dest_acc['Local_Validation'].map(supply_map)
+origin_dest_acc['supply_demand_ratio'] = origin_dest_acc['supply'] / origin_dest_acc['Pop_W_S']
+origin_dest_acc['supply_demand_ratio'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
+# -
 
 # Compute the Supply-Demand Ratio (Rj)
 origin_dest_acc['supply_demand_ratio'] = 1 / origin_dest_acc.Pop_W_S
