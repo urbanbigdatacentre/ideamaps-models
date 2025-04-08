@@ -481,16 +481,6 @@ plt.ylabel('Frequency')
 plt.show()
 
 # +
-# 2. distribution plot of accessibility score
-
-sns.displot(origin_dest_acc['Accessibility_standard'], kde=True)
-
-plt.title('Distribution of Accessibility Score')
-plt.xlabel('Accessibility Score')
-plt.ylabel('Frequency')
-plt.show()
-
-# +
 # 3. distribution plot of population/duration
 sns.scatterplot(x=['duration_seconds', y='population', data=origin_dest_acc)
 
