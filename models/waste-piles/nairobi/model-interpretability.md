@@ -17,7 +17,7 @@ The dataset groups places into three levels based on how likely you are to find 
 
 ## **Waste Accumulation Probability Levels:**
 
-### **🟢 Low (probability of 0 – 2.4%):**  
+### **Low (probability of 0 – 2.4%):**  
 <!--- **Unlikely** to see waste piles in this area.  
 - But low does not always mean clean—it might also mean **no data** was available for this place.
 - **Your feedback** is still very important! If you know there is waste in an area marked as "Low," telling us helps improve the data.
@@ -31,7 +31,7 @@ The dataset groups places into three levels based on how likely you are to find 
 
 ![Low Waste Accumulation Probability](image-examples/L_NB.png)
 
-### **🟡 Medium (2.5% – 16.4%):**  
+### **Medium (2.5% – 16.4%):**  
 <!--- **Some chance** of seeing waste on the street.  
 - Waste may be there, but **not always in large amounts**.  
 - This type of waste is more likely to be **temporary**. People may pile waste near the street on purpose so that **waste collection companies can pick it up** for proper management.  
@@ -45,7 +45,7 @@ The dataset groups places into three levels based on how likely you are to find 
 
 ![Medium Waste Accumulation Probability](image-examples/M_NB.png)
 
-### **🔴 High (16.4% – 100%):**  
+### **High (16.4% – 100%):**  
 <!--- **Very likely** to see waste piles.  
 - This might mean waste is **not collected properly** or people dump waste near the main road.  
 - Waste is **often** dumped without proper collection, leading to constant piles that turn into informal dumping sites with **little to no management**.
