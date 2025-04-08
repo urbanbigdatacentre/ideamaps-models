@@ -26,24 +26,29 @@ Below, we give the adopted definitions of the morphological deprivation levels.
 
 ### Low
 <blockquote> Buildings are larger, detached from one another, and regularly arranged. It is easy to visualise roads, pathways, or open spaces between them. Areas with no buildings are also categorised as low. </blockquote>
-<img src="image-examples/buildings-low.png" alt="buildings-low"/>
-<img src="image-examples/roads-low.png" alt="roads-low"/>
+<img src="image-examples/example-low-morphological-informality.png" alt="example-low"/>
 
 ### Medium
 <blockquote> Buildings are small and close together (it can be hard to visualise roads, pathways, or spaces between them) OR buildings are irregularly arranged (with varying alignment to neighbouring structures). Roads are moderately present. </blockquote>
-<img src="image-examples/buildings-medium.png" alt="buildings-medium"/>
-<img src="image-examples/roads-medium.png" alt="roads-medium"/>
+<img src="image-examples/example-medium-morphological-informality.png" alt="example-medium"/>
 
 ### High
 <blockquote > Buildings are small and close together AND buildings are irregularly arranged (with varying alignment to neighbouring structures). Roads are hard to visualise or they are absent. </blockquote>
-<img src="image-examples/buildings-high.png" alt="buildings-high"/>
-<img src="image-examples/roads-high.png" alt="roads-high"/>
+<img src="image-examples/example-high-morphological-informality.png" alt="example-high"/>
 
 <aside>
 💡 Together, the morphology of buildings and roads form the different levels of morphological informality that you see reflected in the grid cells on our map. 
 
 To learn more about how you can help improve the accuracy of these classifications, visit our page on [How to Validate Our Data](/docs/using-the-map/how-to-validate-our-data).
 </aside>
+
+## Mixed Grid Cells
+
+Different morphological areas may be present within a single grid cell due to the spatial resolution (100 x 100 m) of the IDEAMAPS grid. In particular, these *mixed* grid cells can appear around the borders of settlements.
+
+For their validation of mixed grid cells, the predominant morphological area within the cell should be considered. In the example below, the lower left and upper right cells contain mixtures of formal and informal morphologies. For the lower left pixel, the largest morphological area within the cell is informal; consequently, the predominant morphological informality level is high. On the other hand, the informal area in the upper right cell smaller than the formal area; consequently, the predominant morphological informality level is low. 
+
+<img src="image-examples/mixed-grid-cells-example.png" alt="accessibility-elements"/>
 
 ## Additional Insights Into Modelling Morphological Informality
 
@@ -53,7 +58,7 @@ This section provides additional information on the definition of morphological 
 
 Our modellers measured morphological informality using two indicators: small, dense structures and irregular settlement layout. The two indicators are combined to three levels of morphological informality according to the following conceptual model: 
 
-<img src="image-examples/conceptual_model.png" alt="accessibility-elements" width="600"/>
+<img src="image-examples/conceptual-model.png" alt="accessibility-elements"/>
 
 ### Modelling indicators based on morphological descriptors 
 
