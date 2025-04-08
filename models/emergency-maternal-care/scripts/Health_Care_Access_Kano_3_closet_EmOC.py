@@ -260,7 +260,7 @@ centroids_df = gpd.read_file(data_temp + 'kano-pop-grid.gpkg')
 
 centroids_df
 
-pop_centroids_hcf = pd.merge(matrix_df, centroids_df[['rowid', 'longitude', 'latitude','bcount','pop_grid_bcount', 'pop_grid_pop', 'pop', 'geometry']], 
+pop_centroids_hcf = pd.merge(matrix_df, centroids_df[['rowid', 'longitude', 'latitude', 'lon_min', 'lat_min', 'lon_max', 'lat_max','bcount','pop_grid_bcount', 'pop_grid_pop', 'pop', 'geometry']], 
                      left_on='destination_id', right_on='rowid', how='left')
 
 pop_centroids_hcf
@@ -268,17 +268,21 @@ pop_centroids_hcf
 pop_centroids_hcf = pop_centroids_hcf.rename(columns={
     "longitude": "origin_lon",
     "latitude": "origin_lat",
+    "lon_min": "origin_lon_min",
+    "lat_min": "origin_lat_min",
+    "lon_max": "origin_lon_max",
+    "lat_max": "origin_lat_max",
     "rowid": "grid_id",
     "origin_id": "hcf_uid",
     "pop": "population"
 })
-columns_to_keep = ["grid_id", "origin_lon", "origin_lat", "population", "bcount","pop_grid_bcount", "pop_grid_pop","geometry", "hcf_uid", "duration_seconds", "distance_km"]
+columns_to_keep = ["grid_id", "origin_lon", "origin_lat", "origin_lon_min","origin_lat_min","origin_lon_max","origin_lat_max","population", "bcount","pop_grid_bcount", "pop_grid_pop","geometry", "hcf_uid", "duration_seconds", "distance_km"]
 pop_centroids_hcf = pop_centroids_hcf[columns_to_keep]
 
 pop_centroids_hcf
 
 distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude', 'Local_Validation']], 
-                     left_on='hcf_uid', right_on='hcf_id', how='inner')
+                     left_on='hcf_uid', right_on='hcf_id', how='left')
 
 distances_duration_matrix = distances_duration_matrix.rename(columns={
     "longitude": "dest_lon",
@@ -292,6 +296,11 @@ category_counts = healthcare_facilities_validated['Local_Validation'].value_coun
 print(category_counts)
 
 # +
+distances_duration_matrix['Local_Validation'] = distances_duration_matrix['Local_Validation'].replace({
+    'Public/Private Basic EmOC': 'Private Basic EmOC',
+    'Public/Private comprehensive EmOC (missionary Hospital)': 'Private Comprehensive EmOC'
+})
+
 selected_categories = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC', 
                        'Private Basic EmOC', 'Public Basic EmOC']
 
@@ -350,7 +359,7 @@ distances_duration_matrix = pd.concat([
 distances_duration_matrix
 
 # +
-geometry = [Point(xy) for xy in zip(distances_duration_matrix['dest_lon'], distances_duration_matrix['dest_lat'])]
+geometry = [Point(xy) for xy in zip(distances_duration_matrix['origin_lon'], distances_duration_matrix['origin_lat'])]
 gdf = gpd.GeoDataFrame(distances_duration_matrix, geometry=geometry, crs="EPSG:4326")
 
 gpkg_path = data_temp + 'distances_duration_3_closet_Emoc.gpkg'
@@ -360,12 +369,13 @@ gdf.to_file(gpkg_path, layer="distances_duration_3_closet_Emoc", driver="GPKG")
 # Review and remove
 origin_dest = distances_duration_matrix
 
+
 # ## Enhanced Two-Step Floating Catchment Area (E2SFCA) method
 
 # Function
 from math import *
 d = 10 * 60 # try max duration 5/10mins/15mins/20 car, under estimation of travel time and traffic condition realted to the selected data sourse 
-W = 0.5 # try 0.1, 0.05, 0.01, 0.75
+W = 0.01 # try 0.1, 0.05, 0.01, 0.75
 beta = - d ** 2 / log(W)
 print(beta)
 
@@ -373,6 +383,7 @@ print(origin_dest.head())
 
 # +
 # Convert 'duration' to numeric, coercing errors to NaN
+origin_dest = origin_dest.copy()
 origin_dest['duration_seconds'] = pd.to_numeric(origin_dest['duration_seconds'], errors='coerce')
 
 # Drop rows with NaN values in 'duration' column
@@ -406,9 +417,15 @@ origin_dest_acc = origin_dest_acc.merge(origin_dest_sum, on='hcf_id')
 origin_dest_acc
 
 # supply value is set to 1 for simplicity (capacity of HCF)
-supply = 1
+# supply = 1
 # in the future, we will link supply with ownership and EmOC service level
 origin_dest_acc = origin_dest_acc.rename(columns={'Pop_W_y': 'Pop_W_S'})  # Pop_W_S: Population Weight Sum
+
+# +
+# Compute the Supply-Demand Ratio (Rj)
+# origin_dest_acc['supply_demand_ratio'] = 1 / origin_dest_acc.Pop_W_S
+# origin_dest_acc['supply_demand_ratio'].replace([np.inf, np.nan], 0, inplace=True)
+# -
 
 supply_map = {
     'Public Comprehensive EmOC': 1,
@@ -417,16 +434,9 @@ supply_map = {
     'Private Basic EmOC': 0.35
 }
 
-# +
-
 origin_dest_acc['supply'] = origin_dest_acc['Local_Validation'].map(supply_map)
 origin_dest_acc['supply_demand_ratio'] = origin_dest_acc['supply'] / origin_dest_acc['Pop_W_S']
 origin_dest_acc['supply_demand_ratio'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
-# -
-
-# Compute the Supply-Demand Ratio (Rj)
-origin_dest_acc['supply_demand_ratio'] = 1 / origin_dest_acc.Pop_W_S
-origin_dest_acc['supply_demand_ratio'].replace([np.inf, np.nan], 0, inplace=True)
 
 # Calculate Rj * Weight for Each Grid Cell
 origin_dest_acc['supply_W'] = origin_dest_acc['supply_demand_ratio'] * origin_dest_acc.Weight
@@ -447,12 +457,14 @@ origin_dest_acc
 max(origin_dest_acc.Accessibility_standard)
 
 # +
-geometry = [Point(xy) for xy in zip(origin_dest_acc['origin_lon'], origin_dest_acc['origin_lat'])]
-gdf = gpd.GeoDataFrame(origin_dest_acc, geometry=geometry, crs="EPSG:4326")
-
-gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d20_w0.05.gpkg'
-gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d20_w0.05", driver="GPKG")
+# gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
+# gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.5_supply_1.gpkg'
+# gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.5_supply_1", driver="GPKG")
 # -
+
+gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
+gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg'
+gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.01_supply_weighted", driver="GPKG")
 
 # ### Distribution Diagram
 
