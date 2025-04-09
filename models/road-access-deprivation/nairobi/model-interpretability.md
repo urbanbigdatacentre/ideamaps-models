@@ -22,11 +22,9 @@ Below, we give definitions of the road access deprivation levels.
 
 
 ### Low
-<blockquote > The road network is paved and in good condition. Most buildings in these areas are directly connected to motorable roads, meaning no buildings block their access to the nearest road. </blockquote>
+<blockquote > The road network is paved and in good condition. Most buildings in these areas are directly connected to motorable roads, meaning no buildings block their access to the nearest road. Areas with no buildings are also categorised as low.</blockquote>
 
 <img src="image-examples/example-low-road-access-deprivation.png" alt="example-low">
-   
-
 
 ### Medium
 <blockquote> Roads are unpaved but motorable. Most buildings are directly connected to roads, meaning no buildings block their access to the road network. </blockquote>
