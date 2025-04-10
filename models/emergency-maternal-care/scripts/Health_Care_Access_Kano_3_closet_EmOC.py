@@ -375,7 +375,7 @@ origin_dest = distances_duration_matrix
 # Function
 from math import *
 d = 10 * 60 # try max duration 5/10mins/15mins/20 car, under estimation of travel time and traffic condition realted to the selected data sourse 
-W = 0.01 # try 0.1, 0.05, 0.01, 0.75
+W = 0.5 # try 0.1, 0.05, 0.01, 0.75
 beta = - d ** 2 / log(W)
 print(beta)
 
@@ -456,17 +456,19 @@ origin_dest_acc
 
 max(origin_dest_acc.Accessibility_standard)
 
+gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
+gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.5_supply_weighted.gpkg'
+gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.5_supply_weighted", driver="GPKG")
+
 # +
-# gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
-# gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.5_supply_1.gpkg'
-# gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.5_supply_1", driver="GPKG")
+#gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
+#gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg'
+#gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.01_supply_weighted", driver="GPKG")
 # -
 
-gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
-gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg'
-gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.01_supply_weighted", driver="GPKG")
-
 # ### Distribution Diagram
+
+origin_dest_acc = gpd.read_file(data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
 
 # +
 # 1. distribution plot of duration
@@ -478,16 +480,7 @@ sns.displot(origin_dest_acc['duration_seconds']/60, kde=True)
 plt.title('Distribution of Duration')
 plt.xlabel('Travel time')
 plt.ylabel('Frequency')
-plt.show()
-
-# +
-# 3. distribution plot of population/duration
-sns.scatterplot(x=['duration_seconds', y='population', data=origin_dest_acc)
-
-plt.xlabel('Duration')
-plt.ylabel('Population')
-
-plt.show()
+plt.show()          
 
 # +
 # 3. distribution plot of population/duration
@@ -496,6 +489,34 @@ sns.scatterplot(x='Accessibility_standard', y='population', data=origin_dest_acc
 plt.xlabel('Accessibility Score')
 plt.ylabel('Population')
 
+plt.show()
+
+# +
+plt.figure(figsize=(10, 6))
+sns.histplot(data=origin_dest_acc, x='Local_Validation')
+
+plt.title('Histogram')
+plt.xlabel('Local Validation')
+plt.ylabel('Count')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# +
+plt.figure(figsize=(20, 7))
+sns.histplot(
+    data=origin_dest_acc,
+    x='facility_name',
+    discrete=True,
+    color='skyblue',
+    edgecolor='black'
+)
+
+plt.title('Facility Name Distribution', fontsize=16)
+plt.xlabel('Facility Name', fontsize=12)
+plt.ylabel('Count', fontsize=12)
+plt.xticks(rotation=60, ha='right', fontsize=10)
+plt.tight_layout()
 plt.show()
 
 # +
