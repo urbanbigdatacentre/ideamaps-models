@@ -9,4 +9,6 @@ geopandas
 numpy 
 rasterio
 rasterstats
+scipy
+tqdm
 # time # not needed for this file
