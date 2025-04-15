@@ -1,0 +1,17 @@
+{
+    "name": "Lagos_v0",
+    "notes": "This dataset represents the accessibility of motorable roads from buildings and their quality in terms of surface type (paved/unpaved) as an indicator of urban deprivation. Motorable roads in areas with higher deprivation levels are generally unpaved but directly accessible from most buildings (medium) or motorable roads are sparse and only accessible via footpaths from most buildings (high).",
+    "focus_area_notes": "The focus areas represent a random sample of grid cells (300 per category). Validating these areas will help us to have representative samples that we will use to improve our classifications",
+    "city": "Lagos",
+    "subdomain": "Road Access Deprivation",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "features": [
+        "Road network",
+        "Road surface types (paved/unpaved)",
+        "Building footprints"
+    ]
+}
