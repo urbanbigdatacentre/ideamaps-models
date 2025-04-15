@@ -5,7 +5,7 @@ category: Our Data
 tags: [Maternal health care, Emergency obstetric care, Accessibility]  
 ---
 
-# Maternal Care Access Deprivation
+# Emergency Maternal Care Access Deprivation
 
 Maternal care access deprivation dataset is a dataset that depicts how difficult is for women in slums and other deprived areas to **access emergency maternal care**. **Mortality** among pregnant women and newborns strongly affects vulnerable communities and has been **prioritised by the communities** participating in the IDEAMAPS project. The team considered community priorities and analysed the different phases of maternity: antenatal, intrapartum or delivery, and postnatal, then decided to **focus on intrapartum or delivery phase as being the most critical**. The intertwined relationship between maternal health care and urban deprivation has been documented and described in the literature [(Abascal et al., 2022)](https://doi.org/10.1016/j.compenvurbsys.2022.101770). Therefore, analysing such conditions implies gathering data and analysing how vulnerable communities relate to emergency maternal care (EmOC) in the cities of Kano and Lagos in Nigeria. To do so, the team built a model that stands on factors such as offer, demmand and access. 
 
@@ -93,6 +93,7 @@ The model relies on the following datasets:
 - [General population counts from WorldPop](https://hub.worldpop.org/geodata/summary?id=49705)
 - [Open buildings V3 from Google](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings_v3_polygons)
 - [Road network data from OpenStreetMap via the Open Route Service API](https://openrouteservice.org/)
+
 
 ## Appendix: Two-Step Floating Catchment Area (2SFCA) Method
 
