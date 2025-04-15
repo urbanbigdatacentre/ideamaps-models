@@ -1,6 +1,6 @@
 ---
 title: Maternal Care Access Deprivation 
-authors: Diego Pajarito Grajales - Diego.PajaritoGrajales@glasgow.ac.uk & Xingyi Du - xingyi.du@glasgow.ac.uk
+authors: [Diego Pajarito Grajales - Diego.PajaritoGrajales@glasgow.ac.uk, Xingyi Du - xingyi.du@glasgow.ac.uk]
 category: Our Data
 tags: [Maternal health care, Emergency obstetric care, Accessibility]  
 ---
