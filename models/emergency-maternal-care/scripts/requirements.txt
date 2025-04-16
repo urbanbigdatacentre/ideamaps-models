@@ -1,7 +1,14 @@
 python-dotenv
+requests
 folium
 openrouteservice
 pandas
 fiona
 shapely
 geopandas
+numpy 
+rasterio
+rasterstats
+scipy
+tqdm
+# time # not needed for this file
