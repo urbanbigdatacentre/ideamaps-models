@@ -156,7 +156,6 @@ client = openrouteservice.Client(key=api_key)
 # Define directories
 data_inputs = '../scripts/Kano/data-inputs/'
 data_temp = '../scripts/Kano/data-temp/'
-data_outputs = '../scripts/Kano/data-outputs/'
 model_outputs = '../kano/'
 
 # ### Option 2: Lagos
@@ -166,18 +165,27 @@ model_outputs = '../kano/'
 # Define directories
 data_inputs = '../scripts/Lagos/data-inputs/'
 data_temp = '../scripts/Lagos/data-temp/'
-data_outputs = '../scripts/Lagos/data-outputs/'
 model_outputs = '../Lagos/'
 
 # + [markdown] magic_args="[markdown]"
-# ## 1. Data Collection
+# ## Data Collection
 
 # + [markdown] magic_args="[markdown]"
-# ### Validated healthcare facilities
+# ### 1. Validated healthcare facilities for Kano
 # note: to describe the process to validate healthcare facilities
 # -
 
 healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities.geojson')
+
+healthcare_facilities_validated
+
+# ### 2. Healthcare facilities in Lagos
+# note: Due to the absence of local expert validation in Lagos, the classification for validation is determine based on the ownership provided in the [datasets of health facilities](https://doi.org/10.6084/m9.figshare.22689667.v2).
+
+healthcare_facilities_validated['Validation'] = healthcare_facilities_validated['owner'].map({
+    1: 'Public Comprehensive EmOC',
+    2: 'Private Comprehensive EmOC'
+})
 
 healthcare_facilities_validated
 
@@ -186,7 +194,7 @@ healthcare_facilities_validated
 # note: explain the rational for female population between 15-49 years old
 
 # + [markdown] magic_args="[markdown]"
-# ## 2. Spatial Analysis Pipeline 
+# ## Spatial Analysis Pipeline 
 # ### Using OpenRouteService (ORS) Matrix API to calculate the travel time and distance from each population grid centroid to the healthcare facility 
 #
 # note: this will generate a file 'OD_matrix_healthcare_pop_grid'
