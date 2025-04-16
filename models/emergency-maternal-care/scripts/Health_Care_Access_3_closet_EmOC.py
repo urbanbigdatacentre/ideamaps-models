@@ -81,16 +81,12 @@
 # ```
 # -
 
-# %%
 import os
 from IPython.display import display
 import requests
-
 import folium
 from folium.plugins import MarkerCluster
 import openrouteservice
-import time
-
 import time
 import pandas as pd
 import numpy as np
@@ -101,12 +97,10 @@ from shapely.geometry import Point
 from shapely.geometry import box
 from scipy.spatial import cKDTree
 from tqdm import tqdm
-
 import rasterio
 from rasterio.transform import xy
 from rasterio.mask import mask
 import rasterstats as rs
-
 import math
 
 # + [markdown] magic_args="[markdown]"
@@ -158,7 +152,6 @@ client = openrouteservice.Client(key=api_key)
 #
 # -
 
-# %%
 # Set paths to access Kano data
 # Define directories
 data_inputs = '../scripts/Kano/data-inputs/'
@@ -169,7 +162,6 @@ model_outputs = '../kano/'
 # ### Option 2: Lagos
 # If you want to process data for the city of Kano, use the following code to filter the dataset. 
 
-# %%
 # Set paths to access Lagos data
 # Define directories
 data_inputs = '../scripts/Lagos/data-inputs/'
@@ -185,10 +177,8 @@ model_outputs = '../Lagos/'
 # note: to describe the process to validate healthcare facilities
 # -
 
-# %%
 healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities.geojson')
 
-# %%
 healthcare_facilities_validated
 
 # + [markdown] magic_args="[markdown]"
@@ -202,26 +192,20 @@ healthcare_facilities_validated
 # note: this will generate a file 'OD_matrix_healthcare_pop_grid'
 # -
 
-# %%
 origin_gdf = centroids_df
 origin_name_column = 'grid_code'
 destination_gdf = healthcare_facilities.dropna(subset=['geometry'])
 destination_name_column = 'facility_name'
 
-# %%
 origins = list(zip(origin_gdf.geometry.x, origin_gdf.geometry.y))
 
-# %%
 destinations = list(zip(destination_gdf.geometry.x, destination_gdf.geometry.y))
 
-# %%
 locations = origins + destinations
 
-# %%
 origins_index = list(range(0, len(origins)))
 destinations_index = list(range(len(origins), len(locations)))
 
-# %%
 body = {'locations': locations,
        'destinations': destinations_index,
        'sources': origins_index,
@@ -235,11 +219,9 @@ headers = {
 
 response = requests.post('https://api.openrouteservice.org/v2/matrix/driving-car', json=body, headers=headers)
 
-# %%
 distances = response.json().get('distances', [])
 durations = response.json().get('durations', [])
 
-# %%
 distances_duration_matrix = []
 
 # Iterate over each origin (grid)
@@ -272,15 +254,12 @@ matrix_df = pd.DataFrame(distances_duration_matrix, columns=[
     'destination_name', 'dest_lat', 'dest_lon','min_duration'
 ])
 
-# %%
 # Save to CSV
 merged_df = pd.merge(matrix_df, grid_df[['grid_code', 'population']], on='grid_code', how='left')
 merged_df.to_csv(data_temp + 'distance_duration_matrix_temp.csv', index=False)
 
-# %%
 merged_df
 
-# %%
 geometry = [Point(xy) for xy in zip(merged_df['dest_lon'], merged_df['dest_lat'])]
 gdf = gpd.GeoDataFrame(merged_df, geometry=geometry, crs="EPSG:4326")
 
@@ -305,30 +284,23 @@ gdf.to_file(gpkg_path, layer="duration_matrix", driver="GPKG")
 # ## Processing OD Matrix
 # -
 
-# %%
 matrix_df = pd.read_csv(data_temp +'OD-matrix-100m.csv')
 
-# %%
 matrix_df
 
 # + [markdown] magic_args="[markdown]"
 # We will select one facility for each gird cell
 # -
 
-# %%
 centroids_df = gpd.read_file(data_temp + 'pop-grid.gpkg')
 
-# %%
 centroids_df
 
-# %%
 pop_centroids_hcf = pd.merge(matrix_df, centroids_df[['rowid', 'longitude', 'latitude', 'lon_min', 'lat_min', 'lon_max', 'lat_max','bcount','pop_grid_bcount', 'pop_grid_pop', 'pop', 'geometry']], 
                      left_on='destination_id', right_on='rowid', how='left')
 
-# %%
 pop_centroids_hcf
 
-# %%
 pop_centroids_hcf = pop_centroids_hcf.rename(columns={
     "longitude": "origin_lon",
     "latitude": "origin_lat",
@@ -343,28 +315,22 @@ pop_centroids_hcf = pop_centroids_hcf.rename(columns={
 columns_to_keep = ["grid_id", "origin_lon", "origin_lat", "origin_lon_min","origin_lat_min","origin_lon_max","origin_lat_max","population", "bcount","pop_grid_bcount", "pop_grid_pop","geometry", "hcf_uid", "duration_seconds", "distance_km"]
 pop_centroids_hcf = pop_centroids_hcf[columns_to_keep]
 
-# %%
 pop_centroids_hcf
 
-# %%
 distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude', 'Local_Validation']], 
                      left_on='hcf_uid', right_on='hcf_id', how='left')
 
-# %%
 distances_duration_matrix = distances_duration_matrix.rename(columns={
     "longitude": "dest_lon",
     "latitude": "dest_lat"
 })
 distances_duration_matrix = distances_duration_matrix.drop(columns=['hcf_uid'])
 
-# %%
 distances_duration_matrix
 
-# %%
 category_counts = healthcare_facilities_validated['Local_Validation'].value_counts()
 print(category_counts)
 
-# %%
 distances_duration_matrix['Local_Validation'] = distances_duration_matrix['Local_Validation'].replace({
     'Public/Private Basic EmOC': 'Private Basic EmOC',
     'Public/Private comprehensive EmOC (missionary Hospital)': 'Private Comprehensive EmOC'
@@ -379,7 +345,6 @@ distances_duration_matrix = distances_duration_matrix[
 
 distances_duration_matrix
 
-# %%
 # creat subsets based on categories of 'Validation of HCFs Categorization'
 categories = {
     "public_comprehensive_EmOC": ["Public Comprehensive EmOC"],
@@ -400,10 +365,8 @@ private_CEmOC = subsets["private_comprehensive_EmOC"]
 public_BEmOC = subsets["public_basic_EmOC"]
 private_BEmOC = subsets["private_basic_EmOC"]
 
-# %%
 public_CEmOC
 
-# %%
 # Step 2: Define a function to get 3 smallest duration_seconds per grid_id for each category
 def get_closest_3(df, n=3):
     return df.groupby('grid_id').apply(lambda x: x.nsmallest(n, 'duration_seconds')).reset_index(drop=True)
@@ -422,17 +385,14 @@ distances_duration_matrix = pd.concat([
 
 # distances_duration_matrix = distances_duration_matrix.groupby('grid_id').apply(lambda x: x.nsmallest(3, 'duration_seconds')).reset_index(drop=True)
 
-# %%
 distances_duration_matrix
 
-# %%
 geometry = [Point(xy) for xy in zip(distances_duration_matrix['origin_lon'], distances_duration_matrix['origin_lat'])]
 gdf = gpd.GeoDataFrame(distances_duration_matrix, geometry=geometry, crs="EPSG:4326")
 
 gpkg_path = data_temp + 'distances_duration_3_closet_Emoc.gpkg'
 gdf.to_file(gpkg_path, layer="distances_duration_3_closet_Emoc", driver="GPKG")
 
-# %%
 # Review and remove
 origin_dest = distances_duration_matrix
 
@@ -440,7 +400,6 @@ origin_dest = distances_duration_matrix
 # ## Enhanced Two-Step Floating Catchment Area (E2SFCA) method
 # -
 
-# %%
 # Function
 from math import *
 d = 10 * 60 # try max duration 5/10mins/15mins/20 car, under estimation of travel time and traffic condition realted to the selected data sourse 
@@ -448,10 +407,8 @@ W = 0.01 # try 0.1, 0.05, 0.01, 0.75
 beta = - d ** 2 / log(W)
 print(beta)
 
-# %%
 print(origin_dest.head())
 
-# %%
 # Convert 'duration' to numeric, coercing errors to NaN
 origin_dest = origin_dest.copy()
 origin_dest['duration_seconds'] = pd.to_numeric(origin_dest['duration_seconds'], errors='coerce')
@@ -462,36 +419,28 @@ origin_dest['grid_id'] = pd.to_numeric(origin_dest['grid_id'], errors='coerce')
 
 origin_dest_acc = origin_dest
 
-# %%
 # Apply Gaussian decay function to calculate the weight of each grid to healthcare 
 # facilities based on the travel duration. d is the travel time and beta is the decay 
 # parameter previously calculated.
 # The weight decreases as the duration increases, meaning facilities that are further away have less impact.
 origin_dest_acc['Weight'] = origin_dest_acc['duration_seconds'].apply(lambda d: round(math.exp(-d**2/beta), 8))
 
-# %%
 # Compute the Weighted Population (Pop_W), the population of each grid cell is multiplied 
 # by the corresponding weight to calculate the weighted population.
 origin_dest_acc['Pop_W'] = origin_dest_acc['population'] * origin_dest_acc['Weight']
 
-# %%
 origin_dest_acc
 
-# %%
 # Sum the Weighted Population
 origin_dest_sum = origin_dest_acc.groupby(by='hcf_id')['Pop_W'].sum().reset_index()
 
-# %%
 origin_dest_sum
 
-# %%
 # Merge the Sum of Weighted Population Back into the Original Data
 origin_dest_acc = origin_dest_acc.merge(origin_dest_sum, on='hcf_id')
 
-# %%
 origin_dest_acc
 
-# %%
 # supply value is set to 1 for simplicity (capacity of HCF)
 # supply = 1
 # in the future, we will link supply with ownership and EmOC service level
@@ -501,7 +450,6 @@ origin_dest_acc = origin_dest_acc.rename(columns={'Pop_W_y': 'Pop_W_S'})  # Pop_
 # origin_dest_acc['supply_demand_ratio'] = 1 / origin_dest_acc.Pop_W_S
 # origin_dest_acc['supply_demand_ratio'].replace([np.inf, np.nan], 0, inplace=True)
 
-# %%
 supply_map = {
     'Public Comprehensive EmOC': 1,
     'Private Comprehensive EmOC': 0.7,
@@ -509,30 +457,24 @@ supply_map = {
     'Private Basic EmOC': 0.35
 }
 
-# %%
 origin_dest_acc['supply'] = origin_dest_acc['Local_Validation'].map(supply_map)
 origin_dest_acc['supply_demand_ratio'] = origin_dest_acc['supply'] / origin_dest_acc['Pop_W_S']
 origin_dest_acc['supply_demand_ratio'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
 
-# %%
 # Calculate Rj * Weight for Each Grid Cell
 origin_dest_acc['supply_W'] = origin_dest_acc['supply_demand_ratio'] * origin_dest_acc.Weight
 
-# %%
 # Compute Accessibility Index (Ai) for Each Grid Cell
 origin_dest_acc['Accessibility'] = origin_dest_acc.groupby('grid_id')['supply_W'].transform('sum')
 
-# %%
 # Normalize
 from sklearn.preprocessing import MinMaxScaler
 
 scaler = MinMaxScaler()
 origin_dest_acc['Accessibility_standard'] = scaler.fit_transform(origin_dest_acc[['Accessibility']])
 
-# %%
 origin_dest_acc
 
-# %%
 max(origin_dest_acc.Accessibility_standard)
 
 gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
@@ -543,10 +485,8 @@ gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.01_supply_weighted"
 # ### Distribution Diagram
 # -
 
-# %%
 origin_dest_acc = gpd.read_file(data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
 
-# %%
 # 1. distribution plot of duration
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -558,7 +498,6 @@ plt.xlabel('Travel time')
 plt.ylabel('Frequency')
 plt.show()          
 
-# %%
 # 3. distribution plot of population/duration
 sns.scatterplot(x='Accessibility_standard', y='population', data=origin_dest_acc)
 
@@ -567,7 +506,6 @@ plt.ylabel('Population')
 
 plt.show()
 
-# %%
 plt.figure(figsize=(10, 6))
 sns.histplot(data=origin_dest_acc, x='Local_Validation')
 
@@ -578,7 +516,6 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
 
-# %%
 plt.figure(figsize=(20, 7))
 sns.histplot(
     data=origin_dest_acc,
@@ -595,7 +532,6 @@ plt.xticks(rotation=60, ha='right', fontsize=10)
 plt.tight_layout()
 plt.show()
 
-# %%
 import geopandas as gpd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -645,7 +581,6 @@ plt.show()
 # There is a need to update this part of the code
 # -
 
-# %%
 # Read the GeoPackage file (if starting from this section)
 results_grid = gpd.read_file(data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
 results_grid = results_grid[['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_min', 'origin_lat_min', 'origin_lon_max', 'origin_lat_max', 'Accessibility_standard', 'geometry']]
@@ -657,7 +592,6 @@ results_grid = results_grid.drop_duplicates(['grid_id', 'origin_lon', 'origin_la
 
 type(results_grid)
 
-# %%
 results_grid
 
 # + [markdown] magic_args="[markdown]"
@@ -668,7 +602,6 @@ results_grid
 # Note: For Kano, we excluded grid cells with index values below 0.000001 that indicated very low population and a small number of buildings.  
 # -
 
-# %%
 results_grid['result'] = -1
 results_grid.loc[results_grid['Accessibility_standard'] > 0.000001, 'result'] = 2
 results_grid.loc[results_grid['Accessibility_standard'] > 0.005, 'result'] = 1
@@ -680,7 +613,6 @@ results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
 # We defined the focus areas based on values for the different thresholds. We aim at participants helping us to confirm the selection of the city-specific thresholds.
 # -
 
-# %%
 results_grid['focused'] = 0
 # Focus areas between the Low category and the excluded cells due to low population or no buildings
 results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
@@ -691,11 +623,9 @@ results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_gri
 
 results_grid
 
-# %%
 results_grid = results_grid.loc[results_grid['result'] != -1]
 
 
-# %%
 results_grid = results_grid.rename(columns={
     'origin_lon': 'longitude',
     'origin_lat': 'latitude',
@@ -707,7 +637,6 @@ results_grid = results_grid.rename(columns={
 
 results_grid
 
-# %%
 # Save the results to a new GeoPackage file
 output_gpkg_path = data_outputs + 'emergency-maternal-care-deprivation-access.gpkg'
 results_grid.to_file(output_gpkg_path, layer='emergency-maternal-care-deprivation-access', driver='GPKG')
@@ -716,5 +645,4 @@ results_grid.to_file(output_gpkg_path, layer='emergency-maternal-care-deprivatio
 results_table = results_grid.drop(columns=['Accessibility_standard', 'grid_id', 'geometry'])
 results_table.to_csv(model_outputs + 'model-output.csv', index=False)
 
-# %%
 results_table
