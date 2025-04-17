@@ -7,6 +7,11 @@ tags: [Maternal health care, Emergency obstetric care, Accessibility]
 
 # Emergency Maternal Care Access Deprivation
 
+The rapid growth of urban areas has put substantial pressure on local services and infrastructure, particularly in African cities. With migrants moving into cities and transient households moving within cities, traditional means of collecting data (e.g., censuses and household surveys) are inadequate and often fail to capture the realities of informal settlements and households. As a consequence, there is a chronic lack of basic data about deprived households and entire settlements. Given that urban poor residents rely predominantly on private and informal service providers for healthcare and other services, they are rarely captured in routine service data, including health information management systems. This is even more critical for women in need of maternal health care. 
+
+Nigeria continues to face a high burden of maternal mortality, with an estimated 993 deaths per 100,000 livebirths ([UNICEF 2025](https://data.unicef.org/resources/trends-in-maternal-mortality-2000-to-2023)), disproportionately affecting women in the northern states, including Kano. In urban settings, especially among the poor, inadequate access to emergency obstetric care (EmOC) remains a critical challenge, compounded by rapid urban growth, infrastructure limitations, and underreporting in health systems ([Johnson et al., 2025](https://doi.org/10.1186/s12963-025-00374-0)). We explored the availability, accessibility, and demand for EmOC services in Kano and Lagos in Nigeria, using geospatial data and socio-economic analysis to identify gaps in service delivery. 
+
+## Modelling approach
 Maternal care access deprivation dataset is a dataset that depicts how difficult is for women in slums and other deprived areas to **access emergency maternal care**. **Mortality** among pregnant women and newborns strongly affects vulnerable communities and has been **prioritised by the communities** participating in the IDEAMAPS project. The team considered community priorities and analysed the different phases of maternity: antenatal, intrapartum or delivery, and postnatal, then decided to **focus on intrapartum or delivery phase as being the most critical**. The intertwined relationship between maternal health care and urban deprivation has been documented and described in the literature [(Abascal et al., 2022)](https://doi.org/10.1016/j.compenvurbsys.2022.101770). Therefore, analysing such conditions implies gathering data and analysing how vulnerable communities relate to emergency maternal care (EmOC) in the cities of Kano and Lagos in Nigeria. To do so, the team built a model that stands on factors such as offer, demmand and access. 
 
 <aside>
@@ -15,7 +20,7 @@ Maternal care access deprivation dataset is a dataset that depicts how difficult
 
 ## Definitions of Deprivation Levels
 
-The dataset relates the offer of emergency obstetric care (i.e., health care facilities offering EmOC), their service levels (i.e., comprehensive or basic care) and relative costs (i.e., private facilities charging higher relative costs that public facilities); the demmand represented as female population in childbearing age; and the phisical accesibility represented in travel time (i.e., travel times that also include delays of waiting for a vehicle, high traffic and difficult road conditions). Together, these values serve to estimate deprivation access based on the two-step floating catchment area (i.e., access deprivation as the inverse of accessibility)  —> **Low, Medium, or High.**
+The dataset relates the offer of emergency obstetric care (i.e., health care facilities offering EmOC), their service levels (i.e., comprehensive or basic care) and relative costs (i.e., private facilities charging higher relative costs that public facilities); the demmand represented as female population in childbearing age; and the physical accesibility represented in travel time (i.e., travel times that also include delays of waiting for a vehicle, high traffic and difficult road conditions). Together, these values serve to estimate deprivation access based on the two-step floating catchment area (i.e., access deprivation as the inverse of accessibility)  —> **Low, Medium, or High.**
 
 Below, we give definitions of the maternal care access deprivation.
 
@@ -47,7 +52,7 @@ To learn more about how you can help improve the accuracy of these classificatio
 
 
 
-The analysis is set as two parallel workstreams (i.e., offer and demand) that merge using a synthetic index to represent access deprivation. Stream one considers health care facilities offering emergency obstetric care (EmOC), their relative costs and a local validation from the local partners in Kano. Stream two considers population counts of the female population of childbearing age and estimates its distribution based on built-up areas within the reference grid. Finally, the accessibility indicator is the result of applying the two-step floating catchment area method based on a pool of nearby health care facilities.
+The analysis is set as two parallel workstreams (i.e., offer and demand) that merge using a synthetic index to represent access deprivation. Stream one considers health care facilities offering emergency obstetric care (EmOC), their relative costs and a local validation from the local partners in Kano. Stream two considers population counts of the female population of childbearing age and estimates its distribution based on built-up areas within the reference grid. Finally, the accessibility indicator is the result of applying the two-step floating catchment area method based on a pool of nearby healthcare facilities.
 
 <img src="image-examples/insights-emergency-maternal-1.jpg" alt="Emergency-maternal-care-model">
 
