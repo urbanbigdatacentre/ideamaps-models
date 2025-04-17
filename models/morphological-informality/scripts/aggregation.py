@@ -1,78 +1,169 @@
 import geopandas as gpd
+from geopandas import GeoDataFrame
 import pandas as pd
 import numpy as np
+from scipy.stats import entropy, gaussian_kde
+import utm
 from pathlib import Path
+import argparse
+from tqdm import tqdm
 
-from parsers import aggregation_parser as argument_parser
+
+def argument_parser():
+    # https://docs.python.org/3/library/argparse.html#the-add-argument-method
+    parser = argparse.ArgumentParser(description="Experiment Args")
+    parser.add_argument('-m', "--morphometrics-dir", dest='morphometrics_dir', required=True)
+    parser.add_argument('-b', "--building-file", dest='building_file', required=True)
+    parser.add_argument('-g', "--grid-file", dest='grid_file', required=True)
+    parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
+                        help="path to output directory")
+
+    parser.add_argument(
+        "opts",
+        help="Modify config options using the command-line",
+        default=None,
+        nargs=argparse.REMAINDER,
+    )
+    return parser
+
+def get_utm_epsg(gdf: GeoDataFrame) -> int:
+    gdf = gdf.to_crs(4326)
+
+    # Calculate the centroid of the bounding box
+    bounds = gdf.total_bounds
+    min_lng, min_lat, max_lng, max_lat = bounds
+    lng, lat = (min_lng + max_lng) / 2, (min_lat + max_lat) / 2
+
+    # Convert to UTM and create EPSG code
+    utm_coords = utm.from_latlon(lat, lng)
+    zone_number, zone_letter = utm_coords[2], utm_coords[3]
+    epsg_code = 32600 + zone_number if zone_letter >= 'N' else 32700 + zone_number
+
+    return epsg_code
+
+def compute_entropy(series, areas=None):
+    if areas is not None:
+        relevant_buildings = areas >= 50
+        if relevant_buildings.sum() < 2:
+            return 0
+        series = series[areas >= 50]
+    probs = series.value_counts(normalize=True)  # Get probability distribution
+    return entropy(probs, base=2)  # Compute Shannon entropy (bits)
+
+
+def kde_entropy(series, areas=None, bandwidth='scott', num_bins=100):
+    """
+    Compute entropy of building orientation deviations using Kernel Density Estimation (KDE).
+
+    Parameters:
+    - series: Pandas Series, angles in degrees within [0, 45]
+    - bandwidth: str or float, KDE bandwidth (default 'scott' adapts to sample size)
+    - num_bins: int, number of evaluation points for entropy computation
+
+    Returns:
+    - Shannon entropy (higher = more irregular orientation distribution)
+    """
+    if series.isna().sum() == len(series) or series.nunique() < 2:
+        return 0  # Return 0 if there's not enough unique data
+
+    if areas is not None:
+        relevant_buildings = areas >= 50
+        if relevant_buildings.sum() < 2:
+            return 0
+        series = series[areas >= 50]
+
+        if series.isna().sum() == len(series) or series.nunique() < 2:
+            return 0  # Return 0 if there's not enough unique data
+
+    # Convert to NumPy array
+    angles_deg = series.dropna().to_numpy()
+
+    # Fit Kernel Density Estimation (KDE)
+    kde = gaussian_kde(angles_deg, bw_method=bandwidth)
+
+    # Define evaluation range (to cover [0, 45] space)
+    x_vals = np.linspace(0, 45, num_bins)
+
+    # Compute estimated density
+    pdf_vals = kde(x_vals)
+
+    # Normalize PDF to ensure it's a proper probability distribution
+    pdf_vals /= pdf_vals.sum()
+
+    # Compute entropy using SciPy's built-in function
+    return entropy(pdf_vals, base=np.e)  # Natural log base
 
 
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
-    # TODO: add ltcWRB
+    assert Path(args.output_dir).exists()
 
-    umm = gpd.read_parquet(args.building_file)
-    umm = umm[['uID', 'geometry']]
-    assert np.all(umm.is_valid)
+    building_file = Path(args.building_file)
+    bmm = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
+    bmm = bmm[['uID', 'geometry']]
 
     # Loading Urban Morphometrics (UMM)
-    metrics = ['sdbAre', 'ssbElo', 'stbOri', 'stcOri', 'ssbCCD', 'sdcAre', 'sscERI', 'sicCAR', 'mtbAli', 'mtbNDi',
-               'mtcWNe', 'mdcAre', 'ltcBuA', 'ltbIBD', 'ltcWRB']
+    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi_log', 'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri', 'strAli']
 
-    for metric in metrics:
-        metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.pq')
-        umm = pd.merge(umm, metric_values, on='uID', how='inner')
+    for metric in building_metrics:
+        metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.parquet')
+        bmm = pd.merge(bmm, metric_values, on='uID', how='inner')
+    bmm = gpd.GeoDataFrame(bmm, geometry='geometry')
 
-    umm = gpd.GeoDataFrame(umm, geometry='geometry')
-    umm = umm.to_crs("EPSG:4326")
-    umm['centroid'] = umm.geometry.centroid
-    umm = gpd.GeoDataFrame(umm, geometry='centroid').drop(columns='geometry')
-
-    #Aggregation to the grid
-    grid = gpd.read_file(args.grid_file)
+    # Loading grid
+    grid_file = Path(args.grid_file)
+    grid = gpd.read_parquet(grid_file) if grid_file.suffix == '.parquet' else gpd.read_file(grid_file)
     grid = grid[['geometry']]
     grid['grid_id'] = range(1, len(grid) + 1)  # create column containing an unique raw numbering for each grid
-    grid = grid.to_crs("EPSG:4326")
-    assert np.all(grid.is_valid)
 
-    # Perform Spatial Join
-    umm_grid = gpd.sjoin(grid, umm, how='inner', predicate='intersects')
+    # Reprojecting buildings and grid to local UTM zone
+    grid_crs = grid.crs
+    utm_epsg = get_utm_epsg(grid)
+    grid, bmm = grid.to_crs(utm_epsg), bmm.to_crs(utm_epsg)
 
-    # handle missing data
-    has_missing_values = umm_grid.isnull().values.any()
+    # Perform spatial join based on building centroids and drop grid cells with no buildings
+    bmm['centroid'] = bmm.geometry.centroid
+    bmm_grid = gpd.sjoin(grid, bmm.set_geometry('centroid').drop(columns='geometry'), how='inner',
+                         predicate='intersects')
+    bmm_grid = bmm_grid.dropna()
 
-    umm_grid = umm_grid.dropna()
-
-    # Assuming 'joined' is your GeoDataFrame
-    # 'geometry' is the column name of the grid geometry
-    # 'grid_id' is the identifier for each grid cell
-
-    # 'variables' is a list of the variable names you want to aggregate by mean and median
-    median = ['sdcAre', 'ssbElo', 'ssbCCD', 'mtbAli', 'mtbNDi', 'ltcBuA', 'sdbAre', 'sscERI', 'sicCAR', 'mtcWNe',
-              'mdcAre', 'ltbIBD', 'ltcWRB']
-    sd = ['stbOri', 'stcOri']
-    sum = ['sdcAre']
+    # 'variables' is a list of the variable names you want to aggregate by median and standard deviation
+    median = ['sdbAre', 'mtbAli', 'sicCAR', 'mtcWNe', 'mtbNDi_log', 'strAli']
+    variation = ['stbOri', 'stcOri']
 
     # Set the grid geometry as the active geometry
-    print(umm_grid.columns)
-    umm_grid = umm_grid.set_geometry('geometry')
+    bmm_grid = bmm_grid.set_geometry('geometry')
+    grouped_bmm_grid = bmm_grid.groupby('grid_id')
 
     # Group by 'grid_id' and calculate median and std
-    median_values = umm_grid.groupby('grid_id')[median].median().add_prefix('md_')
-    sd_values = umm_grid.groupby('grid_id')[sd].std().fillna(0).add_prefix('sd_')
-    sum_values = umm_grid.groupby('grid_id')[sum].sum().add_prefix('sum_')
+    median_values = grouped_bmm_grid[median].median().add_prefix('md_')
 
-    building_counts = umm_grid.groupby('grid_id').size().rename('bcount')
-    single_building_grids = building_counts[building_counts == 1]
+    variation_measures = ['kdes']
+    variation_dict = {f'{measure}_{metric}': [] for metric in variation for measure in variation_measures}
+    variation_dict['grid_id'] = []
+    for grid_id, values in tqdm(grouped_bmm_grid):
+        variation_dict['grid_id'].append(grid_id)
+        for metric in variation:
+            skde_value = kde_entropy(values[metric])
+            variation_dict[f'kdes_{metric}'].append(skde_value)
+            skder_value = kde_entropy(values[metric], areas=values['sdbAre'])
+            variation_dict[f'kdesr_{metric}'].append(skder_value)
+    variation_values = pd.DataFrame(variation_dict)
+    building_counts = grouped_bmm_grid.size().rename('bcount')
 
-    # the NaN values are because there is only 1 building per grid
-    sd_values.isnull().sum()
-
-    # Assuming df_shp and join_df are your DataFrames and 'uID' is the common column
-    merge_stats = pd.merge(median_values, sd_values, on='grid_id', how='inner')
-    merge_stats = pd.merge(merge_stats, sum_values, on='grid_id', how='inner')
+    # Merge all statistics
+    merge_stats = pd.merge(median_values, variation_values, on='grid_id', how='inner')
     merge_stats = pd.merge(merge_stats, building_counts, on='grid_id', how='inner')
 
-    merge_stats.isnull().sum()
+    # Compute sum of built-up area 'sum_sdbAre'
+    # Get intersecting building footprints for each grid cell and sum the intersected areas
+    intersections = gpd.overlay(bmm, grid, how='intersection')
+    intersections['intersected_area'] = intersections.geometry.area
+    grid_building_area = intersections.groupby('grid_id')['intersected_area'].sum().reset_index()
+    merge_stats = pd.merge(merge_stats, grid_building_area, on='grid_id', how='left')
+    merge_stats = merge_stats.rename(columns={'intersected_area': 'sum_sdbAre'})
+    # Fill NaN values with 0 (cells with no buildings)
+    merge_stats['sum_sdbAre'] = merge_stats['sum_sdbAre'].fillna(0)
 
     if grid.index.name != 'grid_id':
         grid = grid.set_index('grid_id')
@@ -81,14 +172,33 @@ if __name__ == '__main__':
         merge_stats = merge_stats.set_index('grid_id')
 
     # Perform Spatial Join
-    df_stats = pd.merge(grid, merge_stats, on='grid_id', how='inner')
-    gdf_stats = gpd.GeoDataFrame(df_stats, geometry='geometry', crs='EPSG:4326')
+    building_stats = pd.merge(grid, merge_stats, on='grid_id', how='inner')
 
-    # if any column is duplicated
-    duplicate_columns = gdf_stats.columns[gdf_stats.columns.duplicated()]
-    print(duplicate_columns)
+    # Roads
+    road_metrics = ['strOri']
+    var_measures_road = ['kdes']
+    rmm = gpd.read_parquet(Path(args.morphometrics_dir) / 'strOri.parquet')
+    rmm = rmm.to_crs(utm_epsg)
+    rmm_grid = gpd.sjoin(grid, rmm, how='left', predicate='intersects')
+    grouped_rmm_grid = rmm_grid.groupby('grid_id')
+
+    var_dict_road = {f'{measure}_{metric}': [] for metric in road_metrics for measure in var_measures_road}
+    var_dict_road['grid_id'] = []
+    for grid_id, values in tqdm(grouped_rmm_grid):
+        var_dict_road['grid_id'].append(grid_id)
+        for metric in road_metrics:
+            skde_value = kde_entropy(values[metric])
+            var_dict_road[f'kdes_{metric}'].append(skde_value)
+
+    var_values_road = pd.DataFrame(var_dict_road)
+    road_point_counts = grouped_rmm_grid.size().rename('rcount')
+    road_stats = pd.merge(var_values_road, road_point_counts, on='grid_id', how='inner')
+
+    df_stats = pd.merge(building_stats, road_stats, on='grid_id', how='left')
+    gdf_stats = gpd.GeoDataFrame(df_stats, geometry='geometry', crs=utm_epsg)
 
     gdf_stats = gdf_stats.loc[:, ~gdf_stats.columns.duplicated()]
+    gdf_stats = gdf_stats.to_crs(grid_crs)
 
     # Export to a new gpkg
-    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid.pq')
+    gdf_stats.to_parquet(Path(args.output_dir) / 'morphometrics_grid.parquet')

@@ -1,6 +1,7 @@
 {
     "name": "Nairobi_v3",
     "notes": "This dataset represents the difference between planned and unplanned areas of the city as an indication of urban deprivation. Areas with higher levels of morphological informality are related to more deprived areas.",
+    "focus_area_notes": "The focus areas represent a random sample of grid cells (300 per category). Validating these areas will help us to have representative samples that we will use to improve our classifications",
     "city": "Nairobi",
     "subdomain": "Morphological Informality",
     "output_keys": {
