@@ -237,7 +237,7 @@ epsg = 'EPSG:32632'
 grid_file = data_inputs + '100mGrid.gpkg'
 grid = gpd.read_file(grid_file)
 grid = grid.to_crs(epsg)
-grid['grid_id'] = range(len(grid))
+grid = grid.rename(columns={'rowid': 'grid_id'})
 grid = grid[['grid_id', 'geometry']].set_geometry('geometry')
 grid.head()
 
