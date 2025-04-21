@@ -79,6 +79,9 @@ from rasterio.mask import mask
 import rasterstats as rs
 import math
 
+from pathlib import Path
+from shapely.geometry import Polygon
+
 # + [markdown] magic_args="[markdown]"
 # ## Preprocessing
 # In this study, users first requested an ORS Matrix API key from the [OpenRouteService](https://openrouteservice.org/) platform and subsequently interacted with the OpenRouteService API through the instantiation of the OpenRouteService client. This is the OpenRouteService [API documentation](https://openrouteservice.org/dev/#/api-docs/introduction) for ORS Core-Version 9.0.0. 
@@ -168,6 +171,134 @@ healthcare_facilities_validated
 # + [markdown] magic_args="[markdown]"
 # ### Population Grid Data (1km resolution) from WorldPop
 # note: explain the rational for female population between 15-49 years old
+# -
+
+study_area = gpd.read_file(data_inputs + '100mGrid.gpkg')
+raster_path = data_inputs + 'nga_f_15_49_2015_1km.tif'
+
+with rasterio.open(raster_path) as dataset:
+    geometries = [study_area.geometry.unary_union.__geo_interface__]
+    clipped_image, clipped_transform = mask(dataset, geometries, crop=True)
+    band1 = clipped_image[0] # Read the first band of the raster
+
+out_meta = dataset.meta.copy()
+out_meta.update({
+        "height": clipped_image.shape[1],
+        "width": clipped_image.shape[2],
+        "transform": clipped_transform
+    })
+
+with rasterio.open(data_inputs + 'Lagos_nga_f_15_49_2015_1km.tif', "w", **out_meta) as dest:
+    dest.write(clipped_image)
+
+
+# ## Adding population data at 1km grid to 100m grid
+
+# +
+# reading in geotiff file as numpy array
+def read_tif(file: Path):
+    if not file.exists():
+        raise FileNotFoundError(f'File {file} not found')
+
+    with rasterio.open(file) as dataset:
+        arr = dataset.read()  # (bands X height X width)
+        transform = dataset.transform
+        crs = dataset.crs
+
+    return arr.transpose((1, 2, 0)), transform, crs
+
+def raster2vector(arr, transform, crs) -> gpd.GeoDataFrame:
+    height, width, bands = arr.shape
+
+    # Generate pixel coordinates
+    geometries = []
+    pixel_values = []
+
+    for row in range(height):
+        for col in range(width):
+            x_min, y_max = transform * (col, row)  # Top-left corner
+            x_max, y_min = transform * (col + 1, row + 1)  # Bottom-right corner
+
+            pixel_value = arr[row, col].tolist()[0]  # Convert numpy array to list
+            polygon = Polygon([(x_min, y_max), (x_max, y_max), (x_max, y_min), (x_min, y_min)])
+
+            geometries.append(polygon)
+            pixel_values.append(pixel_value)
+
+    # Convert to DataFrame
+    gdf = gpd.GeoDataFrame({'pop_grid_pop': pixel_values, 'geometry': geometries}, crs=crs)
+
+    return gdf
+
+epsg = 'EPSG:32632'
+# -
+
+# Preparing grid
+grid_file = data_inputs + '100mGrid.gpkg'
+grid = gpd.read_file(grid_file)
+grid = grid.to_crs(epsg)
+grid['grid_id'] = range(len(grid))
+grid = grid[['grid_id', 'geometry']].set_geometry('geometry')
+grid.head()
+
+# +
+# Count buildings per grid cell
+
+# Loading Google building footprints
+building_file = Path('Lagos_GOBv3.gpkg')
+buildings = gpd.read_file(building_file)
+buildings = buildings.to_crs(epsg)
+buildings['centroid'] = buildings['geometry'].centroid
+
+# Joining buildings to grid
+grid_buildings = grid.sjoin(buildings.set_geometry('centroid').drop(columns='geometry'), how='inner', predicate='intersects')
+grid_buildings = grid_buildings.groupby('grid_id')
+
+# Counting buildings per grid
+building_counts = grid_buildings.size().rename('bcount')
+
+# Adding building count to grid cells
+grid = grid.merge(building_counts, on='grid_id', how='left')
+
+# Assign building count 0 to cells with no buildings (NaN)
+grid['bcount'] = grid['bcount'].fillna(0)
+grid.head()
+
+# +
+# Adding population data at 1km grid to finer grid
+
+# Loading coarse pop data
+pop_file = data_path / 'Lagos_nga_f_15_49_2015_1km.tif'
+pop_raster, transform, crs = read_tif(pop_file)
+
+# Converting the raster grid to vector data
+pop_grid = raster2vector(pop_raster, transform, crs)
+pop_grid = pop_grid.to_crs(epsg)
+pop_grid['pop_grid_id'] = range(len(pop_grid))
+# pop_grid.to_parquet(data_path / 'sanity_check_pop.parquet')
+
+# Assign coarse population data to finer grid based on the centroid locations of the finer grid cells
+grid['centroid'] = grid['geometry'].centroid
+grid = gpd.sjoin(grid.set_geometry('centroid'), pop_grid, how='left', predicate='within')
+print(grid.columns)
+grid = grid[['grid_id', 'bcount', 'pop_grid_id', 'geometry']]
+grid.head()
+
+# +
+# Calculate population weight (fraction of total population count that should be assigned to cell based on its building count)
+grid_grouped_pop = grid.groupby('pop_grid_id')
+building_count_pop = grid_grouped_pop['bcount'].sum().rename('pop_grid_bcount')
+grid = grid.merge(building_count_pop, on='pop_grid_id', how='left')
+grid['pop_weight'] = grid['bcount'] / grid['pop_grid_bcount']
+
+# Compute disaggregated population count based on weight and building count at coarser cell level
+grid = grid.merge(pop_grid, on='pop_grid_id', how='left')
+grid['population'] = grid['pop_grid_pop'] * grid['pop_weight']
+grid.head()
+# -
+
+# Saving to file
+grid.to_parquet(data_temp + 'pop_grid.parquet')
 
 # + [markdown] magic_args="[markdown]"
 # ## Spatial Analysis Pipeline 
