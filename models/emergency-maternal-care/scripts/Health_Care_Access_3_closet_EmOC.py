@@ -14,51 +14,24 @@
 # ---
 
 # + [markdown] magic_args="[markdown]"
-# # Analysis of Emergency Obstetric Care (EmOC) in Kano
-# > Note: This notebook requires the local environment dependencies listed in our [requirements.txt](requirements.txt) file.
+# # Analysis of Emergency Maternal Care Deprivation in Kano and Lagos, Nigeria
+# > Note: This notebook requires the local environment dependencies listed in our [requirements.txt] (requirements.txt) file. Use this file to install the required packages in a virtual environment.
 #
-# > To excecute OpenRouteService functions, it is required to install the [library dependencies](https://github.com/GIScience/openrouteservice-examples#local-installation).
-# > You should either have an [openrouteservice API key](https://openrouteservice.org/dev/#/signup) or a local ORS environment to complete the analysis.
+# > To excecute OpenRouteService functions, it is required to install the [library dependencies](https://github.com/GIScience/openrouteservice-examples#local-installation). You should either have an [openrouteservice API key](https://openrouteservice.org/dev/#/signup) or a local ORS environment to complete the analysis.
 #
-# prepare environment dependencies document
+# The model concepts and processes are described in our documentation. The [Dataset-interpretability](https://github.com/urbanbigdatacentre/ideamaps-models/blob/a4084fb650424ac575941cdacb71421aa882bae4/models/emergency-maternal-care/kano/dataset-interpretability.md) file describes the rationale behind this model.
+# -
 
-# + [markdown] magic_args="[markdown]"
-# ## Abstract
-# The rapid growth of urban areas has put substantial pressure on local services and infrastructure, particularly in African cities. With migrants moving into cities and transient households moving within cities, traditional means of collecting data (e.g., censuses and household surveys) are inadequate and often overlook informal settlements and households. As a consequence, there is a chronic lack of basic data about deprived households and entire settlements. Given that urban poor residents rely predominantly on private and informal service providers for healthcare and other services, they are rarely captured in routine service data, including health information management systems. This is even more critical for women in need of maternal health care. 
+# ## Workflow:
+# The notebook is divided into the following sections:
 #
-# Considering the different phases of maternity: antenatal care, interpartern or delivery, and postnatal care, the team decided to focus on interpartern or delivery phase being the most critical. The intertwined relationship between maternal health care and urban deprivation has been documented and described in the literature [Abascal et al., 2022](https://doi.org/10.1016/j.compenvurbsys.2022.101770). The IDEAMAPS Data Ecosystem team aims to analyse the conditions in which vulnerable communities relate to emergency maternal care (EmOC) in the city of Kano. To do so, the analysis is divided into three main components: 
-# 1. **EmOC Offer**: Based on the geospatial database of travel times [(Macharia et al., 2023)](https://doi.org/10.1038/s41597-023-02651-9) and the team's field validation, we characterised 145 HC facilities offering EmOC in Kano, their service levels and relative costs.
-# 2. **EmOC Accessibility**: The team used different routing services, including the OSM-based openrouteservice API, to calculate the travel times to the nearest EmOC facility for each 100x100m grid cell in Kano. 
-# 3. **EmOC Demand**: The team discussed a set of socio-economic factors that determine the way communities from slums and other deprived areas demand or interact with EmOC services such as available income, employment, education, age, medical practitioners' age and gender as well as religious beliefs and social practices. despite not having access to specific data, the team discussed the potential impacts on demand for EmOC services in Kano based on these factors.
-#
-#
-#
-# ### Workflow:
-#
-# The notebook gives an overview of the distribution of centres offering EmOC in Kano, their classification and how they can be accessed by car. Open source data from OpenStreetMap and tools (such as the openrouteservice) were used to create accessibility measures such as travel times and isochrones. Spatial analysis and other data analytics functions led to generating outputs within the 100x100m grid cells that categorised them into three levels: low, medium, and high.
-#
-# * **Preprocessing**: Get data for EmOC facilities.
-# * **Analysis for Offer**:
-#     * Filter and classify EmOC facilities based on discussed criteria.
-#     * Visualise EmOC faccilities in their categories.
-# * **Analysis for Accessibility**:
-#     * Compute travel times to facilities using openrouteservice API or other routing services.
-#     * Generate areas for low, medium and high categories based on discussed criteria.
-# * **Analysis for Demmand**:
-#     * Derive socio-economic descriptors based on discussed criteria.
-# * **Result**: Visualize results as maps and export model outputs.
-#
-#
-# ### Datasets and Tools:
-# * [A geospatial database of close to reality travel times to obstetric emergency care in 15 Nigerian conurbations](https://figshare.com/s/8868db0bf3fd18a9585d) - A curated list of health care facilities offering EmOC in Nigeria [(Macharia et al., 2023)](https://doi.org/10.1038/s41597-023-02651-9).
-# * [openrouteservice](https://openrouteservice.org/) - generate isochrones on the OpenStreetMap road network
-#
+# 1. Initial Setup
+# 2. Data Preparation
+# 3. Travel time estimates
+# 4. Two-step floating catchment area (2SFCA) analysis
+# 5. Results
 
-# + [markdown] magic_args="[markdown]"
-# # Python Workflow
-
-# + [markdown] magic_args="[markdown]"
-# This study integrates various Python geospatial analysis libraries and packages to support spatial data processing, visualization, and isochrone generation. The os module is used to interact with the operating system, managing file paths and reading environment variables such as API keys. folium library along with its MarkerCluster plugin, facilitates the creation of interactive maps for visualizing large-scale geospatial data. The openrouteservice.client serves as an interface to the OpenRouteService API, enabling the extraction of isochrones. pandas library for data analysis, provides functions for analyzing, cleaning, exploring, and manipulating data, while fiona supports reading and writing real-world data using multi-layered GIS formats, such as shapefiles. The shapely package is employed for the manipulation and analysis of planar geometric objects.
+# ## 1. Initial Setup
 
 # + [markdown] magic_args="[markdown]"
 # ## Setting up the virtual environment
@@ -79,15 +52,17 @@
 # pip install -U ipykernel
 # python -m ipykernel install --user --name=.venv
 # ```
-# -
 
+# +
 import os
 from IPython.display import display
 import requests
+
 import folium
 from folium.plugins import MarkerCluster
 import openrouteservice
 import time
+
 import pandas as pd
 import numpy as np
 import fiona as fn
@@ -97,6 +72,7 @@ from shapely.geometry import Point
 from shapely.geometry import box
 from scipy.spatial import cKDTree
 from tqdm import tqdm
+
 import rasterio
 from rasterio.transform import xy
 from rasterio.mask import mask
