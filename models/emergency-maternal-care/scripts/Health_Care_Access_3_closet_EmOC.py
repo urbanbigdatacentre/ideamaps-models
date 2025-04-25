@@ -139,8 +139,182 @@ healthcare_facilities_validated = gpd.read_file(data_inputs + 'health-care-facil
 healthcare_facilities_validated
 
 # %% [markdown]
+# ### 2. Healthcare facilities in Lagos
+# note: Due to the absence of local expert validation in Lagos, the classification for validation is determine based on the ownership provided in the [datasets of health facilities](https://doi.org/10.6084/m9.figshare.22689667.v2).
+
+# %%
+healthcare_facilities_validated['Validation'] = healthcare_facilities_validated['owner'].map({
+    1: 'Public Comprehensive EmOC',
+    2: 'Private Comprehensive EmOC'
+})
+
+# %%
+healthcare_facilities_validated
+
+# %% [markdown]
 # ### Population Grid Data (1km resolution) from WorldPop
 # note: explain the rational for female population between 15-49 years old
+
+# %%
+study_area = gpd.read_file(data_inputs + '100mGrid.gpkg')
+raster_path = data_inputs + 'nga_f_15_49_2015_1km.tif'
+
+# %%
+with rasterio.open(raster_path) as dataset:
+    geometries = [study_area.geometry.unary_union.__geo_interface__]
+    clipped_image, clipped_transform = mask(dataset, geometries, crop=True)
+    band1 = clipped_image[0] # Read the first band of the raster
+
+# %%
+out_meta = dataset.meta.copy()
+out_meta.update({
+        "height": clipped_image.shape[1],
+        "width": clipped_image.shape[2],
+        "transform": clipped_transform
+    })
+
+# %%
+with rasterio.open(data_inputs + 'Lagos_nga_f_15_49_2015_1km.tif', "w", **out_meta) as dest:
+    dest.write(clipped_image)
+
+# %% [markdown]
+# ## Adding population data at 1km grid to 100m grid
+
+# %%
+# reading in geotiff file as numpy array
+def read_tif(file: Path):
+    if not file.exists():
+        raise FileNotFoundError(f'File {file} not found')
+
+    with rasterio.open(file) as dataset:
+        arr = dataset.read()  # (bands X height X width)
+        nodata = dataset.nodata
+        transform = dataset.transform
+        crs = dataset.crs
+
+    # Replace NoData value with NaN
+    if nodata is not None:
+        arr[arr == nodata] = np.nan
+
+    return arr.transpose((1, 2, 0)), transform, crs
+
+def raster2vector(arr, transform, crs) -> gpd.GeoDataFrame:
+    height, width, bands = arr.shape
+
+    # Generate pixel coordinates
+    geometries = []
+    pixel_values = []
+
+    for row in range(height):
+        for col in range(width):
+            x_min, y_max = transform * (col, row)  # Top-left corner
+            x_max, y_min = transform * (col + 1, row + 1)  # Bottom-right corner
+
+            pixel_value = arr[row, col].tolist()[0]  # Convert numpy array to list
+            polygon = Polygon([(x_min, y_max), (x_max, y_max), (x_max, y_min), (x_min, y_min)])
+
+            geometries.append(polygon)
+            pixel_values.append(pixel_value)
+
+    # Convert to DataFrame
+    gdf = gpd.GeoDataFrame({'pop_grid_pop': pixel_values, 'geometry': geometries}, crs=crs)
+
+    return gdf
+
+epsg = 'EPSG:32632'
+
+# %%
+# Preparing grid
+grid_file = data_inputs + '100mGrid.gpkg'
+grid = gpd.read_file(grid_file)
+grid = grid.to_crs(epsg)
+grid['grid_id'] = range(len(grid))
+grid = grid[['grid_id', 'geometry','rowid', 'latitude', 'lat_min', 'lat_max', 'longitude', 'lon_min','lon_max']].set_geometry('geometry')
+grid
+
+# %%
+# Count buildings per grid cell
+
+# Loading Google building footprints
+building_file = data_inputs + 'Lagos_GOBv3.gpkg'
+buildings = gpd.read_file(building_file)
+buildings = buildings.to_crs(epsg)
+buildings['centroid'] = buildings['geometry'].centroid
+
+# Joining buildings to grid
+grid_buildings = grid.sjoin(buildings.set_geometry('centroid').drop(columns='geometry'), how='inner', predicate='intersects')
+grid_buildings = grid_buildings.groupby('grid_id')
+
+# Counting buildings per grid
+building_counts = grid_buildings.size().rename('bcount')
+
+# Adding building count to grid cells
+grid = grid.merge(building_counts, on='grid_id', how='left')
+
+# Assign building count 0 to cells with no buildings (NaN)
+grid['bcount'] = grid['bcount'].fillna(0)
+grid
+
+# %%
+# Adding population data at 1km grid to finer grid
+from pathlib import Path
+
+data_path = Path(data_inputs)
+
+# Loading coarse pop data
+pop_file = data_path / 'lagos_nga_f_15_49_2015_1km.tif'
+pop_raster, transform, crs = read_tif(pop_file)
+
+# Converting the raster grid to vector data
+pop_grid = raster2vector(pop_raster, transform, crs)
+pop_grid = pop_grid.to_crs(epsg)
+pop_grid['pop_grid_id'] = range(len(pop_grid))
+# pop_grid.to_parquet(data_path / 'sanity_check_pop.parquet')
+
+# Assign coarse population data to finer grid based on the centroid locations of the finer grid cells
+grid['centroid'] = grid['geometry'].centroid
+grid = gpd.sjoin(grid.set_geometry('centroid'), pop_grid, how='left', predicate='within')
+print(grid.columns)
+grid = grid[['grid_id', 'bcount', 'pop_grid_id', 'geometry','rowid', 'latitude', 'lat_min', 'lat_max',
+       'longitude', 'lon_min', 'lon_max']]
+grid.head()
+
+# %%
+
+
+print("Min value in raster:", np.min(pop_raster))
+
+
+# %%
+with rasterio.open(pop_file) as ds:
+    print("NoData value:", ds.nodata)
+
+
+# %%
+print(grid['bcount'].sum())
+
+# %%
+# Calculate population weight (fraction of total population count that should be assigned to cell based on its building count)
+grid_grouped_pop = grid.groupby('pop_grid_id')
+building_count_pop = grid_grouped_pop['bcount'].sum().rename('pop_grid_bcount')
+grid = grid.merge(building_count_pop, on='pop_grid_id', how='left')
+grid['pop_weight'] = grid['bcount'] / grid['pop_grid_bcount']
+
+# Compute disaggregated population count based on weight and building count at coarser cell level
+grid = grid.merge(pop_grid, on='pop_grid_id', how='left')
+grid['pop'] = grid['pop_grid_pop'] * grid['pop_weight']
+grid.head()
+
+# %%
+# Saving to file
+grid = grid.drop(columns=["geometry_y"])
+grid.head()
+
+
+# %%
+grid = grid.set_geometry("geometry_x")
+grid = grid.to_crs(4326)
+grid.to_file(data_temp + 'pop_grid.gpkg', driver='GPKG')
 
 # %% [markdown]
 # ## 2. Spatial Analysis Pipeline 
@@ -314,6 +488,28 @@ distances_duration_matrix['Local_Validation'] = distances_duration_matrix['Local
     'Public/Private comprehensive EmOC (missionary Hospital)': 'Private Comprehensive EmOC'
 })
 
+# %%
+selected_categories = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC', 
+                       'Private Basic EmOC', 'Public Basic EmOC']
+
+# %%
+distances_duration_matrix = distances_duration_matrix[
+    distances_duration_matrix['Local_Validation'].isin(selected_categories)
+]
+
+# %%
+distances_duration_matrix
+
+# %%
+category_counts = healthcare_facilities_validated['Local_Validation'].value_counts()
+print(category_counts)
+
+# %%
+distances_duration_matrix['Local_Validation'] = distances_duration_matrix['Local_Validation'].replace({
+    'Public/Private Basic EmOC': 'Private Basic EmOC',
+    'Public/Private comprehensive EmOC (missionary Hospital)': 'Private Comprehensive EmOC'
+})
+
 selected_categories = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC', 
                        'Private Basic EmOC', 'Public Basic EmOC']
 
@@ -346,6 +542,18 @@ private_BEmOC = subsets["private_basic_EmOC"]
 
 # %%
 public_CEmOC
+
+# %%
+# Step 2: Define a function to get 3 smallest duration_seconds per grid_id for each category
+def get_closest_3(df, n=3):
+    return df.groupby('grid_id').apply(lambda x: x.nsmallest(n, 'duration_seconds')).reset_index(drop=True)
+
+# %%
+# If the subsets are already created for each category, we apply the function to each subset:
+public_CEmOC_closest_3 = get_closest_3(public_CEmOC)
+private_CEmOC_closest_3 = get_closest_3(private_CEmOC)
+public_BEmOC_closest_3 = get_closest_3(public_BEmOC)
+private_BEmOC_closest_3 = get_closest_3(private_BEmOC)
 
 # %%
 # Step 2: Define a function to get 3 smallest duration_seconds per grid_id for each category
@@ -404,6 +612,7 @@ origin_dest['duration_seconds'] = pd.to_numeric(origin_dest['duration_seconds'],
 origin_dest = origin_dest.dropna(subset=['duration_seconds'])
 origin_dest['grid_id'] = pd.to_numeric(origin_dest['grid_id'], errors='coerce')
 
+# %%
 origin_dest_acc = origin_dest
 
 # %%
@@ -471,6 +680,10 @@ origin_dest_acc['Accessibility'] = origin_dest_acc.groupby('grid_id')['supply_W'
 # Normalize
 from sklearn.preprocessing import MinMaxScaler
 
+# %%
+# Normalize
+from sklearn.preprocessing import MinMaxScaler
+
 scaler = MinMaxScaler()
 origin_dest_acc['Accessibility_standard'] = scaler.fit_transform(origin_dest_acc[['Accessibility']])
 
@@ -501,12 +714,28 @@ origin_dest_acc = gpd.read_file(data_outputs + 'acc_score_3_closet_Emoc_d10_w0.0
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# %%
+sns.displot(origin_dest_acc['duration_seconds']/60, kde=True)
+
+# %%
+# 1. distribution plot of duration
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 sns.displot(origin_dest_acc['duration_seconds']/60, kde=True)
 
 plt.title('Distribution of Duration')
 plt.xlabel('Travel time')
 plt.ylabel('Frequency')
 plt.show()          
+
+# %%
+# 3. distribution plot of population/duration
+sns.scatterplot(x='Accessibility_standard', y='population', data=origin_dest_acc)
+
+# %%
+plt.xlabel('Accessibility Score')
+plt.ylabel('Population')
 
 # %%
 # 3. distribution plot of population/duration
@@ -521,12 +750,26 @@ plt.show()
 plt.figure(figsize=(10, 6))
 sns.histplot(data=origin_dest_acc, x='Local_Validation')
 
+# %%
+plt.figure(figsize=(10, 6))
+sns.histplot(data=origin_dest_acc, x='Local_Validation')
+
 plt.title('Histogram')
 plt.xlabel('Local Validation')
 plt.ylabel('Count')
 plt.xticks(rotation=45)
 plt.tight_layout()
 plt.show()
+
+# %%
+plt.figure(figsize=(20, 7))
+sns.histplot(
+    data=origin_dest_acc,
+    x='facility_name',
+    discrete=True,
+    color='skyblue',
+    edgecolor='black'
+)
 
 # %%
 plt.figure(figsize=(20, 7))
@@ -588,6 +831,7 @@ plt.tight_layout()
 output_image_path = 'data_outputs/output_image.png'
 plt.savefig(output_image_path, bbox_inches='tight', dpi=300)
 
+# %%
 plt.show()
 
 # %% [markdown]
@@ -610,6 +854,36 @@ results_grid = results_grid[['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_
 results_grid = results_grid.drop_duplicates(['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_min', 'origin_lat_min', 'origin_lon_max', 'origin_lat_max', 'Accessibility_standard', 'geometry'])
 
 type(results_grid)
+
+# %%
+results_grid
+
+# %% [markdown]
+# ### Setting values for Low medium and High categories
+# 
+# We started by defining equal value division, and modified the thesholds to a value that is more legible and easier to interpret. Every model should have their own thresholds based on the data distribution of the three categories. 
+# 
+# Note: For Kano, we excluded grid cells with index values below 0.000001 that indicated very low population and a small number of buildings.  
+
+# %%
+results_grid['result'] = -1
+results_grid.loc[results_grid['Accessibility_standard'] > 0.000001, 'result'] = 2
+results_grid.loc[results_grid['Accessibility_standard'] > 0.005, 'result'] = 1
+results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
+
+# %% [markdown]
+# ### Setting values for focus areas
+# 
+# We defined the focus areas based on values for the different thresholds. We aim at participants helping us to confirm the selection of the city-specific thresholds.
+
+# %%
+results_grid['focused'] = 0
+# Focus areas between the Low category and the excluded cells due to low population or no buildings
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
+# Focus areas between the Medium and High categories
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.003) & (results_grid['Accessibility_standard'] < 0.006), 'focused'] = 1
+# Focus areas between the Low and Medium categories
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_grid['Accessibility_standard'] < 0.03), 'focused'] = 1
 
 # %%
 results_grid
