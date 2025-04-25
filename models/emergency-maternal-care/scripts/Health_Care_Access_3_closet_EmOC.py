@@ -1,23 +1,20 @@
 # %% [markdown]
 # # Analysis of Emergency Maternal Care Deprivation in Kano and Lagos, Nigeria
-# > Note: This notebook requires the local environment dependencies listed in our [requirements.txt](requirements.txt) file. Use this file to install the required packages in a virtual environment.
+# > Note: This notebook requires the local environment dependencies listed in our [requirements.txt] (requirements.txt) file. Use this file to install the required packages in a virtual environment.
 # 
-# > To excecute OpenRouteService functions, it is required to install the [library dependencies](https://github.com/GIScience/openrouteservice-examples#local-installation).
-# > You should either have an [openrouteservice API key](https://openrouteservice.org/dev/#/signup) or a local ORS environment to complete the analysis.
+# > To excecute OpenRouteService functions, it is required to install the [library dependencies](https://github.com/GIScience/openrouteservice-examples#local-installation). You should either have an [openrouteservice API key](https://openrouteservice.org/dev/#/signup) or a local ORS environment to complete the analysis.
+# 
+# The model concepts and processes are described in our documentation. The [Dataset-interpretability](https://github.com/urbanbigdatacentre/ideamaps-models/blob/a4084fb650424ac575941cdacb71421aa882bae4/models/emergency-maternal-care/kano/dataset-interpretability.md) file describes the rationale behind this model.
 
 # %% [markdown]
-# The model concepts and processes are described in our documentation. The [Dataset-interpretability](../kano/dataset-interpretability.md) file describes the rationale behind this model. 
-# 
-# ##Workflow:
-# 
+# ## Workflow:
 # The notebook is divided into the following sections:
+# 
 # 1. Initial Setup
 # 2. Data Preparation
 # 3. Travel time estimates
 # 4. Two-step floating catchment area (2SFCA) analysis
 # 5. Results
-# 
-# 
 
 # %% [markdown]
 # ## 1. Initial Setup
@@ -52,7 +49,6 @@ from folium.plugins import MarkerCluster
 import openrouteservice
 import time
 
-import time
 import pandas as pd
 import numpy as np
 import fiona as fn
@@ -67,8 +63,19 @@ import rasterio
 from rasterio.transform import xy
 from rasterio.mask import mask
 import rasterstats as rs
-
 import math
+
+from pathlib import Path
+from shapely.geometry import Polygon
+
+# Used for scaling the data
+from sklearn.preprocessing import MinMaxScaler
+
+# Used for data analysis and visualization
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
 
 # %% [markdown]
 # ## Preprocessing
@@ -86,6 +93,7 @@ import math
 #     OPENROUTESERVICE_API_KEY='your_api_key'
 # ```
 
+# %%
 # %%
 # Read the api key from the .env file
 from dotenv import load_dotenv
@@ -113,47 +121,73 @@ client = openrouteservice.Client(key=api_key)
 # * [Functional Urban Areas](https://human-settlement.emergency.copernicus.eu/download.php?ds=FUA) - data from Global Human Settlement Layer(2015)
 
 # %% [markdown]
-# ### option 1: Kano
+# ### Option 1: Kano
 # If you want to process data for the city of Kano, use the following code to filter the dataset. 
 # 
 
 # %%
-# Set paths to access data
+# Set paths to access Kano data
 # Define directories
-data_inputs = '../scripts/data-inputs/'
-data_temp = '../scripts/data-temp/'
-data_outputs = '../scripts/data-outputs/'
+data_inputs = '../scripts/Kano/data-inputs/'
+data_temp = '../scripts/Kano/data-temp/'
 model_outputs = '../kano/'
 
 # %% [markdown]
-# ## 1. Data Collection
+# ### Option 2: Lagos
+# If you want to process data for the city of Kano, use the following code to filter the dataset. 
+
+# %%
+# Set paths to access Lagos data
+# Define directories
+data_inputs = '../scripts/Lagos/data-inputs/'
+data_temp = '../scripts/Lagos/data-temp/'
+model_outputs = '../lagos/'
 
 # %% [markdown]
-# ### Validated healthcare facilities
+# ## Data Collection
+
+# %% [markdown]
+# ### 1.1 Validated healthcare facilities for Kano
 # note: to describe the process to validate healthcare facilities
 
 # %%
-healthcare_facilities_validated = gpd.read_file(data_inputs + 'health-care-facilities-validated-Apr2025.geojson')
+healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities.geojson')
 
 # %%
 healthcare_facilities_validated
 
 # %% [markdown]
-# ### 2. Healthcare facilities in Lagos
+# ### 1.2 Healthcare facilities in Lagos
 # note: Due to the absence of local expert validation in Lagos, the classification for validation is determine based on the ownership provided in the [datasets of health facilities](https://doi.org/10.6084/m9.figshare.22689667.v2).
 
 # %%
-healthcare_facilities_validated['Validation'] = healthcare_facilities_validated['owner'].map({
-    1: 'Public Comprehensive EmOC',
-    2: 'Private Comprehensive EmOC'
-})
+healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities.geojson')
+
+# %% [markdown]
+# To assing the healthcare facilities to the different categories, we used the following criteria:
+# - **Public**: Facilities owned by the government (1), the military (3) or the police (6) health authorities. 
+# - **Private**: Facilities owned by private individuals or other organizations.
+
+# %%
+conditions = [
+    healthcare_facilities_validated['specific_owner'].isin([1, 3, 6]),
+    healthcare_facilities_validated['specific_owner'].isin([2, 4, 5])
+]
+choices = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC']
+
+# Explicitly set the default to a string
+healthcare_facilities_validated['Validation'] = np.select(
+    conditions, choices, default='Other'
+)
 
 # %%
 healthcare_facilities_validated
 
 # %% [markdown]
-# ### Population Grid Data (1km resolution) from WorldPop
+# ### 2. Population Grid Data (1km resolution) from WorldPop
 # note: explain the rational for female population between 15-49 years old
+# 
+# ** Add a note to explain the process applies for the two cities **
 
 # %%
 study_area = gpd.read_file(data_inputs + '100mGrid.gpkg')
@@ -174,11 +208,11 @@ out_meta.update({
     })
 
 # %%
-with rasterio.open(data_inputs + 'Lagos_nga_f_15_49_2015_1km.tif', "w", **out_meta) as dest:
+with rasterio.open(data_inputs + 'lagos_nga_f_15_49_2015_1km.tif', "w", **out_meta) as dest:
     dest.write(clipped_image)
 
 # %% [markdown]
-# ## Adding population data at 1km grid to 100m grid
+# ### Adding population data at 1km grid to 100m grid
 
 # %%
 # reading in geotiff file as numpy array
@@ -317,7 +351,7 @@ grid = grid.to_crs(4326)
 grid.to_file(data_temp + 'pop_grid.gpkg', driver='GPKG')
 
 # %% [markdown]
-# ## 2. Spatial Analysis Pipeline 
+# ## 3. Estimating travel times (Spatial Analysis Pipeline) 
 # ### Using OpenRouteService (ORS) Matrix API to calculate the travel time and distance from each population grid centroid to the healthcare facility 
 # 
 # note: this will generate a file 'OD_matrix_healthcare_pop_grid'
@@ -347,12 +381,14 @@ body = {'locations': locations,
        'sources': origins_index,
        'metrics': ['distance', 'duration']}
 
+# %%
 headers = {
     'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
     'Authorization': api_key,
     'Content-Type': 'application/json; charset=utf-8'
 }
 
+# %%
 response = requests.post('https://api.openrouteservice.org/v2/matrix/driving-car', json=body, headers=headers)
 
 # %%
@@ -362,6 +398,7 @@ durations = response.json().get('durations', [])
 # %%
 distances_duration_matrix = []
 
+# %%
 # Iterate over each origin (grid)
 for origin_index, origin in origin_gdf.iterrows():
     origin_name = origin[origin_name_column]
@@ -386,6 +423,7 @@ for origin_index, origin in origin_gdf.iterrows():
             min_duration
         ])
 
+# %%
 # Convert the results into a DataFrame
 matrix_df = pd.DataFrame(distances_duration_matrix, columns=[
     'grid_code','origin_lat', 'origin_lon',
@@ -404,6 +442,7 @@ merged_df
 geometry = [Point(xy) for xy in zip(merged_df['dest_lon'], merged_df['dest_lat'])]
 gdf = gpd.GeoDataFrame(merged_df, geometry=geometry, crs="EPSG:4326")
 
+# %%
 gpkg_path = data_temp + 'distance_duration_matrix_temp.gpkg'
 gdf.to_file(gpkg_path, layer="duration_matrix", driver="GPKG")
 
@@ -422,22 +461,50 @@ gdf.to_file(gpkg_path, layer="duration_matrix", driver="GPKG")
 # 
 
 # %% [markdown]
-# ## Processing OD Matrix
+# ## Selecting the Healthcare facilities pool based on the OD Matrix
 
 # %%
-matrix_df = pd.read_csv(data_temp +'kano-od-matrix-100m.csv')
+matrix_df = pd.read_csv(data_temp +'lagos-od-matrix-tenclosest.csv')
+
+# need to normalise the filenames
 
 # %%
 matrix_df
 
 # %% [markdown]
-# We will select one facility for each gird cell
+# **GRID CELLS WITHOUT TRAVEL TIME ESTIMATE**
+# If a grid cell has a NULL value in the travel estimate, we will remove it from the analysis. This is because we cannot calculate the 2SFCA without a travel time estimate.
 
 # %%
-centroids_df = gpd.read_file(data_temp + 'kano-pop-grid.gpkg')
+# Calculate the percentage of missing values in the 'duration_seconds' column
+percentage_na = (matrix_df['duration_seconds'].isna().sum() / len(matrix_df)) * 100
+print(percentage_na)
+
+
+# %% [markdown]
+# Removing the grid cells with NULL values in the travel time estimate will help us to avoid errors in the analysis.
+
+# %%
+# Removing rows with NaN values in the 'duration_seconds' column
+matrix_df = matrix_df.dropna(subset=['duration_seconds'])
+
+
+
+# %% [markdown]
+# ## Combining the OD matrix and the population data
+# 
+# Population data is the result of combining 1km grid data with 100m grid data. See [Section 2]() for more details.
+
+# %%
+# If stating the process here, read the file again
+centroids_df = gpd.read_file(data_temp + 'pop_grid.gpkg')
 
 # %%
 centroids_df
+
+# %% [markdown]
+# Note: The OD matrix contains ids for every grid cell ('destination_id') and the healtcare facilities ('origin_id').
+# 
 
 # %%
 pop_centroids_hcf = pd.merge(matrix_df, centroids_df[['rowid', 'longitude', 'latitude', 'lon_min', 'lat_min', 'lon_max', 'lat_max','bcount','pop_grid_bcount', 'pop_grid_pop', 'pop', 'geometry']], 
@@ -445,6 +512,12 @@ pop_centroids_hcf = pd.merge(matrix_df, centroids_df[['rowid', 'longitude', 'lat
 
 # %%
 pop_centroids_hcf
+
+# %% [markdown]
+# ## Option 1: Kano
+
+# %% [markdown]
+# To make the dataframe easier to read, we will rename the columns in the dataframe.
 
 # %%
 pop_centroids_hcf = pop_centroids_hcf.rename(columns={
@@ -475,6 +548,9 @@ distances_duration_matrix = distances_duration_matrix.rename(columns={
 })
 distances_duration_matrix = distances_duration_matrix.drop(columns=['hcf_uid'])
 
+# %% [markdown]
+# **Review** descriptions for this procedures
+
 # %%
 distances_duration_matrix
 
@@ -494,29 +570,9 @@ selected_categories = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC'
 
 # %%
 distances_duration_matrix = distances_duration_matrix[
-    distances_duration_matrix['Local_Validation'].isin(selected_categories)
-]
+    distances_duration_matrix['Local_Validation'].isin(selected_categories)]
 
 # %%
-distances_duration_matrix
-
-# %%
-category_counts = healthcare_facilities_validated['Local_Validation'].value_counts()
-print(category_counts)
-
-# %%
-distances_duration_matrix['Local_Validation'] = distances_duration_matrix['Local_Validation'].replace({
-    'Public/Private Basic EmOC': 'Private Basic EmOC',
-    'Public/Private comprehensive EmOC (missionary Hospital)': 'Private Comprehensive EmOC'
-})
-
-selected_categories = ['Public Comprehensive EmOC', 'Private Comprehensive EmOC', 
-                       'Private Basic EmOC', 'Public Basic EmOC']
-
-distances_duration_matrix = distances_duration_matrix[
-    distances_duration_matrix['Local_Validation'].isin(selected_categories)
-]
-
 distances_duration_matrix
 
 # %%
@@ -528,6 +584,7 @@ categories = {
     "public_basic_EmOC": ["Public Basic EmOC"]
 }
 
+# %%
 subsets = {
     key: distances_duration_matrix[
         distances_duration_matrix['Local_Validation'].str.contains('|'.join(values), na=False)
@@ -535,6 +592,7 @@ subsets = {
     for key, values in categories.items()
 }
 
+# %%
 public_CEmOC = subsets["public_comprehensive_EmOC"]
 private_CEmOC = subsets["private_comprehensive_EmOC"]
 public_BEmOC = subsets["public_basic_EmOC"]
@@ -556,23 +614,13 @@ public_BEmOC_closest_3 = get_closest_3(public_BEmOC)
 private_BEmOC_closest_3 = get_closest_3(private_BEmOC)
 
 # %%
-# Step 2: Define a function to get 3 smallest duration_seconds per grid_id for each category
-def get_closest_3(df, n=3):
-    return df.groupby('grid_id').apply(lambda x: x.nsmallest(n, 'duration_seconds')).reset_index(drop=True)
-                      
-# If the subsets are already created for each category, we apply the function to each subset:
-public_CEmOC_closest_3 = get_closest_3(public_CEmOC)
-private_CEmOC_closest_3 = get_closest_3(private_CEmOC)
-public_BEmOC_closest_3 = get_closest_3(public_BEmOC)
-private_BEmOC_closest_3 = get_closest_3(private_BEmOC)
-
 # Step 4: Concatenate the filtered results into a single DataFrame
 distances_duration_matrix = pd.concat([
     public_CEmOC_closest_3, private_CEmOC_closest_3,
     public_BEmOC_closest_3, private_BEmOC_closest_3
 ])
 
-# %%
+# %% [markdown]
 # distances_duration_matrix = distances_duration_matrix.groupby('grid_id').apply(lambda x: x.nsmallest(3, 'duration_seconds')).reset_index(drop=True)
 
 # %%
@@ -582,6 +630,56 @@ distances_duration_matrix
 geometry = [Point(xy) for xy in zip(distances_duration_matrix['origin_lon'], distances_duration_matrix['origin_lat'])]
 gdf = gpd.GeoDataFrame(distances_duration_matrix, geometry=geometry, crs="EPSG:4326")
 
+# %%
+gpkg_path = data_temp + 'distances_duration_3_closet_Emoc.gpkg'
+gdf.to_file(gpkg_path, layer="distances_duration_3_closet_Emoc", driver="GPKG")
+
+# %%
+# Review and remove
+origin_dest = distances_duration_matrix
+
+# %% [markdown]
+# ## Option 2: Lagos
+# This option differ from the Kano option in the validation data being estimated as part of the OD matrix estimation and the selection of healthcare facilities in the pool. 
+
+# %%
+pop_centroids_hcf = pop_centroids_hcf.rename(columns={
+    "longitude": "origin_lon",
+    "latitude": "origin_lat",
+    "lon_min": "origin_lon_min",
+    "lat_min": "origin_lat_min",
+    "lon_max": "origin_lon_max",
+    "lat_max": "origin_lat_max",
+    "rowid": "grid_id",
+    "origin_id": "hcf_uid",
+    "pop": "population"
+})
+columns_to_keep = ["grid_id", "origin_lon", "origin_lat", "origin_lon_min","origin_lat_min","origin_lon_max","origin_lat_max",
+                   "population", "bcount","pop_grid_bcount", "pop_grid_pop","geometry", "hcf_uid", "duration_seconds", "distance_km", "validation"]
+pop_centroids_hcf = pop_centroids_hcf[columns_to_keep]
+
+# %% [markdown]
+# Merging the dataframe than contains the od matrix (with the healthcare facility class) and the population data with the full information about health care facilities.
+
+# %%
+distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude']], 
+                     left_on='hcf_uid', right_on='hcf_id', how='left')
+
+# %%
+distances_duration_matrix = distances_duration_matrix.rename(columns={
+    "longitude": "dest_lon",
+    "latitude": "dest_lat"
+})
+distances_duration_matrix = distances_duration_matrix.drop(columns=['hcf_uid'])
+
+# %% [markdown]
+# DEscrfibe
+
+# %%
+geometry = [Point(xy) for xy in zip(distances_duration_matrix['origin_lon'], distances_duration_matrix['origin_lat'])]
+gdf = gpd.GeoDataFrame(distances_duration_matrix, geometry=geometry, crs="EPSG:4326")
+
+# %%
 gpkg_path = data_temp + 'distances_duration_3_closet_Emoc.gpkg'
 gdf.to_file(gpkg_path, layer="distances_duration_3_closet_Emoc", driver="GPKG")
 
@@ -596,7 +694,7 @@ origin_dest = distances_duration_matrix
 # Function
 from math import *
 d = 10 * 60 # try max duration 5/10mins/15mins/20 car, under estimation of travel time and traffic condition realted to the selected data sourse 
-W = 0.5 # try 0.1, 0.05, 0.01, 0.75
+W = 0.01 # try 0.1, 0.05, 0.01, 0.75
 beta = - d ** 2 / log(W)
 print(beta)
 
@@ -608,6 +706,7 @@ print(origin_dest.head())
 origin_dest = origin_dest.copy()
 origin_dest['duration_seconds'] = pd.to_numeric(origin_dest['duration_seconds'], errors='coerce')
 
+# %%
 # Drop rows with NaN values in 'duration' column
 origin_dest = origin_dest.dropna(subset=['duration_seconds'])
 origin_dest['grid_id'] = pd.to_numeric(origin_dest['grid_id'], errors='coerce')
@@ -650,7 +749,7 @@ origin_dest_acc
 # in the future, we will link supply with ownership and EmOC service level
 origin_dest_acc = origin_dest_acc.rename(columns={'Pop_W_y': 'Pop_W_S'})  # Pop_W_S: Population Weight Sum
 
-# %%
+# %% [markdown]
 # Compute the Supply-Demand Ratio (Rj)
 # origin_dest_acc['supply_demand_ratio'] = 1 / origin_dest_acc.Pop_W_S
 # origin_dest_acc['supply_demand_ratio'].replace([np.inf, np.nan], 0, inplace=True)
@@ -663,8 +762,22 @@ supply_map = {
     'Private Basic EmOC': 0.35
 }
 
+# %% [markdown]
+# Option 1: Kano
+# 
+
 # %%
 origin_dest_acc['supply'] = origin_dest_acc['Local_Validation'].map(supply_map)
+
+
+# %% [markdown]
+# Option 2: Lagos
+
+# %%
+origin_dest_acc['supply'] = origin_dest_acc['validation'].map(supply_map)
+
+
+# %%
 origin_dest_acc['supply_demand_ratio'] = origin_dest_acc['supply'] / origin_dest_acc['Pop_W_S']
 origin_dest_acc['supply_demand_ratio'].replace([np.inf, -np.inf, np.nan], 0, inplace=True)
 
@@ -676,14 +789,18 @@ origin_dest_acc['supply_W'] = origin_dest_acc['supply_demand_ratio'] * origin_de
 # Compute Accessibility Index (Ai) for Each Grid Cell
 origin_dest_acc['Accessibility'] = origin_dest_acc.groupby('grid_id')['supply_W'].transform('sum')
 
-# %%
-# Normalize
-from sklearn.preprocessing import MinMaxScaler
+# %% [markdown]
+# To normalise the accesibility index, we use the sklearn library. 
+# Double check you have installed the library
+# ```bash
+# pip install -U scikit-learn
+# ```
+# ```python
+# from sklearn.preprocessing import MinMaxScaler
+# 
 
 # %%
 # Normalize
-from sklearn.preprocessing import MinMaxScaler
-
 scaler = MinMaxScaler()
 origin_dest_acc['Accessibility_standard'] = scaler.fit_transform(origin_dest_acc[['Accessibility']])
 
@@ -695,35 +812,20 @@ max(origin_dest_acc.Accessibility_standard)
 
 # %%
 gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
-gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.5_supply_weighted.gpkg'
-gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.5_supply_weighted", driver="GPKG")
-
-# %%
-#gdf = gpd.GeoDataFrame(origin_dest_acc, geometry='geometry', crs="EPSG:4326")
-#gpkg_path = data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg'
-#gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.01_supply_weighted", driver="GPKG")
+gpkg_path = data_temp + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg'
+gdf.to_file(gpkg_path, layer="acc_score_3_closet_Emoc_d10_w0.01_supply_weighted", driver="GPKG")
 
 # %% [markdown]
-# ### Distribution Diagram
+# ### Results analysis Distribution Diagram
 
 # %%
-origin_dest_acc = gpd.read_file(data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
-
-# %%
-# 1. distribution plot of duration
-import seaborn as sns
-import matplotlib.pyplot as plt
+# If not load
+origin_dest_acc = gpd.read_file(data_temp + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
 
 # %%
 sns.displot(origin_dest_acc['duration_seconds']/60, kde=True)
 
 # %%
-# 1. distribution plot of duration
-import seaborn as sns
-import matplotlib.pyplot as plt
-
-sns.displot(origin_dest_acc['duration_seconds']/60, kde=True)
-
 plt.title('Distribution of Duration')
 plt.xlabel('Travel time')
 plt.ylabel('Frequency')
@@ -738,12 +840,6 @@ plt.xlabel('Accessibility Score')
 plt.ylabel('Population')
 
 # %%
-# 3. distribution plot of population/duration
-sns.scatterplot(x='Accessibility_standard', y='population', data=origin_dest_acc)
-
-plt.xlabel('Accessibility Score')
-plt.ylabel('Population')
-
 plt.show()
 
 # %%
@@ -751,9 +847,6 @@ plt.figure(figsize=(10, 6))
 sns.histplot(data=origin_dest_acc, x='Local_Validation')
 
 # %%
-plt.figure(figsize=(10, 6))
-sns.histplot(data=origin_dest_acc, x='Local_Validation')
-
 plt.title('Histogram')
 plt.xlabel('Local Validation')
 plt.ylabel('Count')
@@ -772,15 +865,6 @@ sns.histplot(
 )
 
 # %%
-plt.figure(figsize=(20, 7))
-sns.histplot(
-    data=origin_dest_acc,
-    x='facility_name',
-    discrete=True,
-    color='skyblue',
-    edgecolor='black'
-)
-
 plt.title('Facility Name Distribution', fontsize=16)
 plt.xlabel('Facility Name', fontsize=12)
 plt.ylabel('Count', fontsize=12)
@@ -796,17 +880,21 @@ import re
 import os
 from matplotlib import gridspec
 
+# %%
 data_folder = 'data_outputs/acc_score_3_closest_Emoc'
 
+# %%
 file_names = [f for f in os.listdir(data_folder) if f.endswith('.gpkg')] 
 
+# %%
 fig = plt.figure(figsize=(20, 15))
 gs = gridspec.GridSpec(4, 5, figure=fig)
 
+# %%
 y_labels = ['5min', '10min', '15min', '20min']
 x_labels = [0.75, 0.5, 0.1, 0.05, 0.01]
 
-
+# %%
 for i, file_name in enumerate(file_names):
     file_path = os.path.join(data_folder, file_name)
     gdf = gpd.read_file(file_path)
@@ -827,6 +915,7 @@ for i, file_name in enumerate(file_names):
     ax.set_xlabel('Accessibility Score')
     ax.set_ylabel('Population')
 
+# %%
 plt.tight_layout()
 output_image_path = 'data_outputs/output_image.png'
 plt.savefig(output_image_path, bbox_inches='tight', dpi=300)
@@ -840,19 +929,22 @@ plt.show()
 
 # %%
 # Read the GeoPackage file (if starting from this section)
-results_grid = gpd.read_file(data_outputs + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
+results_grid = gpd.read_file(data_temp + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
 results_grid = results_grid[['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_min', 'origin_lat_min', 'origin_lon_max', 'origin_lat_max', 'Accessibility_standard', 'geometry']]
 
-
-
-
-
-# %%
+# %% [markdown]
 # Group by multiple columns and calculate the mean for numeric columns
 # results_grid = results_grid.groupby(['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_min', 'origin_lat_min', 'origin_lon_max', 'origin_lat_max', 'Accessibility_standard']).count().reset_index()
 
+# %%
 results_grid = results_grid.drop_duplicates(['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_min', 'origin_lat_min', 'origin_lon_max', 'origin_lat_max', 'Accessibility_standard', 'geometry'])
 
+# %%
+# save the results to a new GeoPackage file
+output_gpkg_path = data_temp + 'emergency-maternal-care-deprivation-access.gpkg'
+results_grid.to_file(output_gpkg_path, layer='emergency-maternal-care-deprivation-access', driver='GPKG')
+
+# %%
 type(results_grid)
 
 # %%
@@ -865,6 +957,21 @@ results_grid
 # 
 # Note: For Kano, we excluded grid cells with index values below 0.000001 that indicated very low population and a small number of buildings.  
 
+# %% [markdown]
+# Option 1: Kano
+# Values are specific for each city and should be adjusted based on the data distribution of the three categories. 
+# 
+
+# %%
+results_grid['result'] = -1
+results_grid.loc[results_grid['Accessibility_standard'] > 0.000001, 'result'] = 2
+results_grid.loc[results_grid['Accessibility_standard'] > 0.005, 'result'] = 1
+results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
+
+# %% [markdown]
+# Option 2: Lagos
+# Values are specific for each city and should be adjusted based on the data distribution of the three categories. 
+
 # %%
 results_grid['result'] = -1
 results_grid.loc[results_grid['Accessibility_standard'] > 0.000001, 'result'] = 2
@@ -876,37 +983,9 @@ results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
 # 
 # We defined the focus areas based on values for the different thresholds. We aim at participants helping us to confirm the selection of the city-specific thresholds.
 
-# %%
-results_grid['focused'] = 0
-# Focus areas between the Low category and the excluded cells due to low population or no buildings
-results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
-# Focus areas between the Medium and High categories
-results_grid.loc[(results_grid['Accessibility_standard'] > 0.003) & (results_grid['Accessibility_standard'] < 0.006), 'focused'] = 1
-# Focus areas between the Low and Medium categories
-results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_grid['Accessibility_standard'] < 0.03), 'focused'] = 1
-
-# %%
-results_grid
-
 # %% [markdown]
-# ### Setting values for Low medium and High categories
+# Option 1: Kano
 # 
-# We started by defining equal value division, and modified the thesholds to a value that is more legible and easier to interpret. Every model should have their own thresholds based on the data distribution of the three categories. 
-# 
-# Note: For Kano, we excluded grid cells with index values below 0.000001 that indicated very low population and a small number of buildings.  
-
-# %%
-results_grid['result'] = -1
-results_grid.loc[results_grid['Accessibility_standard'] > 0.000001, 'result'] = 2
-results_grid.loc[results_grid['Accessibility_standard'] > 0.005, 'result'] = 1
-results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
-
-
-
-# %% [markdown]
-# ### Setting values for focus areas
-# 
-# We defined the focus areas based on values for the different thresholds. We aim at participants helping us to confirm the selection of the city-specific thresholds.
 
 # %%
 results_grid['focused'] = 0
@@ -917,11 +996,23 @@ results_grid.loc[(results_grid['Accessibility_standard'] > 0.003) & (results_gri
 # Focus areas between the Low and Medium categories
 results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_grid['Accessibility_standard'] < 0.03), 'focused'] = 1
 
+# %% [markdown]
+# Option 2: Lagos
+
+# %%
+results_grid['focused'] = 0
+# Focus areas between the Low category and the excluded cells due to low population or no buildings
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
+# Focus areas between the Medium and High categories
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.003) & (results_grid['Accessibility_standard'] < 0.006), 'focused'] = 1
+# Focus areas between the Low and Medium categories
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_grid['Accessibility_standard'] < 0.03), 'focused'] = 1
+
+# %%
 results_grid
 
 # %%
 results_grid = results_grid.loc[results_grid['result'] != -1]
-
 
 # %%
 results_grid = results_grid.rename(columns={
@@ -933,6 +1024,7 @@ results_grid = results_grid.rename(columns={
     'origin_lat_max': 'lat_max'
 })
 
+# %%
 results_grid
 
 # %%
@@ -940,6 +1032,7 @@ results_grid
 output_gpkg_path = data_outputs + 'emergency-maternal-care-deprivation-access.gpkg'
 results_grid.to_file(output_gpkg_path, layer='emergency-maternal-care-deprivation-access', driver='GPKG')
 
+# %%
 # Save the results to a CSV file in the format required by the IDEAMAPS data ecosystem
 results_table = results_grid.drop(columns=['Accessibility_standard', 'grid_id', 'geometry'])
 results_table.to_csv(model_outputs + 'model-output.csv', index=False)
