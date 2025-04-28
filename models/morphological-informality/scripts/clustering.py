@@ -99,5 +99,5 @@ if __name__ == '__main__':
     axes[1].set_ylabel("Sum of Squared Distances (SSD)")
     plt.savefig(Path(args.output_dir) / 'elbow.png', dpi=300, bbox_inches='tight')
 
-    gdf.to_parquet(Path(args.output_dir) / 'clusters_v6.parquet')
+    gdf.to_parquet(Path(args.output_dir) / 'clusters.parquet')
 
