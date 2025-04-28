@@ -1001,8 +1001,8 @@ results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_gri
 
 # %%
 results_grid['focused'] = 0
-# Focus areas between the Low category and the excluded cells due to low population or no buildings
-results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
+# Focus areas between the Low category and city expansion areas
+# results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
 # Focus areas between the Medium and High categories
 results_grid.loc[(results_grid['Accessibility_standard'] > 0.003) & (results_grid['Accessibility_standard'] < 0.006), 'focused'] = 1
 # Focus areas between the Low and Medium categories
@@ -1029,8 +1029,8 @@ results_grid
 
 # %%
 # Save the results to a new GeoPackage file
-output_gpkg_path = data_outputs + 'emergency-maternal-care-deprivation-access.gpkg'
-results_grid.to_file(output_gpkg_path, layer='emergency-maternal-care-deprivation-access', driver='GPKG')
+output_gpkg_path = data_temp + 'emergency-maternal-care-deprivation-access-class.gpkg'
+results_grid.to_file(output_gpkg_path, layer='emergency-maternal-care-deprivation-access-class', driver='GPKG')
 
 # %%
 # Save the results to a CSV file in the format required by the IDEAMAPS data ecosystem
