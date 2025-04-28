@@ -12,6 +12,8 @@ def argument_parser():
     parser.add_argument('--sds-clusters', dest='sds_clusters', required=True, metavar='N', type=int, nargs='+')
     parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
                         help="path to output directory")
+    parser.add_argument('--isl-n-clusters', dest='isl_n_clusters', required=False, default=10, type=int)
+    parser.add_argument('--sds-n-clusters', dest='sds_n_clusters', required=False, default=10, type=int)
 
     parser.add_argument(
         "opts",
@@ -28,10 +30,11 @@ if __name__ == '__main__':
     cluster_file = Path(args.cluster_file)
     gdf = gpd.read_parquet(cluster_file) if cluster_file.suffix == '.parquet' else gpd.read_file(cluster_file)
 
-    n_clusters = 10
-    gdf['isl'] = gdf[f'isl_c{n_clusters}'].isin(args.isl_clusters)
+    n_isl_clusters = int(args.isl_n_clusters)
+    gdf['isl'] = gdf[f'isl_c{n_isl_clusters}'].isin(args.isl_clusters)
     gdf['isl'] = gdf['isl'].astype(int)
-    gdf['sds'] = gdf[f'sds_c{n_clusters}'].isin(args.sds_clusters)
+    n_sds_clusters = int(args.sds_n_clusters)
+    gdf['sds'] = gdf[f'sds_c{n_sds_clusters}'].isin(args.sds_clusters)
     gdf['sds'] = gdf['sds'].astype(int)
 
     def model_logic(row):
