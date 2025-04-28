@@ -930,6 +930,8 @@ plt.show()
 # %%
 # Read the GeoPackage file (if starting from this section)
 results_grid = gpd.read_file(data_temp + 'acc_score_3_closet_Emoc_d10_w0.01_supply_weighted.gpkg')
+
+# %%
 results_grid = results_grid[['grid_id', 'origin_lon', 'origin_lat', 'origin_lon_min', 'origin_lat_min', 'origin_lon_max', 'origin_lat_max', 'Accessibility_standard', 'geometry']]
 
 # %% [markdown]
@@ -974,9 +976,9 @@ results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
 
 # %%
 results_grid['result'] = -1
-results_grid.loc[results_grid['Accessibility_standard'] > 0.000001, 'result'] = 2
-results_grid.loc[results_grid['Accessibility_standard'] > 0.005, 'result'] = 1
-results_grid.loc[results_grid['Accessibility_standard'] > 0.02, 'result'] = 0
+results_grid.loc[results_grid['Accessibility_standard'] >= 0, 'result'] = 2
+results_grid.loc[results_grid['Accessibility_standard'] > 0.007, 'result'] = 1
+results_grid.loc[results_grid['Accessibility_standard'] > 0.015, 'result'] = 0
 
 # %% [markdown]
 # ### Setting values for focus areas
@@ -1004,9 +1006,9 @@ results_grid['focused'] = 0
 # Focus areas between the Low category and city expansion areas
 # results_grid.loc[(results_grid['Accessibility_standard'] > 0.000001) & (results_grid['Accessibility_standard'] < 0.0000015), 'focused'] = 1
 # Focus areas between the Medium and High categories
-results_grid.loc[(results_grid['Accessibility_standard'] > 0.003) & (results_grid['Accessibility_standard'] < 0.006), 'focused'] = 1
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.005) & (results_grid['Accessibility_standard'] < 0.009), 'focused'] = 1
 # Focus areas between the Low and Medium categories
-results_grid.loc[(results_grid['Accessibility_standard'] > 0.019) & (results_grid['Accessibility_standard'] < 0.03), 'focused'] = 1
+results_grid.loc[(results_grid['Accessibility_standard'] > 0.014) & (results_grid['Accessibility_standard'] < 0.016), 'focused'] = 1
 
 # %%
 results_grid
