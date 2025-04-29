@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     # Define cluster values
     cluster_range = range(1, 16)
-    cluster_selection = [6, 8, 10]
+    cluster_selection = [6, 8, 10, 12, 14]
 
     # Storage for SSD
     ssd_isl = []

@@ -26,9 +26,9 @@ The following is a list of our active datasets. These datasets are available for
 
 |     Dataset Name     |      City       | Version |
 |:--------------------:|:---------------:|:-------:|
-| Morphological Informality | Nairobi (Kenya) |   V1    |
-| Morphological Informality | Lagos (Nigeria)  |   V1    |
-| Morphological Informality | Kano (Nigeria)   |   V1    |
+| Morphological Informality | Nairobi (Kenya) |   V2    |
+| Morphological Informality | Lagos (Nigeria)  |   V2    |
+| Morphological Informality | Kano (Nigeria)   |   V2    |
 |  Barriers to Healthcare   | Kano (Nigeria)   |  V1.1   |
 
 
