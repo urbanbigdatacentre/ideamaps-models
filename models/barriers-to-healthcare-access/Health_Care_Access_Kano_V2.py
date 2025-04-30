@@ -107,15 +107,41 @@ ors = client.Client(key=api_key)
 # * [Datasets of health facilities](https://doi.org/10.6084/m9.figshare.22689667.v2) (15/07/2023)
 # * [Shapefile of district boundaries](https://data.humdata.org/dataset/nigeria-admin-level-2) - Admin Level 2 (data from Humanitarian Data Exchange, 25/11/2015)
 
-# Set paths to access data
-# Define directories
-data_inputs = '../scripts/data_inputs/'
-data_temp = '../scripts/data_temp/'
-data_outputs = '../scripts/data_outputs/'
+# ### Option 1: Kano
+# If you want to process data for the city of Kano, use the following code to filter the dataset. 
 
-# Define file paths correctly
+# Set paths to access Kano data
+# Define directories
+data_inputs = '../scripts/Kano/data-inputs/'
+data_temp = '../scripts/Kano/data-temp/'
+model_outputs = '../kano/'
+
+# ### Option 2: Lagos
+# If you want to process data for the city of Kano, use the following code to filter the dataset. 
+
+# Set paths to access Lagos data
+# Define directories
+data_inputs = '../scripts/Lagos/data-inputs/'
+data_temp = '../scripts/Lagos/data-temp/'
+model_outputs = '../lagos/'
+
+# ## Data Collection
+
+# ### 1.1 Administrative level 2 of Kano
+
 districts_filename = data_inputs + 'administrative_level2.shp'
-health_facilities_filename = data_inputs + 'healthcare_facilities.shp'
+
+# ### 1.2 Administrative level 2 of Lagos
+
+districts_filename = data_inputs + 'administrative_level2.shp'
+
+# ### 2.1 Validated healthcare facilities for Kano
+# note: to describe the process to validate healthcare facilities
+
+healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities.geojson')
+
+# ### 2.2 Healthcare facilities in Lagos
+# note: Due to the absence of local expert validation in Lagos, the classification for validation is determine based on the ownership provided in the [datasets of health facilities](https://doi.org/10.6084/m9.figshare.22689667.v2).
 
 # ### Create district dictionary and facilities dictionary
 # In conducting geospatial analysis, we created dictionaries containing district information and healthcare facility information to achieve efficient data management and subsequent analysis.
