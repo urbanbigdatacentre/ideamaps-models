@@ -77,6 +77,8 @@ import math
 from pathlib import Path
 from shapely.geometry import Polygon
 
+import seaborn as sns
+
 
 
 # %% [markdown]
@@ -508,9 +510,10 @@ study_area.to_file(data_temp + 'grid_count_iso_1km_3_3km.gpkg', driver="GPKG")
 # %%
 
 study_area["result"] = study_area.apply(
-    lambda row: "2" if row["iso_walk_1k_count"] <= 1 and row["iso_3_3km_count"] <= 2
-    else "1" if 2 < row["iso_walk_1k_count"] <= 4 or row["iso_3_3km_count"] <= 4
-    else "0",
+    lambda row: 2 if row["iso_walk_1k_count"] <= 1
+    else 1 if 2 >= row["iso_walk_1k_count"] <= 4 and row["iso_3_3km_count"] >=20
+    else 1 if 5 >= row["iso_walk_1k_count"] <= 10 and row["iso_3_3km_count"] >=10
+    else 0,
     axis=1
 )
 
@@ -536,11 +539,10 @@ study_area.to_csv(model_outputs + 'output.csv',
 # ## Further analysis
 
 # %%
-# 1. Calculate the number of hospitals reachable within a 10-minute drive
-car_joined = gpd.sjoin(study_area, isochrones_car_gdf, how="left", predicate="intersects")
-car_counts = car_joined.groupby(car_joined.index)["hcf_id"].nunique()
-study_area["facilities_10min_drive"] = study_area.index.map(car_counts).fillna(0).astype(int)
+#
+# Scatter plot with count of isochrones
 
+sns.scatterplot(data=study_area, x='iso_walk_1k_count', y='iso_3_3km_count', hue='result', palette='Set1')
 
 # %%
 # 2. Calculate the number of hospitals reachable within a 15-minute walk
