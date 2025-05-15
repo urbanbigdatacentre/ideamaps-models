@@ -79,8 +79,6 @@ from shapely.geometry import Polygon
 
 import seaborn as sns
 
-
-
 # %% [markdown]
 # ## Preprocessing
 # In this study, users first requested an API key from the [OpenRouteService](https://openrouteservice.org/) platform and subsequently interacted with the OpenRouteService API through the instantiation of the OpenRouteService client. This is the OpenRouteService [API documentation](https://openrouteservice.org/dev/#/api-docs/introduction) for ORS Core-Version 9.0.0. 
