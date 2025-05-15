@@ -89,7 +89,10 @@ import seaborn as sns
 # 
 # OpenRouteService primarily uses API keys for authentication. However, if a token is required for certain endpoints, you can send a request with your API key in the Authorization header. This process facilitated various geospatial analysis functions, including isochrone generation.
 # 
-# ### API Key
+
+# %% [markdown]
+# 
+# ### Setting up the OSR API and the public endpoint
 # Make sure you have a .env file in the root directory with the following content:
 # ```bash
 #     OPENROUTESERVICE_API_KEY='your_api_key'
@@ -109,7 +112,9 @@ api_key = '5b3ce3597851110001cf62480c829160e12e4f8cae69c28d694ad1e1'
 ors = openrouteservice.Client(key=api_key)
 
 # %% [markdown]
-# ## Setting up the OSR local client
+# ### Setting up the OSR using a local instance for the service
+# 
+# You must have set up the OpenRouteService API locally. You can find the instructions in the [OpenRouteService documentation](https://openrouteservice.org/dev/).
 
 # %%
 import openrouteservice
@@ -125,7 +130,7 @@ ors = openrouteservice.Client(base_url=base_url)
 # * [Shapefile of district boundaries](https://data.humdata.org/dataset/nigeria-admin-level-2) - Admin Level 2 (data from Humanitarian Data Exchange, 25/11/2015)
 
 # %% [markdown]
-# ### Option 1: Kano
+# ### Setting up folde structure for inputs, temp and outputs folders - Option 1: Kano
 # If you want to process data for the city of Kano, use the following code to filter the dataset. 
 
 # %%
@@ -136,7 +141,7 @@ data_temp = '../scripts/Kano/data-temp/'
 model_outputs = '../Kano-v2/'
 
 # %% [markdown]
-# ### Option 2: Lagos
+# ### Setting up folde structure for inputs, temp and outputs folders - Option 2: Lagos
 # If you want to process data for the city of Kano, use the following code to filter the dataset. 
 
 # %%
@@ -144,7 +149,7 @@ model_outputs = '../Kano-v2/'
 # Define directories
 data_inputs = '../scripts/Lagos/data-inputs/'
 data_temp = '../scripts/Lagos/data-temp/'
-model_outputs = '../lagos/'
+model_outputs = '../Lagos-v2/'
 
 # %% [markdown]
 # ## Data Collection
@@ -157,6 +162,7 @@ study_area = gpd.read_file(data_inputs + '100mGrid.gpkg')
 districts = gpd.read_file(data_inputs + 'administrative_level2.geojson')
 
 # %%
+# Adding a grid_id to the gridcells in the study area
 study_area['grid_id'] = range(len(study_area))
 
 # %% [markdown]
@@ -456,7 +462,7 @@ isochrones_foot_gdf = gpd.read_file(data_temp + 'General_healthcare_iso_1km_walk
 isochrones_car_gdf = gpd.read_file(data_temp + 'General_healthcare_iso_3_3km_car.gpkg')
 
 # %%
-# We just consider the isochrones for priary healthcare facilities
+# We just consider the isochrones for prixary healthcare facilities
 isochrones_foot_gdf = isochrones_foot_gdf[isochrones_foot_gdf['Local Validation'] == 'Primary']
 isochrones_car_gdf = isochrones_car_gdf[isochrones_car_gdf['Local Validation'] == 'Primary']
 
@@ -509,15 +515,25 @@ study_area.to_file(data_temp + 'grid_count_iso_1km_3_3km.gpkg', driver="GPKG")
 
 # %%
 
+
+# %%
+
 study_area["result"] = study_area.apply(
     lambda row: 2 if row["iso_walk_1k_count"] <= 1
-    else 1 if 2 >= row["iso_walk_1k_count"] <= 4 and row["iso_3_3km_count"] >=20
-    else 1 if 5 >= row["iso_walk_1k_count"] <= 10 and row["iso_3_3km_count"] >=10
+    else 1 if (row["iso_walk_1k_count"] < 4) or (row["iso_3_3km_count"] < 15)
     else 0,
     axis=1
 )
 
 study_area
+
+# %%
+study_area["focused"] = study_area.apply(
+    lambda row: 1 if (1 <= row["iso_walk_1k_count"] <= 2) # and (row["iso_3_3km_count"] < 10)
+    else 0,
+    axis=1
+)
+
 
 # %% [markdown]
 # ## Save output as GeoPackage file
@@ -540,7 +556,7 @@ study_area.to_csv(model_outputs + 'output.csv',
 
 # %%
 #
-# Scatter plot with count of isochrones
+# Scatter plot with count of isochrone
 
 sns.scatterplot(data=study_area, x='iso_walk_1k_count', y='iso_3_3km_count', hue='result', palette='Set1')
 
