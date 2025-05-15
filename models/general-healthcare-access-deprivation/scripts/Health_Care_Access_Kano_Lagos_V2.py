@@ -106,7 +106,7 @@ ors = client.Client(key=api_key)
 
 # %%
 import openrouteservice
-api_key = '5b3ce3597851110001cf62480c829160e12e4f8cae69c28d694ad1e1'
+api_key = 'your_api_key_here'  # Replace with your actual API key
 ors = openrouteservice.Client(key=api_key)
 
 # %% [markdown]
@@ -194,27 +194,36 @@ facilities
 # %% [markdown]
 # ### Option 2: Lagos
 
+# %% [markdown]
+# Considering the study area defined for Lagos, the selection of healthcare facilities relied on the intersection of the boundaries of our study area ([see the documentation about IDEAMAPS study areas](../../../docs/study-areas/README.md)).  
+
 # %%
 healthcare_facilities = gpd.read_file(data_inputs + 'GRID3_NGA_healthcare_facilities.geojson')
 healthcare_facilities
 
 # %%
+# Selection of healthcare faclities inside the study area
 healthcare_facilities = gpd.sjoin(healthcare_facilities, study_area, how="inner", predicate="intersects")
 healthcare_facilities
 
 # %%
 print(healthcare_facilities['ownership'].unique())
 
-# %%
-facilities = healthcare_facilities[
-    healthcare_facilities['ownership'].isin(['Public'])]
+# %% [markdown]
+# Since local validation of the healthcare facilities was not possible for the Kano study area, the classfication of facilities offering general healthcare was made based on the ownership provided in the GRID3 NGA - Health Facilities v2.0 dataset.
+# - Public: For those where the ownership was reported.
+# - Unknown: To not exclude facilities potentially offering general healthcare in slums or other deprived areas. 
 
+# %%
+
+facilities = healthcare_facilities[
+    healthcare_facilities['ownership'].isin(['Public', 'Unknown'])]
 facilities
 
 # %%
 facilities = facilities.reset_index(drop=True)
 facilities['hcf_id'] = facilities.index + 1
-facilities
+
 
 # %% [markdown]
 # ### Create district dictionary and facilities dictionary
@@ -289,7 +298,7 @@ map_outline
 # Due to the limited road networks in the slum areas of these three cities, the accessibility of hospitals within a 10-minute range is of significant concern. Therefore, isochrones with 15 minutes walk range and 10 minutes car drive range around each hospital were created with the open source tool [OpenRouteService](https://openrouteservice.org/). This might take several minutes depending on the number of health facilities (currently we can send 40 requests per minute).
 
 # %% [markdown]
-# ### Option 1: Kano
+# ## Option 1: Kano
 
 # %%
 print(facilities['Local Validation'].unique())
@@ -481,7 +490,7 @@ if all_features:
     iso_gdf.to_file(data_temp + 'General_healthcare_iso_1km_walking.gpkg', driver="GPKG")
 
 # %% [markdown]
-# ### Option 2: Lagos
+# ## Option 2: Lagos
 
 # %%
 print(facilities['facility_level'].unique())
@@ -499,7 +508,8 @@ request_counter = 0
 isochrones_by_category = {
     "Primary": [],
     "Secondary": [],
-    "Tertiary": []
+    "Tertiary": [],
+    "Unknown": []
 }
 
 # Loop through each category
@@ -591,7 +601,8 @@ request_counter = 0
 isochrones_by_category = {
     "Primary": [],
     "Secondary": [],
-    "Tertiary": []
+    "Tertiary": [],
+    "Unknown": []
 }
 
 # Loop through each category
@@ -674,7 +685,7 @@ if all_features:
     iso_gdf.to_file(data_temp + 'General_healthcare_iso_1km_walking.gpkg', driver="GPKG")
 
 # %% [markdown]
-# ### Spatial joins for the grid and isochrone layers using geopandas
+# ## Spatial joins for the grid and isochrone layers using geopandas
 # This study employed the GeoPandas library to perform a spatial join between isochrone data and 100x100m grid cells, which allowed for the analysis and evaluation of accessibility for each grid cell within the study area in these three cities, across different time intervals (specifically by walking or driving). Accessibility was classified as three levels: high, medium and low. The analysis results were exported in GeoPackage format to ensure both the persistent storage and reusability of the data. Additionally, all spatial datasets were maintained in the same coordinate reference system (EPSG:4326), which ensured consistency and accuracy in the spatial joins and subsequent analyses.
 
 # %%
@@ -683,10 +694,23 @@ if all_features:
 isochrones_foot_gdf = gpd.read_file(data_temp + 'General_healthcare_iso_1km_walking.gpkg')
 isochrones_car_gdf = gpd.read_file(data_temp + 'General_healthcare_iso_3_3km_car.gpkg')
 
+# %% [markdown]
+# ### Spatial joins for the grid and isochrone layers using geopandas - Option 1: Kano
+# Considering the different column names.
+
 # %%
 # We just consider the isochrones for prixary healthcare facilities
 isochrones_foot_gdf = isochrones_foot_gdf[isochrones_foot_gdf['Local Validation'] == 'Primary']
 isochrones_car_gdf = isochrones_car_gdf[isochrones_car_gdf['Local Validation'] == 'Primary']
+
+# %% [markdown]
+# ### Spatial joins for the grid and isochrone layers using geopandas - Option 2: Lagos
+# Considering the different column names.
+
+# %%
+# We just consider the isochrones for prixary healthcare facilities
+isochrones_foot_gdf = isochrones_foot_gdf[isochrones_foot_gdf['facility_level'] == 'Primary']
+isochrones_car_gdf = isochrones_car_gdf[isochrones_car_gdf['facility_level'] == 'Primary']
 
 # %%
 target_crs = "EPSG:4326"
@@ -731,9 +755,9 @@ study_area.to_file(data_temp + 'grid_count_iso_1km_3_3km.gpkg', driver="GPKG")
 
 # %% [markdown]
 # Define the categories for healtcare access deprivation:
-# - High: 0-1 isochrones at 1km walking distance and 0-2 isochrones at 3.3km driving distance
-# - Medium: 2-4 isochrones at 1km walking distance and 3+ isochrones at 3.3km driving distance
-# - Low: 5+ isochrones at 1km walking distance 
+# - High: 
+# - Medium:
+# - Low: 
 
 # %%
 
