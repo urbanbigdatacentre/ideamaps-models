@@ -153,7 +153,7 @@ model_outputs = '../Lagos-v2/'
 # ## Data Collection
 
 # %% [markdown]
-# ### 1.1 Administrative level 2
+# ### 1.1 Study area and Administrative level 2
 
 # %%
 study_area = gpd.read_file(data_inputs + '100mGrid.gpkg')
@@ -167,6 +167,9 @@ study_area['grid_id'] = range(len(study_area))
 # ### 2.1 Validated healthcare facilities
 # note: to describe the process to validate healthcare facilities
 # Due to the absence of local expert validation, the classification for validation is determine based on the ownership provided in the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore).
+
+# %% [markdown]
+# ### Option 1: Kano
 
 # %%
 healthcare_facilities_validated = gpd.read_file(data_inputs + 'healthcare_facilities.geojson')
@@ -182,6 +185,31 @@ facilities = healthcare_facilities_validated[
 facilities
 
 
+
+# %%
+facilities = facilities.reset_index(drop=True)
+facilities['hcf_id'] = facilities.index + 1
+facilities
+
+# %% [markdown]
+# ### Option 2: Lagos
+
+# %%
+healthcare_facilities = gpd.read_file(data_inputs + 'GRID3_NGA_healthcare_facilities.geojson')
+healthcare_facilities
+
+# %%
+healthcare_facilities = gpd.sjoin(healthcare_facilities, study_area, how="inner", predicate="intersects")
+healthcare_facilities
+
+# %%
+print(healthcare_facilities['ownership'].unique())
+
+# %%
+facilities = healthcare_facilities[
+    healthcare_facilities['ownership'].isin(['Public'])]
+
+facilities
 
 # %%
 facilities = facilities.reset_index(drop=True)
@@ -259,6 +287,9 @@ map_outline
 # %% [markdown]
 # ### Get Isochrones from OpenRouteService
 # Due to the limited road networks in the slum areas of these three cities, the accessibility of hospitals within a 10-minute range is of significant concern. Therefore, isochrones with 15 minutes walk range and 10 minutes car drive range around each hospital were created with the open source tool [OpenRouteService](https://openrouteservice.org/). This might take several minutes depending on the number of health facilities (currently we can send 40 requests per minute).
+
+# %% [markdown]
+# ### Option 1: Kano
 
 # %%
 print(facilities['Local Validation'].unique())
@@ -443,6 +474,199 @@ if all_features:
 
     # Ensure 'combination' is a string column
     iso_gdf["Local Validation"] = iso_gdf["Local Validation"].astype(str)
+    iso_gdf["facility_id"] = iso_gdf["facility_id"].astype(str)
+    iso_gdf["facility_name"] = iso_gdf["facility_name"].astype(str)
+
+    # Save to a single GeoPackage file
+    iso_gdf.to_file(data_temp + 'General_healthcare_iso_1km_walking.gpkg', driver="GPKG")
+
+# %% [markdown]
+# ### Option 2: Lagos
+
+# %%
+print(facilities['facility_level'].unique())
+
+# %% [markdown]
+# ### Calculating the isochrones for driving
+
+# %%
+all_features = []
+
+# Initialize request counter
+request_counter = 0
+
+# Create a dictionary to store isochrones by category
+isochrones_by_category = {
+    "Primary": [],
+    "Secondary": [],
+    "Tertiary": []
+}
+
+# Loop through each category
+for category in isochrones_by_category.keys():
+    # Filter facilities by category
+    group = facilities[facilities["facility_level"] == category]
+
+    for _, row in group.iterrows():
+        loc = row["geometry"]
+        facility_id = row["hcf_id"]
+        facility_name = row["facility_name"]
+
+        # Make sure geometry is a Point and get [lon, lat]
+        if isinstance(loc, Point):
+            coordinates = [loc.x, loc.y]
+        else:
+            print(f"Invalid geometry for: {row.get('facility_name', 'Unknown')} — Skipping")
+            continue
+
+        try:
+            # Prepare request parameters
+            iso_params = {
+                "locations": [coordinates],
+                "profile": "driving-car",
+                "range_type": "distance",
+                "range": [3300],  # 3.3km
+
+                # "range": [600],  # 10 minutes
+                # "attributes": ["area"]
+            }
+
+            # Request isochrone from ORS
+            isochrone = ors.isochrones(**iso_params)
+
+            for feature in isochrone['features']:
+                properties = feature['properties']
+
+                # Convert list fields to strings if needed
+                for key, value in properties.items():
+                    if isinstance(value, list):
+                        properties[key] = ', '.join(map(str, value))
+
+                # Add a new column for the category
+                properties["facility_level"] = category
+                properties["facility_id"] = facility_id
+                properties["facility_name"] = facility_name
+
+                all_features.append({
+                    'geometry': feature['geometry'],
+                    'properties': properties
+                })
+
+            # Handle rate limiting
+            request_counter += 1
+            if request_counter % 35 == 0:
+                print("Pausing for 60 seconds to respect API rate limits...")
+                # Use this sleep when using the OSR instance hosted by HeiGIT
+                # # time.sleep(60)
+            if request_counter > 2500:
+                print("Reached max request threshold.")
+                break
+
+        except Exception as e:
+            print(f"Request failed for {row.get('facility_name', 'Unknown')}: {e}")
+
+# %%
+# Convert to GeoDataFrame if there are valid features
+if all_features:
+    iso_gdf = gpd.GeoDataFrame.from_features(all_features, crs="EPSG:4326")
+
+    # Ensure 'Local Validation' is a string column
+    iso_gdf["facility_level"] = iso_gdf["facility_level"].astype(str)
+    iso_gdf["facility_id"] = iso_gdf["facility_id"].astype(str)
+    iso_gdf["facility_name"] = iso_gdf["facility_name"].astype(str)
+
+    # Save to a single GeoPackage file
+    iso_gdf.to_file(data_temp + 'General_healthcare_iso_3_3km_car.gpkg', driver="GPKG")
+
+# %% [markdown]
+# ### Calculating the isochrones for walking
+
+# %%
+all_features = []
+
+# Initialize request counter
+request_counter = 0
+
+# Create a dictionary to store isochrones by category
+isochrones_by_category = {
+    "Primary": [],
+    "Secondary": [],
+    "Tertiary": []
+}
+
+# Loop through each category
+for category in isochrones_by_category.keys():
+    # Filter facilities by category
+    group = facilities[facilities["facility_level"] == category]
+
+    for _, row in group.iterrows():
+        loc = row["geometry"]
+        facility_id = row["hcf_id"]
+        facility_name = row["facility_name"]
+
+        # Make sure geometry is a Point and get [lon, lat]
+        if isinstance(loc, Point):
+            coordinates = [loc.x, loc.y]
+        else:
+            print(f"Invalid geometry for: {row.get('facility_name', 'Unknown')} — Skipping")
+            continue
+
+        try:
+            # Prepare request parameters
+            iso_params = {
+                "locations": [coordinates],
+                "profile": "driving-car",
+
+                "range_type": "distance",
+                "range": [1000],  # 1km
+
+               # "range_type": "time",
+               # "range": [900],  # 15 minutes
+
+                "attributes": ["area"]
+            }
+
+            # Request isochrone from ORS
+            isochrone = ors.isochrones(**iso_params)
+
+            for feature in isochrone['features']:
+                properties = feature['properties']
+
+                # Convert list fields to strings if needed
+                for key, value in properties.items():
+                    if isinstance(value, list):
+                        properties[key] = ', '.join(map(str, value))
+
+                # Add a new column for the category
+                properties["facility_level"] = category
+                properties["facility_id"] = facility_id
+                properties["facility_name"] = facility_name
+
+                all_features.append({
+                    'geometry': feature['geometry'],
+                    'properties': properties
+                })
+
+            # Handle rate limiting
+            request_counter += 1
+            if request_counter % 35 == 0:
+                print("Pausing for 60 seconds to respect API rate limits...")
+                # time.sleep(60)
+            if request_counter > 2500:
+                print("Reached max request threshold.")
+                break
+
+        except Exception as e:
+            print(f"Request failed for {row.get('facility_name', 'Unknown')}: {e}")
+
+
+# %%
+# Convert to GeoDataFrame if there are valid features
+if all_features:
+    iso_gdf = gpd.GeoDataFrame.from_features(all_features, crs="EPSG:4326")
+
+    # Ensure 'combination' is a string column
+    iso_gdf["facility_level"] = iso_gdf["facility_level"].astype(str)
     iso_gdf["facility_id"] = iso_gdf["facility_id"].astype(str)
     iso_gdf["facility_name"] = iso_gdf["facility_name"].astype(str)
 
