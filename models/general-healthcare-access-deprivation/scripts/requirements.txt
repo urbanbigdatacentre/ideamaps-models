@@ -1,0 +1,9 @@
+python-dotenv
+folium
+openrouteservice
+pandas
+fiona
+shapely
+geopandas
+seaborn
+matplotlib
