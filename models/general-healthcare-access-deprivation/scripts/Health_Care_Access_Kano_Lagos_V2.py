@@ -712,6 +712,9 @@ isochrones_car_gdf = isochrones_car_gdf[isochrones_car_gdf['Local Validation'] =
 isochrones_foot_gdf = isochrones_foot_gdf[isochrones_foot_gdf['facility_level'] == 'Primary']
 isochrones_car_gdf = isochrones_car_gdf[isochrones_car_gdf['facility_level'] == 'Primary']
 
+# %% [markdown]
+# ## Aggregating the results to the grid cell level 
+
 # %%
 target_crs = "EPSG:4326"
 isochrones_foot_gdf = isochrones_foot_gdf.to_crs(target_crs)
@@ -754,13 +757,19 @@ study_area
 study_area.to_file(data_temp + 'grid_count_iso_1km_3_3km.gpkg', driver="GPKG")
 
 # %% [markdown]
+# ## Classify gridcells based on the critera
+
+# %% [markdown]
 # Define the categories for healtcare access deprivation:
 # - High: 
 # - Medium:
 # - Low: 
 
 # %%
+# If needed, read the gridcells and isochrones from the GeoPackage file
 
+study_area = gpd.read_file(data_temp + 'grid_count_iso_1km_3_3km.gpkg')
+study_area
 
 # %%
 
@@ -772,6 +781,9 @@ study_area["result"] = study_area.apply(
 )
 
 study_area
+
+# %% [markdown]
+# Define the focus areas
 
 # %%
 study_area["focused"] = study_area.apply(
@@ -795,7 +807,8 @@ study_area.to_file(data_temp + 'general_healthcare_outputs.gpkg', driver="GPKG")
 
 # %%
 study_area.to_csv(model_outputs + 'output.csv', 
-                           columns=['latitude', 'longitude', 'lat_min', 'lat_max', 'lon_min', 'lon_max', 'result'])
+                           columns=['latitude', 'longitude', 'lat_min', 'lat_max', 'lon_min', 'lon_max', 'result', 'focused'],
+                           index=False)
 
 # %% [markdown]
 # ## Further analysis
