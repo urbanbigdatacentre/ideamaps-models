@@ -11,7 +11,4 @@ rasterio
 rasterstats
 scipy
 tqdm
-scikit-learn
-seaborn
-matplotlib
 # time # not needed for this file
