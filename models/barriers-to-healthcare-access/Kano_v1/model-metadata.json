@@ -1,0 +1,16 @@
+{
+    "name": "Barriers to Healthcare Access",
+    "notes": "This model represents the barriers communities face when accessing health care. The model estimates the areas from where a person can walk (less than 10min) or need a motorised vehicle (10min or more) to reach a healthcare facility.",
+    "city": "Kano",
+    "subdomain": "Barriers to Healthcare Access",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "features": [
+        "Health care facilities",
+        "travel distance",
+        "Accessibility"
+    ]
+}

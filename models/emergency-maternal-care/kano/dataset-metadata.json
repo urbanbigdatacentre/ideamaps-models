@@ -2,7 +2,7 @@
     "name": "Emergency Maternal Care Access Deprivation",
     "notes": "This model show how women in slums and deprived areas struggle to access emergency maternal care (EmOC). Since maternal healthcare strongly relates quality of life, we analysed where maternal care is provided, its cost, and how female population can access it.",
     "city": "Kano",
-    "focus_area_notes": "Two wards Doray Karama and Rimin Kebe ",
+    "focus_area_notes": "Areas where there is a transition between our access deprivation levels and the urban area limits.",
     "subdomain": "Health care availability and quality",
     "output_keys": {
         "0": "Low",
