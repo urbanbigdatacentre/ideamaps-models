@@ -24,12 +24,16 @@ The [utils](/utils) folder contains helpful scripts to perform common and useful
 ## 🌍 Available Datasets
 The following is a list of our active datasets. These datasets are available for exploration using the project's [web application](https://ideamapsdataecosystem.org). Their source code and documentation is available in the respective folders.
 
-|     Dataset Name     |      City       | Version |
-|:--------------------:|:---------------:|:-------:|
+|       Dataset Name        |      City       | Version |
+|:-------------------------:|:---------------:|:-------:|
 | Morphological Informality | Nairobi (Kenya) |   V2    |
-| Morphological Informality | Lagos (Nigeria)  |   V2    |
-| Morphological Informality | Kano (Nigeria)   |   V2    |
-|  Barriers to Healthcare   | Kano (Nigeria)   |  V1.1   |
+| Morphological Informality | Lagos (Nigeria) |   V2    |
+| Morphological Informality | Kano (Nigeria)  |   V2    |
+|  Road Access Deprivation  | Nairobi (Kenya) |   V1    |
+|  Road Access Deprivation  | Lagos (Nigeria) |   V1    |
+|  Road Access Deprivation  | Kano (Nigeria)  |   V1    |
+|        Waste Piles        | Nairobi (Kenya) |   V1    |
+|  Barriers to Healthcare   | Kano (Nigeria)  |  V1.1   |
 
 
 ## ⚙️ New Models and Datasets
