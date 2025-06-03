@@ -186,10 +186,7 @@ The longitude coordinate of the output location.
 
 This dataset is useful for:
 
-- **Evaluating machine learning models** of urban deprivation
-- **Studying expert vs. community perceptions** of deprivation
-- **Ground truthing** geospatial models with crowdsourced input
-- Training **deprivation classification algorithms** using human validation
+- **Ground truthing** geospatial datasets of urban deprivation using local input
 - Supporting **urban planning and health access policy research**
 
 ---
