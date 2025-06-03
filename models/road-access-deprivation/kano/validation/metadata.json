@@ -1,0 +1,89 @@
+{
+  "title": "Validation of Road Access Deprivation in Kano, Nigeria",
+  "description": "This dataset contains user-contributed validations of modelled outputs for Road Access Deprivation in Kano, Nigeria. The data was exported from the IDEAMAPS Data Ecosystem platform and includes responses from participants with varied backgrounds.",
+  "source": "IDEAMAPS Data Ecosystem Platform",
+  "dataset_reference": "...",
+  "created": "03-06-2025",
+  "fields": [
+    {
+      "name": "id",
+      "description": "Unique identifier for the validation record.",
+      "type": "string"
+    },
+    {
+      "name": "created_at",
+      "description": "Timestamp when the validation was submitted.",
+      "type": "datetime"
+    },
+    {
+      "name": "validation",
+      "description": "User-assigned validation score for the model output. Scale: 0 = Low, 1 = Medium, 2 = High.",
+      "type": "integer"
+    },
+    {
+      "name": "user_id",
+      "description": "Anonymized unique identifier for the user who submitted the validation.",
+      "type": "string"
+    },
+    {
+      "name": "user_background",
+      "description": "The background of the user, e.g. ['Research'], ['Community Member'], etc.",
+      "type": "string"
+    },
+    {
+      "name": "user_map_usage",
+      "description": "Self-reported user experience level with map-based data (e.g., 1 = Low, 2 = Medium, 3 = High).",
+      "type": "integer"
+    },
+    {
+      "name": "output_id",
+      "description": "Unique identifier for the model output that was validated.",
+      "type": "string"
+    },
+    {
+      "name": "output_model",
+      "description": "Identifier for the underlying model that generated the output.",
+      "type": "string"
+    },
+    {
+      "name": "output_model_city_name",
+      "description": "City name associated with the model output.",
+      "type": "string"
+    },
+    {
+      "name": "output_model_city_country",
+      "description": "Country where the city is located.",
+      "type": "string"
+    },
+    {
+      "name": "output_model_subdomain_name",
+      "description": "Thematic subdomain of the model output (e.g., Road Access Deprivation).",
+      "type": "string"
+    },
+    {
+      "name": "output_result",
+      "description": "Model-derived classification of deprivation (categorical or index-based).",
+      "type": "integer"
+    },
+    {
+      "name": "output_latitude",
+      "description": "Latitude coordinate of the validated location.",
+      "type": "float"
+    },
+    {
+      "name": "output_longitude",
+      "description": "Longitude coordinate of the validated location.",
+      "type": "float"
+    }
+  ],
+  "validation_scale": {
+    "0": "Low",
+    "1": "Medium",
+    "2": "High"
+  },
+  "location": {
+    "city": "Kano",
+    "country": "Nigeria"
+  },
+  "keywords": ["IDEAMAPS", "validation", "urban deprivation", "road access deprivation", "Kano", "Nigeria", "geospatial", "citizen science"]
+}

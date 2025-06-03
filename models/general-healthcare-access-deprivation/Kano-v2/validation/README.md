@@ -1,12 +1,12 @@
-# IDEAMAPS Validation Data: Emergency Obstetric Care Access Deprivation – Kano, Nigeria
+# IDEAMAPS Validation Data: General Healthcare Access Deprivation – Kano, Nigeria
 
-This dataset contains user-contributed validation records for modelled outputs estimating **emergency obstetric care access deprivation** in **Kano, Nigeria**. The data was generated and validated via the [IDEAMAPS Data Ecosystem](https://ideamaps.org), a collaborative platform for mapping urban deprivation using local knowledge and scientific models.
+This dataset contains user-contributed validation records for modelled outputs estimating **general healthcare access deprivation** in **Kano, Nigeria**. The data was generated and validated via the [IDEAMAPS Data Ecosystem](https://ideamaps.org), a collaborative platform for mapping urban deprivation using local knowledge and scientific models.
 
 ---
 
 ## 📦 Contents
 
-- `validation-kano-emergency-obstetric-care-access-deprivation.csv`: Main dataset with 21 validation records
+- `validation-kano-general-healthcare-access-deprivation.csv`: Main dataset with 21 validation records
 - `metadata.json`: Describes the structure, fields, and context of the dataset
 - `LICENSE.md`: (CC BY-NC 4.0) license for dataset use
 - `CONTRIBUTORS.md`: List of user display names that contributed to the validation dataset
@@ -30,9 +30,9 @@ Each validation dataset is created at its most granular level - meaning one row 
 
 **Key Fields:**
 - `validation`: User's rating of model accuracy
-  - `0` = Low
-  - `1` = Medium
-  - `2` = High
+    - `0` = Low
+    - `1` = Medium
+    - `2` = High
 - `user_background`: Self-described background of the validator (e.g. `['Research']`, `['Community Member']`)
 - `user_map_usage`: Self-rated experience using maps (scale: 1–3)
 - `output_result`: Model classification at a specific location
@@ -193,7 +193,7 @@ This dataset is useful for:
 
 **Citation:** If using this data, please cite:
 
-> IDEAMAPS Data Ecosystem. (2025). Validation Data: Emergency Obstetric Care Access Deprivation – Kano, Nigeria [Data set]. Zenodo. https://doi.org/xxxx/zenodo.xxxxxxxx
+> IDEAMAPS Data Ecosystem. (2025). Validation Data: General Healthcare Access Deprivation – Kano, Nigeria [Data set]. Zenodo. https://doi.org/xxxx/zenodo.xxxxxxxx
 
 ## Contact
 For any questions or queries, please contact the platform administrator at [andrew.c.c.clarke@glasgow.ac.uk](mailto:andrew.c.clarke@glasgow.ac.uk)
