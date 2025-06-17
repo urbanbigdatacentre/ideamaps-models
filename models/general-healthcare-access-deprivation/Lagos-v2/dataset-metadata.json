@@ -1,0 +1,17 @@
+{
+    "name": "General healthcare Access Deprivation",
+    "notes": "This model shows how people living in slums and other deprived areas have trouble getting basic healthcare.",
+    "city": "Lagos",
+    "focus_area_notes": "Areas in transition between high and medium access deprivation",
+    "subdomain": "Health care availability and quality",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "features": [
+        "General healthcare",
+        "Public healthcare",
+        "Accessibility"
+    ]
+}
