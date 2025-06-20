@@ -54,16 +54,16 @@ We refer to our publication for a detailed description of the methodology: [Docu
 
 Follow these steps to obtain lack of Emergency Obstetric Care accessibility levels (low, medium, high).
 
-1. **Open the notebook:**  
+### 1. **Open the notebook:**  
    `EmOC-Access-Deprivation-Kano.ipynb`
 
-2. **Configure input paths:**  
+### 2. **Configure input paths:**  
    Ensure all input paths are correctly set in the notebook.
 
-3. **Aggregate population data:**  
+### 3. **Aggregate population data:**  
    Aggregate the population data from a 1 km grid to a 100 m × 100 m resolution using [Google Building Footprints](https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_Research_open-buildings_v3_polygons).
 
-4. **Calculate OD Matrix Using OpenRouteService (ORS) Matrix API**  
+### 4. **Calculate OD Matrix Using OpenRouteService (ORS) Matrix API**  
 
    Includes estimated travel times and distances from each population grid centroid to the healthcare facility. There are two options for computing travel time and distance:
 
@@ -79,9 +79,9 @@ Follow these steps to obtain lack of Emergency Obstetric Care accessibility leve
 
    - **Option B: Local ORS Instance of the ORS server**
 
-add description here
+     add description here
 
-5. **Applying the Two-Step Floating Catchment Area (2SFCA) Method**
+### 5. **Applying the Two-Step Floating Catchment Area (2SFCA) Method**
 
    - **Catchment definition** — For each facility, a surrounding area is defined using a travel time threshold.
 
