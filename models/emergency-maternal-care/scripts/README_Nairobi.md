@@ -80,7 +80,7 @@ Follow these steps to obtain lack of Emergency Obstetric Care accessibility leve
 
    - **Option B: Local ORS Instance of the ORS server**
 
-     A local instance of the ORS can be set up to generate OD Matrices using Docker. More information about this setup can be found on the [Open Route Service documentation](https://github.com/GIScience/openrouteservice/tree/main)
+     A local instance of the ORS can be set up to generate OD Matrices using Docker. More information about this setup can be found on the [Open Route Service documentation](https://github.com/GIScience/openrouteservice/tree/main).
 
 ### 5. **Applying the Two-Step Floating Catchment Area (2SFCA) Method**
 
