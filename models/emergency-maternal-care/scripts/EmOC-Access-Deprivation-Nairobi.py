@@ -103,7 +103,6 @@ from sklearn.preprocessing import MinMaxScaler
 
 # %%
 # Read the api key from the .env file
-from dotenv import load_dotenv
 %load_ext dotenv
 %dotenv
 api_key = os.getenv('OPENROUTESERVICE_API_KEY')
@@ -119,7 +118,7 @@ client = openrouteservice.Client(key=api_key)
 # The following datasets are considered as input data for the analysis:
 # 
 # * [Datasets of health facilities](../scripts/Nairobi/data-inputs/helthcare_facilities.geojson) 
-# * [Population: Women in childbearing age](../scripts/Nairobi/data-inputs/population.geojson) from [WorldPop](https://hub.worldpop.org/geodata/summary?id=18447)
+# * [Population: Women in childbearing age](../scripts/Nairobi/data-inputs/population.geojson) from [WorldPop](https://hub.worldpop.org/geodata/summary?id=18401)
 # * [Study Area](../../../docs/study-areas/grid-boundary-nairobi.gpkg) defined by the IDEAMAPS team
 
 # %%
@@ -134,7 +133,7 @@ data_outputs = '../nairobi/'
 
 # %% [markdown]
 # ### Validated healthcare facilities - (Supply/Offer)
-# note: to describe the process to validate healthcare facilities
+# For Nairobi, the classification for validation was determined with the assistance of local experts, based on data obtained from from [the Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/) website.
 
 # %%
 healthcare_facilities_validated = gpd.read_file(data_inputs + 'helthcare_facilities.geojson')
