@@ -1,0 +1,18 @@
+{
+  "name": "Nairobi-Flood-Hazard-V1",
+  "notes": "The field survey for validation was done only in specific deprived communities. It is important to validate the performance of the model in other DUAs. Also, extra validation for areas reported in the workshops as misclassified would be great.",
+  "focus_area_notes": "The focus areas represent a random sample of grid cells (300 per category). Validating these areas will help us to have representative samples that we will use to improve our classifications",
+  "city": "Nairobi",
+  "subdomain": "Flood Hazard",
+  "output_keys": {
+    "0": "Low",
+    "1": "Medium",
+    "2": "High"
+  },
+  "features": [
+    "Elevation (Copernicus)",
+    "Infiltration rate (SOILGRIDS)",
+    "Land cover (Sentinel2-World Cover)",
+    "Rainfall (TAHMO, aspatial data)"
+  ]
+}

@@ -30,17 +30,17 @@ Below, we give definitions of the maternal care access deprivation.
 ### Low
 <blockquote > My neighbourhood has multiple options for accessing primary healthcare. There are enough (4+) public facilities to choose from within walking distance, or plenty of them (15+) if using a vehicle.</blockquote>
 
-<img src="image-examples/primary-healthcare-access-deprivation-low.png" alt="example-low">
+<img src="image-examples/primary-healthcare-access-deprivation-low.png" style="max-width:200px" alt="example-low">
 
 ### Medium
 <blockquote> There are some options to access primary healthcare in my neighbourhood. A few facilities are accessible on foot (no more than 3), but it is better to consider using a vehicle to have alternatives. </blockquote>
 
-<img src="image-examples/primary-healthcare-access-deprivation-medium.png" alt="example-medium">
+<img src="image-examples/primary-healthcare-access-deprivation-medium.png" style="max-width:200px" alt="example-medium">
 
 ### High
 <blockquote > My neighbourhood has minimal options for accessing primary healthcare. At best, there is just one public healthcare facility nearby. Therefore, a vehicle is required to access public facilities. </blockquote>
 
-<img src="image-examples/primary-healthcare-access-deprivation-high.png" alt="example-high">
+<img src="image-examples/primary-healthcare-access-deprivation-high.png" style="max-width:200px" alt="example-high">
 
 
 
