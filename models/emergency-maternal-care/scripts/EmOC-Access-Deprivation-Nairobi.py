@@ -67,6 +67,7 @@ import numpy as np
 import pandas as pd
 
 import openrouteservice
+from dotenv import load_dotenv
 
 import rasterio
 from rasterio.mask import mask

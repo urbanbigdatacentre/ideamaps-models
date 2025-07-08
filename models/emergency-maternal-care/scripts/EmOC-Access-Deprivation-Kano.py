@@ -65,6 +65,7 @@ import numpy as np
 import pandas as pd
 
 import openrouteservice
+from dotenv import load_dotenv
 
 import rasterio
 from rasterio.mask import mask
@@ -96,9 +97,7 @@ from sklearn.preprocessing import MinMaxScaler
 # ```
 
 # %%
-# %%
 # Read the api key from the .env file
-from dotenv import load_dotenv
 %load_ext dotenv
 %dotenv
 api_key = os.getenv('OPENROUTESERVICE_API_KEY')
@@ -140,7 +139,7 @@ healthcare_facilities_validated
 
 # %% [markdown]
 # ### Population Grid Data (Demand)
-# This data originally comes as a grid (1km resolution) from [WorldPop](https://hub.worldpop.org/geodata/summary?id=18401) to transform it into a 100x100m grid, we use a procedure explained below. 
+# This data originally comes as a grid (1km resolution) from [WorldPop](https://hub.worldpop.org/geodata/summary?id=18447) to transform it into a 100x100m grid, we use a procedure explained below. 
 # 
 # Note: explain the process to scale down the population data. 
 # note: explain the rational for female population between 15-49 years old.
