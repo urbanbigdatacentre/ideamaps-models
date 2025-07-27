@@ -1,0 +1,13 @@
+requests
+openrouteservice
+dotenv
+folium
+rasterio
+pandas
+shapely
+geopandas
+numpy
+scikit-learn
+rasterio
+seaborn
+time
