@@ -53,7 +53,7 @@ We refer to our publication for a detailed description of the methodology: [Docu
 
 ## 🚀 Running the Model
 
-Follow these steps to obtain lack of Emergency Obstetric Care accessibility levels (low, medium, high).
+Follow these steps to obtain deprivation levels (low, medium, high) of Emergency Obstetric Care.
 
 ### 1. **Open the notebook:**  
    `EmOC-Access-Deprivation-Nairobi.ipynb`
