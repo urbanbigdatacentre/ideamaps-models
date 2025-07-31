@@ -65,6 +65,7 @@ import numpy as np
 import pandas as pd
 
 import openrouteservice
+from dotenv import load_dotenv
 
 import rasterio
 from rasterio.mask import mask
@@ -99,7 +100,6 @@ from sklearn.preprocessing import MinMaxScaler
 # %%
 # %%
 # Read the api key from the .env file
-from dotenv import load_dotenv
 %load_ext dotenv
 %dotenv
 api_key = os.getenv('OPENROUTESERVICE_API_KEY')
@@ -160,7 +160,7 @@ healthcare_facilities_validated
 
 # %% [markdown]
 # ### Population Grid Data (Demand)
-# This data originally comes as a grid (1km resolution) from [WorldPop](https://hub.worldpop.org/geodata/summary?id=18401) to transform it into a 100x100m grid, we use a procedure explained below. 
+# This data originally comes as a grid (1km resolution) from [WorldPop](https://hub.worldpop.org/geodata/summary?id=18447) to transform it into a 100x100m grid, we use a procedure explained below. 
 # 
 # Note: explain the process to scale down the population data. 
 # note: explain the rational for female population between 15-49 years old
@@ -267,7 +267,7 @@ grid = grid[['grid_id', 'geometry','rowid', 'latitude', 'lat_min', 'lat_max', 'l
 grid
 
 # %% [markdown]
-# Building footprint data is used to estimate population distribution within each 1km cell. Building centroids are spatially joined to 100m grid cells. The number of buildings per 100m cell (bcount) is calculated.
+# Building footprint data is used to estimate population distribution within each 1km cell. We recommend using open-source building footprint data from the [Overture Map Foundation](https://overturemaps.org/). Building centroids are spatially joined to a 100 m resolution grid, and the number of buildings within each 100 m cell (bcount) is subsequently calculated.
 
 # %%
 # Count buildings per grid cell
@@ -472,7 +472,7 @@ centroids_df = gpd.read_file(data_temp +'pop-grid-nairobi-centroids.gpkg')
 centroids_df
 
 # %%
-# If not loaded yet, read from the temporary folder
+# If not loaded yet, read from the temporary folder, selected ten closest healthcare facilities.
 matrix_df = pd.read_csv(data_temp + 'OD-matrix-lagos-access-emoc.csv')
 matrix_df
 
@@ -514,7 +514,7 @@ pop_centroids_hcf = pop_centroids_hcf[columns_to_keep]
 # Merging the dataframe than contains the od matrix (with the healthcare facility class) and the population data with the full information about health care facilities.
 
 # %%
-distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude']], 
+distances_duration_matrix = pd.merge(pop_centroids_hcf, healthcare_facilities_validated[['hcf_id','facility_name', 'longitude', 'latitude', 'Validation', 'specific_owner']], 
                      left_on='hcf_uid', right_on='hcf_id', how='left')
 
 # %%
@@ -529,8 +529,8 @@ geometry = [Point(xy) for xy in zip(distances_duration_matrix['origin_lon'], dis
 gdf = gpd.GeoDataFrame(distances_duration_matrix, geometry=geometry, crs="EPSG:4326")
 
 # %%
-gpkg_path = data_temp + 'distances_duration_3_closet_Emoc.gpkg'
-gdf.to_file(gpkg_path, layer="distances_duration_3_closet_Emoc", driver="GPKG")
+gpkg_path = data_temp + 'distances_duration_10_closet_Emoc.gpkg'
+gdf.to_file(gpkg_path, layer="distances_duration_10_closet_Emoc", driver="GPKG")
 
 # %%
 # Review and remove

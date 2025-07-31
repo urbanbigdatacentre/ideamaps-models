@@ -21,7 +21,7 @@ Below, we give definitions of the maternal care access deprivation.
 
 
 ### Low
-<blockquote > It is difficult to find adequate maternal care in my neighbourhood, especially during an emergency. Women definitely require a long trip (i.e., more than 30min by car) to reach a suitable and affordable facility offering obstetric care.</blockquote>
+<blockquote > My neighbourhood offers a wide range of places to provide maternal care and handle obstetric emergencies. The places are nearby with a good mix of public and affordable options as well as private and more expensive ones for those who prefer them. </blockquote>
 
 <img src="image-examples/emergency-maternal-care-access-deprivation-low.png" alt="example-low" width="200">
 
@@ -31,7 +31,7 @@ Below, we give definitions of the maternal care access deprivation.
 <img src="image-examples/emergency-maternal-care-access-deprivation-medium.png" alt="example-medium" width="200">
 
 ### High
-<blockquote > My neighbourhood offers a wide range of places to provide maternal care and handle obstetric emergencies. The places are nearby with a good mix of public and affordable options as well as private and more expensive ones for those who prefer them. </blockquote>
+<blockquote > It is difficult to find adequate maternal care in my neighbourhood, especially during an emergency. Women definitely require a long trip (i.e., more than 30min by car) to reach a suitable and affordable facility offering obstetric care.</blockquote>
 
 <img src="image-examples/emergency-maternal-care-access-deprivation-high.png" alt="example-high" width="200">
 

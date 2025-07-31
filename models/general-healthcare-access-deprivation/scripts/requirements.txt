@@ -1,0 +1,11 @@
+geopandas
+numpy
+pandas
+openrouteservice
+python-dotenv
+folium
+rasterio
+shapely
+requests
+scikit-learn
+seaborn
