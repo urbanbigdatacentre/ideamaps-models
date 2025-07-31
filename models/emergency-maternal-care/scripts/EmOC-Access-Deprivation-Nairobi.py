@@ -250,7 +250,7 @@ grid = grid[['grid_id', 'geometry','rowid', 'latitude', 'lat_min', 'lat_max', 'l
 grid
 
 # %% [markdown]
-# Building footprint data is used to estimate population distribution within each 1km cell. Building centroids are spatially joined to 100m grid cells. The number of buildings per 100m cell (bcount) is calculated.
+# Building footprint data is used to estimate population distribution within each 1km cell. We recommend using open-source building footprint data from the [Overture Map Foundation](https://overturemaps.org/). Building centroids are spatially joined to a 100 m resolution grid, and the number of buildings within each 100 m cell (bcount) is subsequently calculated.
 
 # %%
 # Count buildings per grid cell
