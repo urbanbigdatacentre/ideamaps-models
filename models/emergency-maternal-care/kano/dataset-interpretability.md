@@ -23,17 +23,17 @@ Below, we give definitions of the maternal care access deprivation.
 ### Low
 <blockquote > My neighbourhood offers a wide range of places to provide maternal care and handle obstetric emergencies. The places are nearby with a good mix of public and affordable options as well as private and more expensive ones for those who prefer them. </blockquote>
 
-<img src="image-examples/maternal-care-access-deprivation-low.png" alt="example-low">
+<img src="image-examples/emergency-maternal-care-access-deprivation-low.png" alt="example-low">
 
 ### Medium
 <blockquote> There are a couple of places offering maternal care in my neighbourhood, some of which can handle emergencies. Women face a mixed scenario with some options to access suitable and affordable obstetric care, and others requiring either to travel long distances, pay relatively high fees or have private insurance to access the required obstetric care. </blockquote>
 
-<img src="image-examples/maternal-care-access-deprivation-medium.png" alt="example-medium">
+<img src="image-examples/emergency-maternal-care-access-deprivation-medium.png" alt="example-medium">
 
 ### High
 <blockquote > It is difficult to find adequate maternal care in my neighbourhood, especially during an emergency. Women definitely require a long trip (i.e., more than 30min by car) to reach a suitable and affordable facility offering obstetric care.</blockquote>
 
-<img src="image-examples/maternal-care-access-deprivation-high.png" alt="example-high">
+<img src="image-examples/emergency-maternal-care-access-deprivation-high.png" alt="example-high">
 
 
 
