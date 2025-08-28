@@ -23,17 +23,17 @@ Below, we give definitions of the maternal care access deprivation.
 ### Low
 <blockquote > My neighbourhood offers a wide range of places to provide maternal care and handle obstetric emergencies. The places are nearby with a good mix of public and affordable options as well as private and more expensive ones for those who prefer them. </blockquote>
 
-<img src="image-examples/maternal-care-access-deprivation-low.png" alt="example-low">
+<img src="image-examples/emergency-maternal-care-access-deprivation-low.png" alt="example-low">
 
 ### Medium
 <blockquote> There are a couple of places offering maternal care in my neighbourhood, some of which can handle emergencies. Women face a mixed scenario with some options to access suitable and affordable obstetric care, and others requiring either to travel long distances, pay relatively high fees or have private insurance to access the required obstetric care. </blockquote>
 
-<img src="image-examples/maternal-care-access-deprivation-medium.png" alt="example-medium">
+<img src="image-examples/emergency-maternal-care-access-deprivation-medium.png" alt="example-medium">
 
 ### High
 <blockquote > It is difficult to find adequate maternal care in my neighbourhood, especially during an emergency. Women definitely require a long trip (i.e., more than 30min by car) to reach a suitable and affordable facility offering obstetric care.</blockquote>
 
-<img src="image-examples/maternal-care-access-deprivation-high.png" alt="example-high">
+<img src="image-examples/emergency-maternal-care-access-deprivation-high.png" alt="example-high">
 
 
 
@@ -95,21 +95,31 @@ The model relies on the following datasets:
 - [Road network data from OpenStreetMap via the Open Route Service API](https://openrouteservice.org/)
 
 
-## Appendix: Two-Step Floating Catchment Area (2SFCA) Method
+## Appendix: Enhanced Two-Step Floating Catchment Area (2SFCA) Method
 
-The two-step floating catchment area (2SFCA) method is used to calculate accessibility. The formula for $R_j$, which represents the accessibility score for a location $j$, is as follows:
+The **Enhanced Two-Step Floating Catchment Area (E2SFCA)** method improves upon the traditional 2SFCA by incorporating a distance decay function. It is calculated in two steps:
+
+**Step 1: Calculate the supply-to-demand ratio $R_i$ for each supply location $i$:**
 
 $$
-R_j = \sum_{i \in \{d_{ij} \leq d_0\}} \frac{S_i}{\sum_{k \in \{d_{ik} \leq d_0\}} P_k}
+R_i = \frac{S_i}{\sum_{k \in \{d_{ik} \leq d_0\}} W(d_{ik}) P_k}
 $$
 
-Where:
-- $R_j$: Accessibility score for location $j$.
-- $S_i$: Supply (e.g., capacity of healthcare facilities) at location $i$.
-- $P_k$: Population demand at location $k$.
-- $d_{ij}$: Distance between location $i$ and $j$.
-- $d_0$: Threshold distance within which accessibility is considered.
-- $\sum_{i \in \{d_{ij} \leq d_0\}}$: Summation over all supply locations $i$ within the threshold distance $d_0$ from $j$.
-- $\sum_{k \in \{d_{ik} \leq d_0\}}$: Summation over all demand locations $k$ within the threshold distance $d_0$ from $i$.
+**Step 2: Calculate the accessibility $A_j$ for each demand location $j$:**
 
-This formula combines supply and demand within a defined catchment area to estimate accessibility.
+$$
+A_j = \sum_{i \in \{d_{ij} \leq d_0\}} W(d_{ij}) R_i
+$$
+
+Where:  
+- $A_j$: Accessibility score for demand location $j$.  
+- $R_i$: Supply-to-demand ratio at supply location $i$.  
+- $S_i$: Supply (e.g., capacity of healthcare facilities) at location $i$.  
+- $P_k$: Population demand at location $k$.  
+- $d_{ij}$: Distance between supply location $i$ and demand location $j$.  
+- $d_0$: Threshold distance within which accessibility is considered.  
+- $W(d)$: Distance decay weight function (e.g., Gaussian, exponential, or stepwise).  
+- $\sum_{k \in \{d_{ik} \leq d_0\}}$: Summation over all demand locations $k$ within the threshold distance $d_0$ from supply location $i$.  
+- $\sum_{i \in \{d_{ij} \leq d_0\}}$: Summation over all supply locations $i$ within the threshold distance $d_0$ from demand location $j$.  
+
+This formula combines supply and demand within a defined catchment area, accounting for distance decay, to estimate accessibility. It provides a more nuanced measure than the traditional 2SFCA, as closer populations have a stronger impact on accessibility than farther ones.
