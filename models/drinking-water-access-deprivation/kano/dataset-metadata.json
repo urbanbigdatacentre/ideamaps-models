@@ -1,0 +1,16 @@
+{
+    "name": "Drinking Water Access Deprivation",
+    "notes": "This model shows how people in informal settlements and deprived areas struggle to access drinking water.",
+    "city": "Kano",
+    "focus_area_notes": "One ward Dorayi Karama and random sample of grid cells (300 per category). Validating these areas will help us to have representative samples that we will use to improve our classifications.",
+    "subdomain": "Drinking Water availability and quality",
+    "output_keys": {
+        "0": "Low",
+        "1": "Medium",
+        "2": "High"
+    },
+    "features": [
+        "Drinking Water",
+        "Accessibility"
+    ]
+}
