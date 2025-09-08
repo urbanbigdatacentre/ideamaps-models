@@ -1,6 +1,6 @@
 ---
 title: Drinking Water Access Deprivation 
-author: [Oluwatimilehin Adenike Shonowo - o.shonowo@research.gla.ac.uk]
+author: [Oluwatimilehin Adenike Shonowo - o.shonowo.1@research.gla.ac.uk]
 category: Our Data
 tags: [Drinking Water, Accessibility]  
 ---
@@ -16,7 +16,7 @@ Drinking Water Access Deprivation is a dataset that depicts how difficult it is 
 
 ## Definitions of Deprivation Levels
 
-The dataset relates the **offer of waterpoints** (improved, unimproved, functional, non-functional or drinkable, non-drinkable), the **demand** represented as household population from WorldPop; and the **physical accessibility** represented in travel time (e.g., walking distances, queuing, and competition at waterpoints). Together, these values serve to estimate deprivation access based on the E2SFCA approach (i.e., access deprivation as the inverse of accessibility) → **Low, Medium, or High**.
+This dataset combines the **supply of waterpoints** (e.g., improved, unimproved, functional, or non-functional), the **demand** from household population data (WorldPop), and the **physical accessibility** represented in travel time (e.g., walking time, queuing, competition at waterpoints). Using the **Enhanced Two-Step Floating Catchment Area (E2SFCA)** method [(Luo & Qi, 2009)](https://www.sciencedirect.com/science/article/abs/pii/S1353829209000574), these factors are used to estimate **access deprivation**, defined as the inverse of accessibility and categorized as **Low, Medium, or High** [(Kiani et al., 2021)](https://archpublichealth.biomedcentral.com/articles/10.1186/s13690-021-00601-8); [(Vadrevu & Kanjilal, 2016)](https://equityhealthj.biomedcentral.com/articles/10.1186/s12939-016-0376-y).
 
 Below, we give the adopted definitions of Drinking Water Access Deprivation:
 
@@ -48,7 +48,7 @@ To learn more about how you can help improve the accuracy of these classificatio
 
 ## Additional Insights into Modelling Drinking Water Access Deprivation
 
-The dataset was developed as part of the IDEAMAPS project, using the **Enhanced Two-Step Floating Catchment Area (E2SFCA)** method to combine the distribution of waterpoints, travel times, and population demand. Accessibility scores were calculated at a fine resolution (100 m grid), weighted with **WorldPop population estimates**. A one-hour travel-time cutoff was applied, guided by statistical distribution, WHO/UNICEF standards, African urban case studies, and feedback from local stakeholders. The scores were then grouped into three categories — Low, Medium, and High deprivation.
+The dataset was developed as part of the IDEAMAPS project, using the E2SFCA method to combine the distribution of waterpoints, travel times, and population demand. Accessibility scores were calculated at a fine resolution (100 m grid), weighted with **WorldPop population estimates**. A one-hour travel-time cutoff was applied, guided by statistical distribution, [(UNICEF, 2024)](https://data.unicef.org/topic/water-and-sanitation/drinking-water/) standards, African urban case studies, and feedback from local stakeholders. The scores were then grouped into three categories — Low, Medium, and High deprivation.
 
 Two parallel **workstreams** were integrated to model deprivation:
 
@@ -85,7 +85,7 @@ The model relies on the following datasets:
 
 ## Appendix: Enhanced Two-Step Floating Catchment Area (E2SFCA) Method
 
-The **Enhanced Two-Step Floating Catchment Area (E2SFCA)** method improves upon the traditional 2SFCA by incorporating a distance decay function. It is calculated in two steps:
+The E2SFCA method improves upon the traditional 2SFCA by incorporating a distance decay function while accounting for competition between supply and demand. This makes it particularly well-suited for analyzing water accessibility in dense urban environments, where both facility crowding and travel time strongly influence access patterns [Luo & Qi, 2009)](https://doi.org/10.1016/j.healthplace.2009.06.002)). It is calculated in two steps:
 
 **Step 1: Calculate the supply-to-demand ratio $R_i$ for each supply location $i$:**
 
