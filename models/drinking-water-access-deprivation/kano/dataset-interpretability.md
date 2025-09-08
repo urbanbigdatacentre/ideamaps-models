@@ -85,7 +85,7 @@ The model relies on the following datasets:
 
 ## Appendix: Enhanced Two-Step Floating Catchment Area (E2SFCA) Method
 
-The E2SFCA method improves upon the traditional 2SFCA by incorporating a distance decay function while accounting for competition between supply and demand. This makes it particularly well-suited for analyzing water accessibility in dense urban environments, where both facility crowding and travel time strongly influence access patterns [Luo & Qi, 2009)](https://doi.org/10.1016/j.healthplace.2009.06.002)). It is calculated in two steps:
+The E2SFCA method improves upon the traditional 2SFCA by incorporating a distance decay function while accounting for competition between supply and demand. This makes it particularly well-suited for analyzing water accessibility in dense urban environments, where both facility crowding and travel time strongly influence access patterns [(Luo & Qi, 2009)](https://doi.org/10.1016/j.healthplace.2009.06.002)). It is calculated in two steps:
 
 **Step 1: Calculate the supply-to-demand ratio $R_i$ for each supply location $i$:**
 
