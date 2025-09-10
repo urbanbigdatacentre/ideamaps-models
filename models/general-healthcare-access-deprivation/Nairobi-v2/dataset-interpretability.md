@@ -2,7 +2,7 @@
 title: General Healthcare Access Deprivation 
 authors: [Diego Pajarito Grajales - Diego.PajaritoGrajales@glasgow.ac.uk, Xingyi Du - xingyi.du@glasgow.ac.uk]
 category: Our Data
-tags: [Maternal health care, Emergency obstetric care, Accessibility]  
+tags: [General Healthcare, Accessibility]  
 ---
 
 # General Healthcare Access Deprivation
