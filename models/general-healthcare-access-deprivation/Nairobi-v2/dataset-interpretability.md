@@ -1,5 +1,5 @@
 ---
-title: Maternal Care Access Deprivation 
+title: General Healthcare Access Deprivation 
 authors: [Diego Pajarito Grajales - Diego.PajaritoGrajales@glasgow.ac.uk, Xingyi Du - xingyi.du@glasgow.ac.uk]
 category: Our Data
 tags: [Maternal health care, Emergency obstetric care, Accessibility]  
@@ -22,23 +22,20 @@ Healthcare accessibility looks at the time and resources needed to choose and ge
 
 ## Definitions of Deprivation Levels
 
-This dataset relates to the general healthcare services offered by public facilities and the conditions in which communities can choose and access them. Counts of the healthcare facilities that can be reached by walking or by short trips by vehicle were used to estimate the three deprivation levels as —> Low, Medium, or High. Below, we give definitions of the general healthcare access deprivation  —> **Low, Medium, or High.**
-
-Below, we give definitions of the maternal care access deprivation.
-
+This dataset relates to the general healthcare services offered by public facilities and the conditions in which communities can choose and access them. In every city, counts of the healthcare facilities that can be reached by walking or by short trips by vehicle were used to estimate the three deprivation levels as —>  **Low, Medium, or High.**
 
 ### Low
-<blockquote > My neighbourhood has multiple options for accessing primary healthcare. There are enough (4+) public facilities to choose from within walking distance, or plenty of them (15+) if using a vehicle.</blockquote>
+<blockquote> My neighbourhood has multiple options for accessing primary healthcare. There are enough public facilities to choose from within walking distance <span style="font-size: smaller; font-style: italic;">(e.g., 4 or more for Kano and Lagos, 2 or more for Nairobi)</span>, or if using a vehicle  <span style="font-size: smaller; font-style: italic;">(e.g., 15 or more for Kano and Lagos, 4 or more for Nairobi)</span>.</blockquote>
 
 <img src="image-examples/primary-healthcare-access-deprivation-low.png" alt="example-low">
 
 ### Medium
-<blockquote> There are some options to access primary healthcare in my neighbourhood. A few facilities are accessible on foot (no more than 3), but it is better to consider using a vehicle to have alternatives. </blockquote>
+<blockquote> There are some options to access primary healthcare in my neighbourhood. A few facilities are accessible on foot <span style="font-size: smaller; font-style: italic;">(e.g., no more than 3 for Kano and Lagos, no more than 1 for Nairobi)</span> , but it is better to consider using a vehicle to have alternatives.
 
 <img src="image-examples/primary-healthcare-access-deprivation-medium.png" alt="example-medium">
 
 ### High
-<blockquote > My neighbourhood has minimal options for accessing primary healthcare. At best, there is just one public healthcare facility nearby. Therefore, a vehicle is required to access public facilities. </blockquote>
+<blockquote> My neighbourhood has limited options for accessing primary healthcare. There is only one <span style="font-size: smaller; font-style: italic;">(e.g.,Kano and Lagos)</span> or no <span style="font-size: smaller; font-style: italic;">(e.g.,Nairobi)</span> public healthcare facility nearby. Therefore, a vehicle is required to access public facilities.</blockquote>
 
 <img src="image-examples/primary-healthcare-access-deprivation-high.png" alt="example-high">
 
