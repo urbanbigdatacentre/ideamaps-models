@@ -30,7 +30,7 @@ This dataset relates to the general healthcare services offered by public facili
 <img src="image-examples/primary-healthcare-access-deprivation-low.png" alt="example-low">
 
 ### Medium
-<blockquote> There are some options to access primary healthcare in my neighbourhood. A few facilities are accessible on foot <span style="font-size: smaller; font-style: italic;">(e.g., no more than 3 for Kano and Lagos, no more than 1 for Nairobi)</span> , but it is better to consider using a vehicle to have alternatives.
+<blockquote> There are some options to access primary healthcare in my neighbourhood. A few facilities are accessible on foot <span style="font-size: smaller; font-style: italic;">(e.g., no more than 3 for Kano and Lagos, no more than 1 for Nairobi)</span> , but it is better to consider using a vehicle to have alternatives.</blockquote>
 
 <img src="image-examples/primary-healthcare-access-deprivation-medium.png" alt="example-medium">
 
