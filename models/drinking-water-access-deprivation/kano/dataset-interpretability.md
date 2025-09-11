@@ -16,7 +16,7 @@ Drinking Water Access Deprivation is a dataset that depicts how difficult it is 
 
 ## Definitions of Deprivation Levels
 
-The dataset relates the **offer of waterpoints** (improved, unimproved, functional, non-functional or drinkable, non-drinkable), the **demand** represented as household population from WorldPop; and the **physical accessibility** represented in travel time (e.g., walking distances, queuing, and competition at waterpoints). Together, these values serve to estimate deprivation access based on the E2SFCA approach (i.e., access deprivation as the inverse of accessibility) → **Low, Medium, or High**.
+The dataset relates the **offer of waterpoints** (improved, unimproved, functional, non-functional or drinkable, non-drinkable), the **demand** represented as household population from WorldPop; and the **physical accessibility** represented in travel time (e.g., walking distances, queuing, and competition at waterpoints). Together, these values serve to estimate deprivation access based on the **Enhanced Two-Step Floating Catchment Area (E2SFCA)** approach (i.e., access deprivation as the inverse of accessibility) → **Low, Medium, or High**.
 
 Below, we give the adopted definitions of Drinking Water Access Deprivation:
 
@@ -48,7 +48,7 @@ To learn more about how you can help improve the accuracy of these classificatio
 
 ## Additional Insights into Modelling Drinking Water Access Deprivation
 
-The dataset was developed as part of the IDEAMAPS project, using the **Enhanced Two-Step Floating Catchment Area (E2SFCA)** method to combine the distribution of waterpoints, travel times, and population demand. Accessibility scores were calculated at a fine resolution (100 m grid), weighted with **WorldPop population estimates**. A one-hour travel-time cutoff was applied, guided by statistical distribution, WHO/UNICEF standards, African urban case studies, and feedback from local stakeholders. The scores were then grouped into three categories — Low, Medium, and High deprivation.
+The dataset was developed as part of the IDEAMAPS project, using the E2SFCA method to combine the distribution of waterpoints, travel times, and population demand. Accessibility scores were calculated at a fine resolution (100 m grid), weighted with **WorldPop population estimates**. A one-hour travel-time cutoff was applied, guided by statistical distribution, [(UNICEF, 2024)](https://data.unicef.org/topic/water-and-sanitation/drinking-water/), African urban case studies, and feedback from local stakeholders. The scores were then grouped into three categories — Low, Medium, and High deprivation.
 
 Two parallel **workstreams** were integrated to model deprivation:
 
