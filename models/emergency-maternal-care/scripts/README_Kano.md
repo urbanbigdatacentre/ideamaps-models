@@ -81,7 +81,7 @@ Follow these steps to obtain deprivation levels (low, medium, high) of Emergency
 
      A local instance of the ORS can be set up to generate OD Matrices using Docker. More information about this setup can be found on the [Open Route Service documentation](https://github.com/GIScience/openrouteservice/tree/main).
 
-### 5. **Applying the Two-Step Floating Catchment Area (2SFCA) Method**
+### 5. **Applying the Enhaced Two-Step Floating Catchment Area (E2SFCA) Method**
 
    - **Catchment definition** — For each facility, a surrounding area is defined using a travel time threshold.
 
