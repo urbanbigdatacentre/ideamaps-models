@@ -1,0 +1,9 @@
+requests
+openrouteservice
+dotenv
+pandas
+shapely
+geopandas
+numpy
+scikit-learn
+rasterio
