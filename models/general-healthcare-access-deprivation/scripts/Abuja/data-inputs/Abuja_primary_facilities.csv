@@ -1,0 +1,126 @@
+OBJECTID,globalid,nhfr_uid,nhfr_facility_code,country,iso,state,lga,lga_name_disagreement,ward,ward_name_disagreement,facility_name,facility_name_source,ownership,ownership_type,facility_level,facility_level_option,last_updated,longitude,latitude,Local Validation
+1351,ebedc02c-64f3-48c3-86d0-83b525a010e1,22817110.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Galadimawa Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.4259867,8.9921167,Primary Health Clinic
+1353,f917d0a1-5c2e-4ac3-8894-239668026c4d,67005003.0,37/06/1/1/1/0002,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,1,Abuja Apo Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.4772066,9.0766981,Primary Health Center
+1354,e0baa86a-de96-46e4-9056-8b8abe81682d,66485163.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Kobi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.5241246,8.9992791,Primary Health Clinic
+3723,799a36ef-3f08-406f-a743-261c9194b5db,54836418.0,37/06/1/1/2/0127,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre,0,Family Health Centre ,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.47846,9.03602,Primary Health Clinic
+10436,1a478ba2-ba0c-4c9a-988b-f2b25e5b89bf,21442234.0,37/06/1/1/1/0028,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Ketti Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.394287109,8.926513672,Primary Health Center
+10437,71b26653-63ab-4506-a121-3ae2f7d1ccdf,25453149.0,37/06/1/1/1/0023,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Karu,0,Jikwoyi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.564514161,8.984313965,Primary Health Clinic
+10800,2c28b2ab-9924-4bd9-95f7-a99ab9ffeeff,15656732.0,37/06/1/1/1/0031,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Mabushi Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.454284668,9.082092285,Primary Health Clinic
+10804,0fb67dd4-029e-4983-a9b7-a2c6fbb21df6,16651207.0,37/06/1/1/1/0012,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Garki Village Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.48852539,9.01928711,Primary Health Clinic
+10806,13224d6a-c99b-407f-acfa-aa657a6c3421,47451176.0,37/06/1/1/1/0041,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Pyakasa Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.405517578,8.965698242,Primary Health Center
+10807,cd145a92-f0f1-4fad-bc89-e19470a936f0,83716614.0,37/06/1/1/1/0004,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Burum Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.442077637,8.889099121,Primary Health Clinic
+10815,fed1a776-aa0f-4503-b5f8-c9a690491b80,76111360.0,37/06/1/1/1/0025,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Kagini Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.299316406,9.130126953,Primary Health Center
+10817,1d286cb0-f8b3-462a-a891-d4dee6f3612f,56571619.0,37/06/1/1/1/0034,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre,0,National Assembly Staff Clinic,NHFR_2024,Public,Federal Government,Primary,Primary Health Center,11/11/2024,7.494873047,9.040893555,Primary Health Center
+11223,6c374a9a-76d0-485c-ae27-3f05f51cc8a4,65598210.0,37/06/1/1/1/0016,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,0,Gui Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.221496582,8.925476074,Primary Health Center
+11238,981bed19-8911-45a4-90d3-bc66771cecc2,70046372.0,37/06/1/1/1/0027,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Karu,0,Karu Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.578733471,9.008950048,Primary Health Center
+11239,39d28b76-e95d-44dd-be8e-e20e3c460f4b,68833611.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Nyanya,0,Gbagarape Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.580348145,9.054084668,Primary Health Center
+11241,0abe2a17-3c2c-41f8-ad5f-fb1de25a4dd8,68950102.0,37/06/1/1/2/0238,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Piwoyi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.393920898,8.999328613,Primary Health Clinic
+11247,8dadced0-1b0c-42ba-b1a0-265ee3568930,14861906.0,37/06/1/1/2/0179,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Kuchingoro Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.422729492,9.015930175,Primary Health Center
+12418,a99df27d-5a1f-4512-92ca-cd99e50e7a6f,13110171.0,37/06/1/1/1/0343,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Saburi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.280056245,9.107876262,Primary Health Clinic
+14089,ea579e15-9cc3-4f58-a1d0-0988b360995b,34435377.0,37/06/1/1/1/0018,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Gwarimpa Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.373768052,9.115803663,Primary Health Clinic
+14167,d6063429-d125-40a8-b758-6049f0d825f4,69707050.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Jiwa,1,Jiwa Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.56729,8.97402,Primary Health Clinic
+14196,3023b48c-b997-44e2-8d15-dd06e24a7f4f,76786677.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Efab Medical Center,NHFR_2024,Public,State Government,Primary,Primary Health Clinic,11/11/2024,7.39579,9.06073,Primary Health Clinic
+15148,f0a782a7-0d15-42ad-abbd-688f8dc6e75e,36821797.0,37/06/1/1/1/0043,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,0,Tungan Madaki Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.245194203,9.022663751,Primary Health Clinic
+16062,01b220a3-7435-4083-9b66-d4fb12c4bbf5,36453994.0,37/06/1/1/1/0008,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Dei Dei Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.28217,9.10538,Primary Health Center
+16481,9b19f724-6e45-45d4-ac21-702f5318392b,75439060.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,1,Shadalafiya Clinic,NHFR_2024,Public,State Government,Primary,Primary Health Center,11/11/2024,7.44658,8.94875,Primary Health Center
+16482,7ae4fdc4-ff20-4353-842b-b3ee0d066970,32375509.0,37/06/1/1/1/0019,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Jiwa,1,Hulumi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.48963,9.03441,Primary Health Clinic
+16483,a614c65f-03eb-40ca-98a8-05cc9eea6776,31465496.0,37/06/1/1/1/0029,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kanshi,0,Kuseki Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.57284,8.82967,Primary Health Clinic
+16496,1a8d43ab-1e02-4c33-8c5d-0d4228d020ec,79023008.0,37/06/1/1/1/0022,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,1,Inec Staff (Utako) Clinic,NHFR_2024,Public,Federal Government,Primary,Primary Health Clinic,11/11/2024,7.48424,9.0408,Primary Health Clinic
+16508,132cf411-66ce-4dd7-a133-52c2e3ae8841,24164918.0,37/06/1/1/1/0009,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Dutsen Garki Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.48662,8.97738,Primary Health Clinic
+16510,8bae724d-70d8-43a2-b2ad-16368444d07a,23806819.0,37/06/1/1/1/0017,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Gwagwa Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.31412,9.09115,Primary Health Center
+16915,2d7aa5f9-54c6-46fb-b9ce-e33230495364,18754817.0,37/06/1/1/1/0030,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Lugbe Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.37124,8.97234,Primary Health Center
+16943,cf521238-61a4-43fd-af14-3da14947f549,13177378.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Kurudu Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.5426299,8.9453279,Primary Health Clinic
+16955,4880b3d5-79c4-4ecb-b29c-c843f05fd9cb,54336355.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Damagaza Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.4680948,8.9815318,Primary Health Center
+16956,c0721221-05d2-4635-bbe9-09ae52df5ad9,27309258.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Kabusa Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.441290382,8.949674092,Primary Health Center
+16958,0245ce0c-f53e-4cfd-9e35-8508b1d60cee,31729367.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Waru Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.4866167,8.9283892,Primary Health Center
+16959,881fe37d-0e21-41d4-80dc-458f50fa5799,62179711.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,0,Gosa Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.3010474,8.945301,Primary Health Center
+16962,bb54e456-1df2-4cad-a7da-1769388d1b67,60515003.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Kpeyegyi Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.547332518,8.954647567,Primary Health Center
+16964,6c2c185c-8337-4434-b65c-894912ba52e8,68540978.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Chorin Bisa Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.514449364,8.856210813,Primary Health Clinic
+16967,c046bb3d-951f-438c-a4f4-9a94f617b15b,82969293.0,37/06/1/1/2/0332,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Zhidu Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.377905627,9.017640976,Primary Health Clinic
+16975,fab66550-e2a9-4f71-b8b7-efd46fa42697,29158959.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Gishiri Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.4648899,9.1000683,Primary Health Clinic
+17239,bd143ec5-edff-4db0-a8bc-ec2d0fe2ab8c,78338897.0,37/06/1/1/1/0011,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre,0,Fereprod Medical Center,NHFR_2024,Public,Federal Government,Primary,Primary Health Clinic,11/11/2024,7.495983,9.036286,Primary Health Clinic
+18145,96c5c198-7ec6-4090-b163-98fe3d44f109,39448708.0,37/06/1/1/1/0015,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Gugugu Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.523178907,8.885151172,Primary Health Clinic
+18253,723bd3a1-8495-4167-933a-e148138e56f1,41516568.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Sheretti Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.440673829,8.942504883,Primary Health Clinic
+18381,0ff8a247-3830-4149-b642-f49c0a58add6,76977552.0,37/06/1/1/2/0218,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Apo Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.505344014,8.981102979,Primary Health Center
+18382,e953ee12-4cfd-4d00-b23a-ed16dc39b36c,33911474.0,37/06/1/1/1/0020,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,0,Iddo Pada Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.21012,8.98509,Primary Health Center
+18383,a2538ca0-c8fb-49aa-8b1d-655f711afadf,44572850.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Jahi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.441156337,9.09548701,Primary Health Clinic
+18384,d850f937-7e08-4265-8a69-4230b0a77f3e,25847295.0,37/06/1/1/2/0050,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Jiwa,0,Bassan Jiwan Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.286318331,9.019611337,Primary Health Center
+18385,f0209dd3-918d-450d-bbdc-7098ce264be3,33469484.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Jiwa,0,Dakwa Dantata Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.2435083,9.099181354,Primary Health Clinic
+18386,f8c48dd7-78e6-40c4-9bfc-a08bbb62cba3,21136728.0,37/06/1/1/1/0013,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Gidan Mangoro Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.563720703,8.916870117,Primary Health Center
+18431,e4734503-2757-4354-a092-07fddea98339,37365768.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Munape Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.497027657,8.823595239,Primary Health Clinic
+23458,f3ee9856-3c1a-46c1-99a0-a89d469d58c7,38742435.0,37/06/1/1/1/0021,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Jiwa,1,Idu Karmo Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.35949707,9.071716309,Primary Health Center
+23714,cc44f94f-d01c-497e-aa38-892aaf8fa7fd,61627861.0,37/06/1/1/1/0024,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Jiwa,1,Jiwa Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.30978,9.08022,Primary Health Center
+25792,b6ec571a-8523-477b-a563-b335ef1d255b,79961907.0,37/06/1/1/1/0339,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Takushara Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.4598351,8.883951711,Primary Health Clinic
+26407,9e961881-8f4a-448c-97ba-7972e6f96df3,54229912.0,37/06/1/1/1/0337,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kanshi,1,Karshi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.57285,8.82966,Primary Health Clinic
+28468,588ab12b-c997-4c07-a8d5-0b49e0e06fa5,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Shadalafiya Primary Health Care Center,GRID3_EHEALTH,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.43411,8.93979,Primary Health Center
+30005,5a093ab0-fec0-4b49-86f5-068b72827d11,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Acupuncture Hospital,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024,7.49079,9.01863,Primary Health Center
+34760,8d0d6f73-53ae-481a-b810-7a973146334c,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Ozoro Primary Health Center,GRID3_EHEALTH,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.574890136,8.895507813,Primary Health Center
+34765,fa68490e-1d02-411c-9a05-f32d9618dd1b,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Karu,0,Abuja Clinic,GRID3_EHEALTH,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.565307617,9.002319336,Primary Health Center
+36851,b74fe3b2-769c-4dd0-b7fa-6f9ff2ee7456,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Karu,0,Karu Ecwa Clinic,GRID3_EHEALTH,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.579968908,9.010461689,Primary Health Clinic
+42553,75216a8b-d54b-4102-86a9-e364eaf3b9e5,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Aso Hospital,GRID3_EHEALTH,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.36276,9.07063,Primary Health Center
+49695,d7687bf5-b390-4686-9517-60fb1afcc05c,56862985.0,37/06/1/1/1/0040,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Orozo Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.5749,8.89612,Primary Health Clinic
+50314,b18838f9-72d6-4ad6-8ca6-6669d008bcb4,63834295.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,0,Tungan Madaki Primary Health Center,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024,7.277336,9.007951,Primary Health Clinic
+50604,3073bc22-8e29-470f-8d6e-8152df7d828c,22071844.0,37/06/1/1/1/0001,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre,0,7 Guards Batallion Medical Reception Station Abuja,NHFR_2024,Public,Federal Government,Primary,Primary Health Clinic,11/11/2024,7.51115,9.09549,Primary Health Clinic
+50606,61a327ba-33d5-4f35-89ec-879d4c42cf1a,61271563.0,37/06/1/1/1/0345,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Aleiyita Primary Health Care Center,NHFR_2024,Public,Local Government,Primary,Primary Health Center,11/11/2024,7.39801,8.98851,Primary Health Center
+16493,499b8165-52d5-43cf-8b81-0c07cf9747f1,84036851.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gui,0,63 Nigeria Air Force Base Hospital,NHFR_2024,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.21126,8.98348,"Primary
+"
+14149,ff65258e-17f1-4fe6-8474-f951e32ad933,68161962.0,37/06/1/1/1/0336,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Abuja Clinic,NHFR_2024,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.48002,9.02008,"Primary
+"
+36847,9ecabed4-dfca-4baf-9b53-29393a85a010,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Awmecare Clinic and Maternity,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.47084,9.01378,"Primary
+"
+36867,a08eb10b-1159-4218-ba5d-2360d8aa1bff,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre 1,0,Azony Maternity,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.48012,9.03361,"Primary
+"
+36844,65f0dd73-8091-41b5-92d9-16c9bbe43bfa,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Nyanya,0,Blessed Trinity Hospital,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.587963522,9.031259331,"Primary
+"
+28361,a751481a-da62-4bae-8c4a-be5e40ca81e6,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Comforter Place,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.46758,8.9985,"Primary
+"
+38442,dd8888c4-220f-42ff-9ec7-cda009b1e032,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Dakwa Primary Health Center,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.26921,9.11321,"Primary
+"
+8984,edd173ac-3adc-472b-b3da-42feda40a70a,77082313.0,37/06/1/1/1/0006,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre,0,Defence Headquarters Abuja Medical Center,NHFR_2024,Public,State Government,Primary,Unknown,11/11/2024 00:00,7.48952,9.0393,"Primary
+"
+49848,51b233e1-aade-4591-84dc-6f461fd36cc5,57305970.0,37/06/1/1/1/0341,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Dnakwo Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024 00:00,7.44348,8.9881,"Primary
+"
+44443,9de35c35-7e46-4635-a884-9dc0339a527b,47730894.0,37/06/1/1/1/0338,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Durumi 2 Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024 00:00,7.46168,9.00798,"Primary
+"
+36732,1e6859fa-ec20-4239-b1f4-aa5ab407e552,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Ecwa Clinic and Maternity,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.31565,9.08872,"Primary
+"
+36846,e38ec536-ce11-4de4-a873-41cf016ccb92,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre 1,0,Fct Management Board Hospital,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.50257,9.04411,"Primary
+"
+36845,f7630fde-606c-4b1e-aa28-db98039588b1,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Nyanya,0,Fountain Head Hospital,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.58633,9.02381,"Primary
+"
+36853,18cd7788-afaf-4aab-94eb-05ec28ab683e,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Karu,0,Fredrickson Mecal Clinic,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.56454,9.01231,"Primary
+"
+38439,948ca5b9-df90-497a-bc20-3c5997c085f5,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwagwa,0,Gbagarape Primary Health Care,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.31674,9.08671,"Primary
+"
+36849,327b20cb-db61-455f-9c93-85f519dbd20d,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre 1,0,Guinue Savannah Medical Center,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.50012,9.04019,"Primary
+"
+38431,6d7520e8-b1f7-443c-8e4b-476d7db62710,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre 1,0,Intergrated Health Care,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.48,9.03155,"Primary
+"
+49022,29aae825-0464-43cb-9919-806c05e44212,20256195.0,37/06/1/1/1/0344,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Karon Majigi Primary Health Clinic,NHFR_2024,Public,Local Government,Primary,Primary Health Clinic,11/11/2024 00:00,7.42525,9.02548,"Primary
+"
+36843,0861bc41-82e9-4304-8b15-408e68cd5510,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Nyanya,0,King Clinic and Maternity,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.58217,9.02959,"Primary
+"
+38432,e3f590ba-7aa0-48d1-bd47-7bc61c9b9e6a,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kanshi,0,Kobi Primary Health Center,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.57788,8.82967,"Primary
+"
+39418,5183339b-13f4-4707-8d1e-a2d942608b01,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Gwarimpa,0,Lamingo Primary Health Center,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.410385309,9.1055668,"Primary
+"
+32876,156b1b93-2841-43d6-84b0-e327c50fdb25,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Wuse,0,Medicaid Radioagnostic,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.46208,9.07742,"Primary
+"
+36854,32d962fb-0770-4080-b799-0077d2fd6000,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Kabusa,0,Mery Clinic,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.44408,8.95189,"Primary
+"
+10816,cf7a25b8-46c5-4b77-a31c-98aed0d80d13,14341390.0,37/06/1/1/1/0005,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Karu,0,Nigeria Custom Medical Center,NHFR_2024,Public,Unknown,Primary,Unknown,11/11/2024 00:00,7.56427002,9.003723145,"Primary
+"
+36730,05f79f11-dc7c-4844-9fea-d4bd43896c9d,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Wuse,0,Primed and Diagnostics Clinic,GRID3_EHEALTH,Public,Unknown,Primary,Unknown,11/11/2024 00:00,7.47864,9.06401,"Primary
+"
+36852,3de262c6-622c-4f96-8fb2-8ee2e3ca804c,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Orozo,0,Samrock Hospital,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.55021,8.93313,"Primary
+"
+41376,0a6eca72-deb6-42e6-ac12-f5b5ceca53cd,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre 1,0,Smart Motherhood Maternity,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.50143,9.04384,"Primary
+"
+36868,6476674e-91d0-425b-86a8-71a3be3b932e,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Wuse,0,The Central Clinic,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.48078,9.07545,"Primary
+"
+38430,2bf9df87-bff9-4701-90cd-65e8feccbfdf,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,City Centre 1,0,United Health Care,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.50317,9.04551,"Primary
+"
+36848,150a8017-1a5b-4798-97bd-dc51a54d1ddf,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,White Diamond Clinic and Maternity,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Clinic,11/11/2024 00:00,7.50137,8.98639,"Primary
+"
+36850,c630a66c-a8d4-4db2-baf8-e3b60f5babf7,,,Nigeria,NGA,Fct,Abuja Municipal Area Council,0,Garki,0,Zenith and Kidney Medical Center,GRID3_EHEALTH,Public,Unknown,Primary,Primary Health Center,11/11/2024 00:00,7.48931,9.01588,"Primary
+"
