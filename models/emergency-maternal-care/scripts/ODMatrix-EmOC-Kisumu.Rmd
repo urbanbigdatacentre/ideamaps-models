@@ -1,5 +1,25 @@
-#library(tictoc)
-#tic('whole script')
+---
+title: "ODMatrix-EmOC-Kisumu"
+author: "Diego Pajarito"
+date: "10 December 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r libraries-install, include=FALSE}
+install.packages("mapview")
+```
+
+```{r libraries-add, include=FALSE}
 library(tidyverse)
 library(glue)
 library(sf)
@@ -9,48 +29,47 @@ library(furrr)
 library(purrr)
 library(mapview)
 
-# Working directory set to the scripts folder
-# This script uses a self-hosted instance of the ORS, therefore, server ip address
-# Must be changed if the public API ORS is going to be used
-# If using local UBDC servers, VPN must be enabled
+```
 
-port <- 8084
+```{r ors-service-path, include=FALSE}
+port <- 8083
 host <- '130.209.67.118'
+```
 
-# Data input
-getwd()
-setwd("D:/githubdp/ideamaps-models/models/emergency-maternal-care/scripts")
+```{r data-input, include=FALSE}
 origin_pts <- st_read('./Kisumu/data-inputs/healthcare_facilities_kisumu.geojson')
 dest_pts <- st_read('Kisumu/data-temp/grid_centroids.gpkg')
+```
 
-# check attributes. This will allow you identify the column names used as
-# unique identifiers and geometry. 
-# These will be required in the process_row function 
+```{r show-origin}
 origin_pts |> names()
-#> "field_1"                   "Field_1_1"                 "Admin_1"                   "facility_name"            
-#> "facility_type"             "owner_type_name"           "latitude"                  "longitude"                
-#> "Sub_Couinty"               "LL_Source"                 "ward_name"                 "keph_level_name"          
-#> "Operating_Time"            "total_.inpatient_beds"     "general_inpatient_beds"    "cots"                     
-#> "maternity_beds"            "emergency_casualty_beds"   "intensive_care_unit_beds"  "high_dependancy_unit_beds"
-#> "isolation_beds"            "general_theatres"          "maternity_theatres"        "minor_theatres"           
-#> "BMoc"                      "CeMoc"                     "Local_Validation"          "hcf_id"                   
-#> "geometry"   
+```
 
+```{r show-destination}
 dest_pts |> names()
-#> "grid_id"   "latitude"  "longitude" "pop"       "geom" 
+```
 
 
+
+```{r add-ids}
 # If one of the datasets does not have an id column, you can add a unique id 
 # using the following example
 #dest_pts <- dest_pts |> mutate(rowid = row_number())
+```
 
+```{r map-view}
 # quick viz to check destinations and origins
 mapview(origin_pts, col.regions='red', cex=5) + mapview(dest_pts, cex=1)
+```
 
+
+```{r parallel}
 #tic('ors matrix requests')
 # parallelize for 4 workers
 plan(multisession, workers = 4)
+```
 
+```{r set-function}
 # Define Function to process each row ~ 1 origin x all destinations
 process_row <- function(i, origin_pts, dest_pts, host, port) {
 
@@ -110,6 +129,11 @@ process_row <- function(i, origin_pts, dest_pts, host, port) {
   return(result)
 }
 
+```
+
+
+```{r run-function}
+
 results_matrix <- future_map_dfr(
   #1:4,
   1:nrow(origin_pts), # we only submit an index, the slicing/subsetting happens in the process_row function
@@ -117,21 +141,42 @@ results_matrix <- future_map_dfr(
   dest_pts=dest_pts,
   host=host, # we need to pass the host address to ensure we are using remote servers (not always localhost)
   port=port, # we need to pass the port to the function, otherwise in parallel processes its defaulting to the public api
+  .options   = furrr_options(seed = 1234),
   process_row
 )
+```
 
+```{r stop-parallel}
 # free the workers
 plan(sequential)
 #toc()
+```
+
+```{r view-results}
 
 results_matrix |> head()
+```
+```{r}
+19800 * 28
+```
+
+```{r vie-restults-size}
+
 results_matrix |> nrow()
+```
 
+```{r write-resutls}
 # write out the result dataframe
-write.csv(results_matrix, "data-processing/kisumu_access.csv", row.names = FALSE)
+write.csv(results_matrix, "Kisumu/data-temp/kisumu_access.csv", row.names = FALSE)
 
+```
+
+```{r write-data-with-ids}
 # Don't forget to write dest_pts as we added a unique (row) id
 st_write(dest_pts, 'data-processing/population_centroids_ROWID.geojson', append=F)
 
 
 #toc()
+
+```
+
