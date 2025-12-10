@@ -1,4 +1,4 @@
-# 🏥 Deploying the General Healthcare Access Deprivation Model – Kano
+# 🏥 Deploying the General Healthcare Access Deprivation Model – Accra
 
 This folder contains all required code and input data to assess general healthcare access deprivation for Accra, Ghana, using a spatial modeling approach based on the isochrones.
 

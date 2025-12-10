@@ -1,15 +1,15 @@
-# 🏥 Deploying the General Healthcare Access Deprivation Model – Abuja
+# 🏥 Deploying the General Healthcare Access Deprivation Model – Pereira
 
-This folder contains all required code and input data to assess general healthcare access deprivation for Abuja, Nigeria, using a spatial modeling approach based on the isochrones.
+This folder contains all required code and input data to assess general healthcare access deprivation for Pereira, Colombia, using a spatial modeling approach based on the isochrones.
 
 We refer to our publication for a detailed description of the methodology: [Document](https://docs.google.com/document/d/1_eq75BEtiBSDKMXuYPQ2AixcUFI7EIN9/edit).
 
 ## 📁 Folder Structure
 
-- `General_Healthcare_Access_Abuja_V1.ipynb`: Main notebook to run the general healthcare access model.
-- `General_Healthcare_Access_Abuja_V1.py`: Python script version of the model.
-- `Abuja/data_inputs/`: Contains all required input data.
-- `Abuja/data_temp/`: Temporary files created during intermediate processing steps.
+- `General_Healthcare_Access_Pereira_V1.ipynb`: Main notebook to run the general healthcare access model.
+- `General_Healthcare_Access_Pereira_V1.py`: Python script version of the model.
+- `Pereira/data_inputs/`: Contains all required input data.
+- `Pereira/data_temp/`: Temporary files created during intermediate processing steps.
 
 ## 🛠️ Setup
 
@@ -42,15 +42,17 @@ We refer to our publication for a detailed description of the methodology: [Docu
    **Format**: GeoPackage
 
 ### 2. **Healthcare Facilities**  
-   Based on data from the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) repository, supplemented by field validation from the IDEAMAPS local expert team.
-   **Format**: GeoPackage or CSV (with facility attributes and coordinates)
+   The dataset is derived from the [Special Registry of Health Service Providers and Venues](https://www.datos.gov.co/Salud-y-Protecci-n-Social/Registro-Especial-de-Prestadores-y-Sedes-de-Servic/c36g-9fc2/about_data), supplemented by field validation from the Colombia local expert team.
+   **Format**: CSV (containing facility attributes but excluding geographic coordinates)
+
+   As the dataset provides a complete address for each healthcare facility, geographic coordinates (latitude and longitude) were obtained using the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding). The addresses were programmatically processed through the API to generate standardized spatial coordinates suitable for geospatial analysis.
 
 ## 🚀 Running the Model
 
 Follow these steps to obtain deprivation levels (low, medium, high) of General Healthcare.
 
 ### 1. **Open the notebook:**  
-   `General_Healthcare_Access_Abuja_V1.ipynb`
+   `General_Healthcare_Access_Pereira_V1.ipynb`
 
 ### 2. **Configure input paths:**  
    Ensure all input paths are correctly set in the notebook.
@@ -78,11 +80,11 @@ General healthcare access deprivation is evaluated by performing spatial joins b
 - **Accessibility classification** - Healthcare access deprivation levels are define based on criteria applied to the isochrone counts.
 
 Note: Ensure all data preprocessing steps are complete and the required input files are available.
-Further methodological details can be found in the [dataset-interpretability](../Abuja-v1/dataset-interpretability.md) documentation.
+Further methodological details can be found in the [dataset-interpretability](../Pereira-v1/dataset-interpretability.md) documentation.
 
 ## 📎 Outputs
 
-Review the outputs in the [output folder](../Abuja-v1):
+Review the outputs in the [output folder](../Pereira-v1):
 
 - `image-examples/`
 - `dataset-interpretability.md`

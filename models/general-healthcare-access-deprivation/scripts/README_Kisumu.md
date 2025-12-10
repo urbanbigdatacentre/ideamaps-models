@@ -1,4 +1,4 @@
-# 🏥 Deploying the General Healthcare Access Deprivation Model – Kano
+# 🏥 Deploying the General Healthcare Access Deprivation Model – Kisumu
 
 This folder contains all required code and input data to assess general healthcare access deprivation for Kisumu, Kenya, using a spatial modeling approach based on the isochrones.
 

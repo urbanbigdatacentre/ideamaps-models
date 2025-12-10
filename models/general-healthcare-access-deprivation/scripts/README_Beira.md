@@ -1,15 +1,15 @@
-# 🏥 Deploying the General Healthcare Access Deprivation Model – Abuja
+# 🏥 Deploying the General Healthcare Access Deprivation Model – Beira
 
-This folder contains all required code and input data to assess general healthcare access deprivation for Abuja, Nigeria, using a spatial modeling approach based on the isochrones.
+This folder contains all required code and input data to assess general healthcare access deprivation for Beira, Mozambique, using a spatial modeling approach based on the isochrones.
 
 We refer to our publication for a detailed description of the methodology: [Document](https://docs.google.com/document/d/1_eq75BEtiBSDKMXuYPQ2AixcUFI7EIN9/edit).
 
 ## 📁 Folder Structure
 
-- `General_Healthcare_Access_Abuja_V1.ipynb`: Main notebook to run the general healthcare access model.
-- `General_Healthcare_Access_Abuja_V1.py`: Python script version of the model.
-- `Abuja/data_inputs/`: Contains all required input data.
-- `Abuja/data_temp/`: Temporary files created during intermediate processing steps.
+- `General_Healthcare_Access_Beira_V1.ipynb`: Main notebook to run the general healthcare access model.
+- `General_Healthcare_Access_Beira_V1.py`: Python script version of the model.
+- `Beira/data_inputs/`: Contains all required input data.
+- `Beira/data_temp/`: Temporary files created during intermediate processing steps.
 
 ## 🛠️ Setup
 
@@ -42,15 +42,16 @@ We refer to our publication for a detailed description of the methodology: [Docu
    **Format**: GeoPackage
 
 ### 2. **Healthcare Facilities**  
-   Based on data from the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) repository, supplemented by field validation from the IDEAMAPS local expert team.
-   **Format**: GeoPackage or CSV (with facility attributes and coordinates)
+   The healthcare facilities data was extracted from the [spatial database of health facilities managed by the public health sector in sub Saharan Africa](https://doi.org/10.6084/m9.figshare.7725374), which is a geocoded inventory of public health service providers in sub Saharan Africa, facility classifications for Beira are determined by ownership and facility type.
+
+   **Format**: xlsx (with facility attributes and coordinates)
 
 ## 🚀 Running the Model
 
 Follow these steps to obtain deprivation levels (low, medium, high) of General Healthcare.
 
 ### 1. **Open the notebook:**  
-   `General_Healthcare_Access_Abuja_V1.ipynb`
+   `General_Healthcare_Access_Beira_V1.ipynb`
 
 ### 2. **Configure input paths:**  
    Ensure all input paths are correctly set in the notebook.
@@ -78,11 +79,11 @@ General healthcare access deprivation is evaluated by performing spatial joins b
 - **Accessibility classification** - Healthcare access deprivation levels are define based on criteria applied to the isochrone counts.
 
 Note: Ensure all data preprocessing steps are complete and the required input files are available.
-Further methodological details can be found in the [dataset-interpretability](../Abuja-v1/dataset-interpretability.md) documentation.
+Further methodological details can be found in the [dataset-interpretability](../Beira-v1/dataset-interpretability.md) documentation.
 
 ## 📎 Outputs
 
-Review the outputs in the [output folder](../Abuja-v1):
+Review the outputs in the [output folder](../Beira-v1):
 
 - `image-examples/`
 - `dataset-interpretability.md`
