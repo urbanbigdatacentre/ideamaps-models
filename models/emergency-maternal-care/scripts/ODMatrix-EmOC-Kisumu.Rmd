@@ -1,0 +1,182 @@
+---
+title: "ODMatrix-EmOC-Kisumu"
+author: "Diego Pajarito"
+date: "10 December 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r libraries-install, include=FALSE}
+install.packages("mapview")
+```
+
+```{r libraries-add, include=FALSE}
+library(tidyverse)
+library(glue)
+library(sf)
+library(units)
+library(openrouteservice) # remotes::install_github("GIScience/openrouteservice-r");
+library(furrr)
+library(purrr)
+library(mapview)
+
+```
+
+```{r ors-service-path, include=FALSE}
+port <- 8083
+host <- '130.209.67.118'
+```
+
+```{r data-input, include=FALSE}
+origin_pts <- st_read('./Kisumu/data-inputs/healthcare_facilities_kisumu.geojson')
+dest_pts <- st_read('Kisumu/data-temp/grid_centroids.gpkg')
+```
+
+```{r show-origin}
+origin_pts |> names()
+```
+
+```{r show-destination}
+dest_pts |> names()
+```
+
+
+
+```{r add-ids}
+# If one of the datasets does not have an id column, you can add a unique id 
+# using the following example
+#dest_pts <- dest_pts |> mutate(rowid = row_number())
+```
+
+```{r map-view}
+# quick viz to check destinations and origins
+mapview(origin_pts, col.regions='red', cex=5) + mapview(dest_pts, cex=1)
+```
+
+
+```{r parallel}
+#tic('ors matrix requests')
+# parallelize for 4 workers
+plan(multisession, workers = 4)
+```
+
+```{r set-function}
+# Define Function to process each row ~ 1 origin x all destinations
+process_row <- function(i, origin_pts, dest_pts, host, port) {
+
+  # Select single source pt
+  origin_pts_subset <- origin_pts[i, ]
+
+  #create list of coordinate pairs only for both origins and destinations
+  origin_pts_subset_coords <- map(origin_pts_subset$geometry |>
+                                    st_centroid(), ~ c(st_coordinates(.x)[, 1], st_coordinates(.x)[, 2]))
+  dest_pts_coords <- map(dest_pts$geom |>
+                                  st_centroid(), ~ c(st_coordinates(.x)[, 1], st_coordinates(.x)[, 2]))
+
+  # merge to one single list of coords, remember first position is the coord of the origin
+  coord_list_run <- c(origin_pts_subset_coords, dest_pts_coords)
+
+  # set local openrouteservice url with port
+  # has to be set in this function as options are overwritten in parallel processing
+  options(openrouteservice.url = glue("http://{host}:{port}/ors"))
+
+  # while loop in case connection problems, retry 10 times
+  attempt <- 1
+  while(!exists('res1') && attempt <= 10) {
+    tryCatch({
+        res1 <- ors_matrix(
+        coord_list_run,
+        sources = 0, # indicates which coord position is the origin/source, not 1 as in R but 0 as in Python/Java
+        metrics = c("duration", "distance"),
+        units = "km", # for durations we don't get to choose, they always come in seconds
+        api_key = '', # not needed in local setup yay
+        output = 'parsed',
+        profile = 'driving-car' # profile to use, see ORS API for more options
+      )
+    }, error = function(e) {
+      message("Attempt ", attempt, " failed: ", conditionMessage(e))
+      Sys.sleep(2) # Wait for 2 seconds before retrying
+    })
+    attempt <- attempt + 1
+  }
+
+  # check if we got a response
+  if (!exists('res1')) {
+    stop(glue("Failed to get a valid response after {attempt} attempts."))
+  }
+
+  # check if amount of responses are same as input paris
+  if (length(res1$durations)!=length(coord_list_run)) {
+    stop(glue("Returned less durations than expected. Expected {length(coord_list_run)}, got {length(res1$durations)}."))
+  }
+
+  # convert json response to dataframe
+  result <- data.frame(
+    origin_id=origin_pts_subset$hcf_id |> rep(length(dest_pts_coords)), # confirm the column names are right
+    destination_id=dest_pts$grid_id,   # confirm the column names are right
+    duration_seconds=res1$durations[-1] |> as.numeric(), # exclude first data point which is the origin to itself
+    distance_km=res1$distances[-1] |> as.numeric() # exclude first data point which is the origin to itself
+  ) |> tibble()
+  return(result)
+}
+
+```
+
+
+```{r run-function}
+
+results_matrix <- future_map_dfr(
+  #1:4,
+  1:nrow(origin_pts), # we only submit an index, the slicing/subsetting happens in the process_row function
+  origin_pts=origin_pts,
+  dest_pts=dest_pts,
+  host=host, # we need to pass the host address to ensure we are using remote servers (not always localhost)
+  port=port, # we need to pass the port to the function, otherwise in parallel processes its defaulting to the public api
+  .options   = furrr_options(seed = 1234),
+  process_row
+)
+```
+
+```{r stop-parallel}
+# free the workers
+plan(sequential)
+#toc()
+```
+
+```{r view-results}
+
+results_matrix |> head()
+```
+```{r}
+19800 * 28
+```
+
+```{r vie-restults-size}
+
+results_matrix |> nrow()
+```
+
+```{r write-resutls}
+# write out the result dataframe
+write.csv(results_matrix, "Kisumu/data-temp/kisumu_access.csv", row.names = FALSE)
+
+```
+
+```{r write-data-with-ids}
+# Don't forget to write dest_pts as we added a unique (row) id
+st_write(dest_pts, 'data-processing/population_centroids_ROWID.geojson', append=F)
+
+
+#toc()
+
+```
+
