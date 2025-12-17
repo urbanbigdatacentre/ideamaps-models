@@ -14,12 +14,12 @@ library(mapview)
 # Must be changed if the public API ORS is going to be used
 # If using local UBDC servers, VPN must be enabled
 
-port <- 8022
+port <- 8082
 host <- '130.209.67.118'
 
 # Data input
-origin_pts <- st_read('Kisumu/data-inputs/healthcare_facilities_kisumu.geojson')
-dest_pts <- st_read('Kisumu/data-temp/grid_centroids.gpkg')
+origin_pts <- st_read('Abuja/data-inputs/healthcare_facilities_abuja_emoc.geojson')
+dest_pts <- st_read('Abuja/data-temp/grid_centroids.gpkg')
 
 # check attributes. This will allow you identify the column names used as
 # unique identifiers and geometry. 
