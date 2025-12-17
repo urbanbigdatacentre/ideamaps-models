@@ -7,3 +7,4 @@ geopandas
 numpy
 scikit-learn
 rasterio
+overturemaps
