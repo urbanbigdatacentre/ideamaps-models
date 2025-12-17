@@ -1,0 +1,224 @@
+---
+title: "ODMatrix-EmOC-Kisumu"
+author: "Diego Pajarito"
+date: "10 December 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r libraries-install, include=FALSE}
+install.packages("mapview")
+```
+
+```{r libraries-add, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(tibble)
+library(glue)
+library(sf)
+library(units)
+library(openrouteservice) # remotes::install_github("GIScience/openrouteservice-r");
+library(furrr)
+library(purrr)
+library(mapview)
+
+```
+
+```{r ors-service-path, include=FALSE}
+port <- 8085
+host <- '130.209.67.118'
+```
+
+
+```{r ors-service-max-single-attempt, include=FALSE}
+MAX_DEST_PER_CALL <- 2000L
+```
+
+
+```{r data-input, include=FALSE}
+origin_pts <- st_read('Pereira/data-temp/healthcare_facilities_emoc.geojson')
+dest_pts <- st_read('Pereira/data-temp/pop-grid-pereira-centroids.gpkg')
+```
+
+```{r show-origin}
+origin_pts |> names()
+```
+
+```{r show-destination}
+dest_pts |> names()
+```
+
+
+
+```{r add-ids}
+# If one of the datasets does not have an id column, you can add a unique id 
+# using the following example
+#dest_pts <- dest_pts |> mutate(rowid = row_number())
+origin_pts <- origin_pts |> mutate(hcf_id = row_number())
+```
+
+```{r map-view}
+# quick viz to check destinations and origins
+mapview(origin_pts, col.regions='red', cex=5) + mapview(dest_pts, cex=1)
+```
+
+
+```{r parallel}
+#tic('ors matrix requests')
+# parallelize for 4 workers
+plan(multisession, workers = 4)
+```
+
+```{r set-function}
+# Define Function to process each row ~ 1 origin x all destinations
+process_row <- function(i, origin_pts, dest_pts, host, port, max_dest = MAX_DEST_PER_CALL) {
+  origin_pts_subset <- origin_pts[i, , drop = FALSE]
+  
+  # origin coordinates (X=lon, Y=lat)
+  origin_pts_subset_coords <- map(
+    origin_pts_subset$geometry |> st_centroid(),
+    ~ {
+      xy <- st_coordinates(.x)
+      c(xy[1, 1], xy[1, 2])  # (lon, lat)
+    }
+  )
+  
+  # separate all dest in batched based on max_dest
+  n_dest <- nrow(dest_pts)
+  dest_indices_list <- split(seq_len(n_dest), ceiling(seq_len(n_dest) / max_dest))
+  
+  all_results <- vector("list", length(dest_indices_list))
+  
+  for (k in seq_along(dest_indices_list)) {
+    idx <- dest_indices_list[[k]]
+    dest_subset <- dest_pts[idx, , drop = FALSE]
+    
+    # dest coordinates (X=lon, Y=lat)
+    dest_pts_coords <- map(
+      dest_subset$geom |> st_centroid(),
+      ~ {
+        xy <- st_coordinates(.x)
+        c(xy[1, 1], xy[1, 2])  # (lon, lat)
+      }
+    )
+    
+    coord_list_run <- c(origin_pts_subset_coords, dest_pts_coords)
+    
+    options(openrouteservice.url = glue("http://{host}:{port}/ors"))
+    
+    res1 <- NULL
+    attempt <- 1
+    while (is.null(res1) && attempt <= 10) {
+      tryCatch({
+        res1 <- ors_matrix(
+          coord_list_run,
+          sources   = 0,                         # NO.0 is origin
+          metrics   = c("duration", "distance"),
+          units     = "km",
+          api_key   = "",
+          output    = "parsed",
+          profile   = "driving-car"
+        )
+      }, error = function(e) {
+        message("Origin ", i,
+                " | chunk ", k, "/", length(dest_indices_list),
+                " | Attempt ", attempt, " failed: ", conditionMessage(e))
+        Sys.sleep(2)
+      })
+      attempt <- attempt + 1
+    }
+    
+    if (is.null(res1)) {
+      stop(glue("Origin {i}, chunk {k}: Failed to get a valid response after {attempt - 1} attempts."))
+    }
+    
+    if (length(res1$durations) != length(coord_list_run)) {
+      stop(glue(
+        "Origin {i}, chunk {k}: Returned less durations than expected. Expected {length(coord_list_run)}, got {length(res1$durations)}."
+      ))
+    }
+    
+    # remove first item of origin→origin
+    chunk_result <- tibble(
+      origin_id        = origin_pts_subset$origin_id |> rep(length(dest_pts_coords)),
+      destination_id   = dest_subset$grid_id,
+      duration_seconds = as.numeric(res1$durations[-1]),
+      distance_km      = as.numeric(res1$distances[-1])
+    )
+    
+    all_results[[k]] <- chunk_result
+  }
+  
+  dplyr::bind_rows(all_results)
+}
+
+```
+
+```{r sequence-test}
+# Quick test with smaller datasets
+seq_to_run <- 1:3
+```
+
+```{r sequence-full}
+seq_to_run <- seq_len(nrow(origin_pts))
+```
+
+
+
+```{r run-function}
+
+results_matrix <- future_map_dfr(
+  seq_to_run, # we only submit an index, the slicing/subsetting happens in the process_row function
+  origin_pts=origin_pts,
+  dest_pts=dest_pts,
+  host=host, # we need to pass the host address to ensure we are using remote servers (not always localhost)
+  port=port, # we need to pass the port to the function, otherwise in parallel processes its defaulting to the public api
+  max_dest   = MAX_DEST_PER_CALL,
+  .options   = furrr_options(seed = 1234),
+  .f         = process_row
+)
+```
+
+```{r stop-parallel}
+# free the workers
+plan(sequential)
+#toc()
+```
+
+```{r view-results}
+
+results_matrix |> head()
+```
+```{r}
+25400 * 13
+```
+
+```{r vie-restults-size}
+
+results_matrix |> nrow()
+```
+
+```{r write-resutls}
+# write out the result dataframe
+write.csv(results_matrix, "Pereira/data-temp/pereira_access.csv", row.names = FALSE)
+
+```
+
+```{r write-data-with-ids}
+# Don't forget to write dest_pts as we added a unique (row) id
+st_write(origin_pts, 'Pereira/data-temp/healthcare_facilities_emoc_hcfid.geojson', append=F)
+
+
+#toc()
+
+```
+
