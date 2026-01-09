@@ -7,6 +7,18 @@ models/Healthcare/BarriersHealthCareAccess/.DS_Store
 models/barriers-to-healthcare-access/scripts/.env
 
 models/general-healthcare-access-deprivation/scripts/Kano/data-temp/
-models/general-healthcare-access-deprivation/scripts/Lagos/data-temp/
-.DS_Store
-.DS_Store
+models/general-healthcare-access-deprivation/scripts/Lagos/data-temp/.DS_Store
+data/
+output/
+models/emergency-maternal-care/scripts/.Rhistory
+models/emergency-maternal-care/scripts/.ipynb_checkpoints/
+# Ignore oversized Accra EmOC intermediate outputs (too large for GitHub)
+models/emergency-maternal-care/scripts/Accra/data-temp/OD-matrix-accra-access-emoc.csv
+models/emergency-maternal-care/scripts/Accra/data-temp/distances_duration_3_closet_Emoc.gpkg
+models/emergency-maternal-care/scripts/Accra/data-temp/acc_score_3closest.gpkg
+# Ignore oversized Kisumu EmOC intermediate outputs (too large for GitHub)
+models/emergency-maternal-care/scripts/Kisumu/data-temp/distances_duration_3_closet_Emoc.gpkg
+models/emergency-maternal-care/scripts/Kisumu/data-temp/acc_score_3closest.gpkg
+# Ignore Kisumu EmOC classification outputs (too large / not for repo)
+models/emergency-maternal-care/scripts/Kisumu/data-temp/emergency-maternal-care-deprivation-access-class.gpkg
+models/emergency-maternal-care/scripts/Kisumu/data-temp/emergency-maternal-care-deprivation-access.gpkg
