@@ -1,5 +1,5 @@
 ---
-title: "ODMatrix-EmOC-Kisumu"
+title: "ODMatrix-EmOC-Abuja"
 author: "Diego Pajarito"
 date: "10 December 2025"
 output: html_document
@@ -148,7 +148,7 @@ process_row <- function(i, origin_pts, dest_pts, host, port, max_dest = MAX_DEST
     
     # remove first item of origin→origin
     chunk_result <- tibble(
-      origin_id        = origin_pts_subset$origin_id |> rep(length(dest_pts_coords)),
+      origin_id        = origin_pts_subset$hcf_id |> rep(length(dest_pts_coords)),
       destination_id   = dest_subset$grid_id,
       duration_seconds = as.numeric(res1$durations[-1]),
       distance_km      = as.numeric(res1$distances[-1])
@@ -198,7 +198,7 @@ plan(sequential)
 results_matrix |> head()
 ```
 ```{r}
-19800 * 28
+135275 * 24
 ```
 
 ```{r vie-restults-size}
