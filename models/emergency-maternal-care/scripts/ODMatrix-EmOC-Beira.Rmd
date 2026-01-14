@@ -198,7 +198,7 @@ plan(sequential)
 results_matrix |> head()
 ```
 ```{r}
-135275 * 24
+12372 * 3
 ```
 
 ```{r vie-restults-size}
@@ -208,7 +208,7 @@ results_matrix |> nrow()
 
 ```{r write-resutls}
 # write out the result dataframe
-write.csv(results_matrix, "Abuja/data-temp/abujau_access.csv", row.names = FALSE)
+write.csv(results_matrix, "Beira/data-temp/beira_access.csv", row.names = FALSE)
 
 ```
 
