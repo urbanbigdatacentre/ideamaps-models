@@ -159,8 +159,6 @@ The following table summarises the data sources considered to identify health ca
 | Pasto     | [Ministerio de Salud](https://doi-org.ezproxy2.lib.gla.ac.uk/10.1038/s41597-023-02651-9)| Initial classification carried out within IDEAMAPS team|
 | Beira     | [Maina et al., 2019](https://doi.org/10.1038/s41597-019-0142-2)| Initial classification carried out within IDEAMAPS team|
 
----
-
 <img src="image-examples/insights-emergency-maternal-2.jpg" alt="Health-care-pool">
 
 ### Stream two: Population counts

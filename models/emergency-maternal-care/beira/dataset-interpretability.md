@@ -161,8 +161,6 @@ The following table summarises the data sources considered to identify health ca
 
 <img src="image-examples/insights-emergency-maternal-2.jpg" alt="Health-care-pool">
 
----
-
 ### Stream two: Population counts
 
 For the second stream, we used population counts from WorldPop: women of childbearing age in 2015 and the reference grid from the general population count. and the open buildings V3 provided by Google. The team analysed various socio-economic conditions that communities highlighted during the participatory-action research sessions carried out with them. Unfortunately, none of them were adequately represented in the available datasets; only elements of income and employment were integrated in the first stream as relative weights. To fit the values of women of childbearing age, aggregated by 1km by 1km grid cells, the team used the number of buildings in the corresponding grid cells as the weighting factor to spread the values. Through that process, the team generated an estimate of the number of women of childbearing age.
