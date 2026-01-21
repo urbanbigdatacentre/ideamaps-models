@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"name": "healthcare_facilities_beira_emoc",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Country": "Mozambique", "Admin1": "Sofala", "Facility name": "Beira Hospital Central", "Facility type": "Hospital Central", "Ownership": null, "Lat": -19.8499, "Long": 34.8767, "LL source": "GPS", "project validation": "Public Comprehansive EmOC", "hcf_id": 1 }, "geometry": { "type": "Point", "coordinates": [ 34.8767, -19.8499 ] } },
+{ "type": "Feature", "properties": { "Country": "Mozambique", "Admin1": "Sofala", "Facility name": "Hospital Geral Da Beira", "Facility type": "Manualy added by the team", "Ownership": null, "Lat": -19.7378, "Long": 34.8769, "LL source": null, "project validation": "Public Comprehansive EmOC", "hcf_id": 2 }, "geometry": { "type": "Point", "coordinates": [ 34.8769, -19.7378 ] } },
+{ "type": "Feature", "properties": { "Country": "Mozambique", "Admin1": "Sofala", "Facility name": "Beira Private Hospital", "Facility type": "Manualy added by the team", "Ownership": null, "Lat": -19.8265, "Long": 34.898, "LL source": null, "project validation": "Private Comprehansive EmOC", "hcf_id": 3 }, "geometry": { "type": "Point", "coordinates": [ 34.898, -19.8265 ] } }
+]
+}
