@@ -143,19 +143,25 @@ The analysis is set as two parallel workstreams (i.e., offer and demand) that me
 
 ### Stream one: Health care facilities offering EmOC
 
-For the first stream, we use information about EmOC offer in terms of capacity and preferences during the maternal emergency time. The team analysed multiple datasets to indentify the one describing where emergency obstetric care is provided 24 hours a day, 7 days a week. This is considered an initial indicator of capacity for the accessibility estimate. To improve it, the team considered complementary factors such as property (e.g., public and private) and service level (e.g., basic and comprehensive) to assign relative weights. The capacity/preference weights are set as public facilities preferred due to their relatively lower costs, and comprehensive services preferred over basic ones at the time of an emergency. 
+For the first stream, we use information about EmOC offer in terms of capacity and preferences during the maternal emergency time. The team analysed multiple datasets to indentify the one describing where emergency obstetric care is provided 24 hours a day, 7 days a week. This is considered an initial indicator of capacity for the accessibility estimate. To improve it, the team considered complementary factors such as property (e.g., public and private) and service level (e.g., basic and comprehensive) to assign relative weights. The capacity/preference weights are set as public facilities preferred due to their relatively lower costs, and comprehensive services preferred over basic ones at the time of an emergency.
 
 The following table summarises the data sources considered to identify health care facilities offering EmOC in different countries.
 
-| Country | Data Source | Local Validation |
-|-------------------|---------------------------|---------------------------|
-| Nigeria          | GRID3 and Macharia et al., 2023 to - Add link  | Local validation from IDEAMAPS local expert team |
-| Country          | Source with link  | Either expert or internal classification |
-| Colombia          | Ministerio de Salud  | Initial classification carried out within IDEAMAPS team |
-
-  
+| Country   | Data Source               | Local Validation                          |
+|-----------|---------------------------|-------------------------------------------|
+| Kano      | [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) and [Macharia et al., 2023](https://doi.org/10.1038/s41597-023-02651-9) | Local validation from IDEAMAPS local expert team|
+| Lagos     | [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) and [Macharia et al., 2023](https://doi.org/10.1038/s41597-023-02651-9) | Local validation from IDEAMAPS local expert team|
+| Nairobi   | [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities)| Local validation from IDEAMAPS local expert team|
+| Accra     | [Official Government Data for Ghana](https://data.gov.gh/dataset/health-facilities)| Initial classification carried out within IDEAMAPS team|
+| Abuja     | [Macharia et al., 2023](https://doi.org/10.1038/s41597-023-02651-9)| Local validation from IDEAMAPS local expert team|
+| Pereira   | [Ministerio de Salud](https://doi-org.ezproxy2.lib.gla.ac.uk/10.1038/s41597-023-02651-9)| Initial classification carried out within IDEAMAPS team|
+| Kisumu    | [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities)| Local validation from IDEAMAPS local expert team|
+| Pasto     | [Ministerio de Salud](https://doi-org.ezproxy2.lib.gla.ac.uk/10.1038/s41597-023-02651-9)| Initial classification carried out within IDEAMAPS team|
+| Beira     | [Maina et al., 2019](https://doi.org/10.1038/s41597-019-0142-2)| Initial classification carried out within IDEAMAPS team|
 
 <img src="image-examples/insights-emergency-maternal-2.jpg" alt="Health-care-pool">
+
+---
 
 ### Stream two: Population counts
 
@@ -187,7 +193,7 @@ As with any model, there are limitations that emerge from the multiple decisions
 
 ## Focus area for validation
 
-The focus areas are where the two vulnerable communities that worked within the IDEAMAPS Data Ecosystem are located: Doray Karama (Dorayi ward) and Rimin Kebe (Zango ward).
+The focus areas consist of grid cells with accessibility index values close to the defined thresholds, allowing us to assess whether the thresholds used to classify deprivation levels are meaningful when validated by communities.
 
 ## Data used for Modelling
 
@@ -197,28 +203,7 @@ The model relies on the following datasets:
 - [Open buildings from Overture Map Foundation](https://overturemaps.org/)
 - [Road network data from OpenStreetMap via the Open Route Service API](https://openrouteservice.org/)
 
-## Data used for Healthcare facilties in expansion cities
-
-- **Kano**: Based on data from the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) repository, the classification for validation is determined by facility ownership and level.
-
-- **Lagos**: Based on data from the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) repository, the classification for validation is determined by facility ownership and level.
-
-- **Nairobi**: The data were scraped from the [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities) which is an application with all health facilities and community units in Kenya, supplemented by field validation from the IDEAMAPS local expert team.
-
-- **Accra**: The healthcare facilities data was extracted from [an official government data set of health care facilities for all of Ghana](https://data.gov.gh/dataset/health-facilities), the classification for facilities is determined by ownership and type, supplemented validation from the IDEAMAPS project team.
-
-- **Abuja**: Based on data from a [geocoded database](https://doi.org/10.6084/m9.figshare.22689667) of health facilities with verified capacity for caesarean section in urban Nigeria, supplemented by field validation from the IDEAMAPS local expert team.
-
-- **Pereira**: The dataset is derived from the [Special Registry of Health Service Providers and Venues](https://www.datos.gov.co/Salud-y-Protecci-n-Social/Registro-Especial-de-Prestadores-y-Sedes-de-Servic/c36g-9fc2/about_data), facility classifications are determined by the IDEAMAPS project team based on facility ownership and level. As the dataset provides a complete address for each healthcare facility, geographic coordinates (latitude and longitude) were obtained using the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding).
-
-- **Kisumu**: The data were scraped from the [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities) which is an application with all health facilities and community units in Kenya, supplemented by field validation from the IDEAMAPS local expert team.  
-
-- **Pasto**: The dataset is derived from the [Special Registry of Health Service Providers and Venues](https://www.datos.gov.co/Salud-y-Protecci-n-Social/Registro-Especial-de-Prestadores-y-Sedes-de-Servic/c36g-9fc2/about_data), facility classifications are determined by the IDEAMAPS project team based on facility ownership and level. As the dataset excluding geographic coordinates but provides a complete address for each healthcare facility, geographic coordinates (latitude and longitude) were obtained using the [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding).
-
-- **Beira**: The healthcare facilities data was extracted from the [Spatial database of health facilities managed by the public health sector in sub Saharan Africa](https://doi.org/10.6084/m9.figshare.7725374), which is a geocoded inventory of public health service providers in sub Saharan Africa, facility classifications for Beira are determined by the IDEAMAPS project team based on ownership and facility type.
-
-
-## Appendix: Enhanced Two-Step Floating Catchment Area (2SFCA) Method
+## Appendix: Enhanced Two-Step Floating Catchment Area (E2SFCA) Method
 
 The **Enhanced Two-Step Floating Catchment Area (E2SFCA)** method improves upon the traditional 2SFCA by incorporating a distance decay function. It is calculated in two steps:
 
