@@ -154,9 +154,9 @@ The following table summarises the data sources considered to identify health ca
 | Nairobi   | [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities)| Local validation from IDEAMAPS local expert team|
 | Accra     | [Official Government Data for Ghana](https://data.gov.gh/dataset/health-facilities)| Initial classification carried out within IDEAMAPS team|
 | Abuja     | [Macharia et al., 2023](https://doi.org/10.1038/s41597-023-02651-9)| Local validation from IDEAMAPS local expert team|
-| Pereira   | [Ministerio de Salud](https://doi-org.ezproxy2.lib.gla.ac.uk/10.1038/s41597-023-02651-9)| Initial classification carried out within IDEAMAPS team|
+| Pereira   | [Registro Especial de Prestadores y Sedes de Servicios de Salud](https://www.datos.gov.co/d/c36g-9fc2)| Initial classification carried out within IDEAMAPS team|
 | Kisumu    | [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities)| Local validation from IDEAMAPS local expert team|
-| Pasto     | [Ministerio de Salud](https://doi-org.ezproxy2.lib.gla.ac.uk/10.1038/s41597-023-02651-9)| Initial classification carried out within IDEAMAPS team|
+| Pasto     | [Registro Especial de Prestadores y Sedes de Servicios de Salud](https://www.datos.gov.co/d/c36g-9fc2)| Initial classification carried out within IDEAMAPS team|
 | Beira     | [Maina et al., 2019](https://doi.org/10.1038/s41597-019-0142-2)| Initial classification carried out within IDEAMAPS team|
 
 <img src="image-examples/insights-emergency-maternal-2.jpg" alt="Health-care-pool">
