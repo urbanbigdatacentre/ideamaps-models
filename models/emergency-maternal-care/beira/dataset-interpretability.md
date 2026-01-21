@@ -28,9 +28,15 @@ The dataset relates the offer of emergency obstetric care (i.e., health care fac
 
 <img src="image-examples/emergency-maternal-care-access-deprivation-high.png" alt="example-high">
 
+## Access deprivation levels based on the accessibility score provided by the E2SFCA method
+
+We use the enhanced two-step floating catchment area (E2SFCA) method to estimate accessibility to emergency maternal care. The E2SFCA method combines information about the supply of healthcare services (i.e., health care facilities offering emergency obstetric care) and the demand for these services. The result is a numeric value called the accessibility score ranging between 0 and 1. To define the deprivation levels (i.e., Low, Medium, High), we apply city-specific thresholds to classify the accessibility scores into three categories. These thresholds are the result city-specific analysis detailed in the next section.
+
 ## City-Specific thresholds for Emergency Maternal Care access deprivation
 
-City-specific thresholds are applied to classify emergency maternal care accessibility deprivation based on the distribution of standardized accessibility scores derived from the enhanced two-step floating catchment area (E2SFCA) method. Threshold variability across cities reflects differences in functional urban area scale, building density, population density ( women of childbearing age), the spatial distribution of the 3 closest healthcare facilities and local mobility conditions. Thresholds also adapt to based on the quality of the available datasets. Accessibility scores are interpreted such that higher values indicate better access and lower levels of deprivation. The table below summarises the thresholds applied in each city for classification.
+City-specific thresholds were applied to classify emergency maternal care accessibility deprivation based on the distribution of standardized accessibility scores derived from the enhanced two-step floating catchment area (E2SFCA) method. Threshold variability across cities reflects differences in functional urban area scale, building density, population density (e.g., women of childbearing age), the spatial distribution of the 3 closest healthcare facilities and local mobility conditions. Thresholds also adapt to based on the quality of the available datasets and the distribution of the accessibility scores. Accessibility scores are interpreted such that higher values indicate better access and lower levels of deprivation. The table below summarises the thresholds applied in each city for classification.
+
+If you require further information about the data sources and methodology used to derive these thresholds, please email us via the [IDEAMAPS network](mailto:admin@ideamapsnetwork.org) or [Dr Diego Pajarito Grajales](mailto:diego.pajaritograjales@glasgow.ac.uk) at the [Urban Big Data Centre](https://ubdc.ac.uk), University of Glasgow.
 
 - ### Kano, Nigeria
 
@@ -131,19 +137,33 @@ To learn more about how you can help improve the accuracy of these classificatio
 
 ## Additional Insights into Modelling Emergency Maternal Care Access Deprivation
 
-The analysis is set as two parallel workstreams (i.e., offer and demand) that merge using a synthetic index to represent access deprivation. Stream one considers health care facilities offering emergency obstetric care (EmOC), their relative costs and a local validation from the local partners in Kano. Stream two considers population counts of the female population of childbearing age and estimates its distribution based on built-up areas within the reference grid. Finally, the accessibility indicator is the result of applying the enhanced two-step floating catchment area method based on a pool of nearby health care facilities.
+The analysis is set as two parallel workstreams (i.e., offer and demand) that merge using a synthetic index to represent access deprivation. Stream one considers health care facilities offering emergency obstetric care (EmOC), their relative costs and a validation from the local partners where possible. Stream two considers population counts of the female population of childbearing age and estimates its distribution based on built-up areas within the reference grid. Finally, the accessibility indicator is the result of applying the enhanced two-step floating catchment area method based on a pool of nearby health care facilities.
 
 <img src="image-examples/insights-emergency-maternal-1.jpg" alt="Emergency-maternal-care-model">
 
-For the first stream, we use information about EmOC offer in terms of capacity and preferences during the maternal emergency time. The team analysed two datasets produced by GRID3 and Macharia et al., 2023 to identify where emergency obstetric care is provided 24 hours a day, 7 days a week. This is considered an initial indicator of capacity for the accessibility estimate. To improve it, the team considers complementary factors such as property (e.g., public and private) and service level (e.g., basic and comprehensive) to assign weights. The capacity/preference weights are set as public facilities preferred due to their relatively lower costs, and comprehensive services preferred over basic ones at the time of an emergency. 
+### Stream one: Health care facilities offering EmOC
+
+For the first stream, we use information about EmOC offer in terms of capacity and preferences during the maternal emergency time. The team analysed multiple datasets to indentify the one describing where emergency obstetric care is provided 24 hours a day, 7 days a week. This is considered an initial indicator of capacity for the accessibility estimate. To improve it, the team considered complementary factors such as property (e.g., public and private) and service level (e.g., basic and comprehensive) to assign relative weights. The capacity/preference weights are set as public facilities preferred due to their relatively lower costs, and comprehensive services preferred over basic ones at the time of an emergency. 
+
+The following table summarises the data sources considered to identify health care facilities offering EmOC in different countries.
+
+| Country | Data Source | Local Validation |
+|-------------------|---------------------------|---------------------------|
+| Nigeria          | GRID3 and Macharia et al., 2023 to - Add link  | Local validation from IDEAMAPS local expert team |
+| Country          | Source with link  | Either expert or internal classification |
+| Colombia          | Ministerio de Salud  | Initial classification carried out within IDEAMAPS team |
+
+  
 
 <img src="image-examples/insights-emergency-maternal-2.jpg" alt="Health-care-pool">
 
-For the second stream, we used population counts from WorldPop: women of childbearing age in 2015 and the reference grid from the general population count. and the open buildings V3 provided by Google. The team analysed various socio-economic conditions that communities highlighted during the participatory-action research sessions carried out with them. Unfortunately, none of them were adequately represented in the available datasets; only elements of income and employment were integrated in the first stream as relative weights. To fit the values of women of childbearing age, aggregated by 1km by 1km grid cells, the team used the number of buildings in the corresponding grid cells as the weighting factor to spread the values. Through that process, the team generated an estimate of the number of women of childbearing age.
+### Stream two: Population counts
 
 For the second stream, we used population counts from WorldPop: women of childbearing age in 2015 and the reference grid from the general population count. and the open buildings V3 provided by Google. The team analysed various socio-economic conditions that communities highlighted during the participatory-action research sessions carried out with them. Unfortunately, none of them were adequately represented in the available datasets; only elements of income and employment were integrated in the first stream as relative weights. To fit the values of women of childbearing age, aggregated by 1km by 1km grid cells, the team used the number of buildings in the corresponding grid cells as the weighting factor to spread the values. Through that process, the team generated an estimate of the number of women of childbearing age.
 
-The two streams were combined in two steps. First, we estimated how long it takes to travel from each spot on a grid (100m by 100m) to every health care facility. Based on these travel times, we linked each grid cell to the three nearest health care facilities that offer different levels of services (like public-comprehensive, public-basic, private-comprehensive, and private-public). Next, we used these links to create a synthetic index using the enhanced two-step floating catchment area (E2SFCA) method, which connects the availability of services (like emergency obstetric care) with the population that needs them.
+### Access deprivation estimation
+
+The two streams were combined in two steps. First, we estimated how long it takes to travel from each spot on a grid (100m by 100m) to every health care facility. For the travel times the team used the [Open Route Service API](https://openrouteservice.org/). Based on these travel times, we linked each grid cell to the three nearest health care facilities that offer different levels of services (like public-comprehensive, public-basic, private-comprehensive, and private-public). Next, we used these links to create a synthetic index using the enhanced two-step floating catchment area (E2SFCA) method, which connects the availability of services (like emergency obstetric care) with the population that needs them.
 
 Once we calculated the synthetic index, we normalized the values to range from 0 to 1, where 0 means high access deprivation (hard to reach health care) and 1 means low access deprivation (easy access). To prepare the data for visualisation, we removed grid cells with no population and then sorted the remaining values into three categories with roughly the same number of grid cells in each.
 
@@ -156,6 +176,8 @@ As with any model, there are limitations that emerge from the multiple decisions
 - The health care facilities we have chosen might not cover all available options, meaning some places that offer emergency obstetric care (EmOC) might be overlooked, while others that do not provide it currently might be included.
 
 - To estimate travel times, we used a standard routing service where the vehicle speeds were not tested on the ground, which can lead to inaccuracies.
+
+- In some areas, the building footprints dataset might not fully capture all structures, especially informal ones, which can affect how we estimate where women of childbearing age live.
 
 - There are some roads that are not captured in the dataset used to calculate routes and travel times.
 
