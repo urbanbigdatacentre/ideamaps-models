@@ -89,7 +89,7 @@ Thresholds for primary healthcare accessibility differ across cities due to vari
 
 - ### Harare, Zimbabwe
 
-[Functional Urban Area (FUA)](https://human-settlement.emergency.copernicus.eu/): ~ 1521 km², FUA population: approximately 2906,612 (2015)
+[Functional Urban Area (FUA)](https://human-settlement.emergency.copernicus.eu/): ~ 1521 km², FUA population: approximately 2,906,612 (2015)
 
 | Deprivation level | Walking access (1 km)                  | Vehicle access (3.3 km)       |
 |-------------------|----------------------------------------|-------------------------------|
@@ -189,7 +189,7 @@ The model relies on the following datasets:
 
 - **Accra**: The healthcare facilities data was extracted from [an official government data set of health care facilities for all of Ghana](https://data.gov.gh/dataset/health-facilities) , the classification for facilities is determined by ownership and type.
 
-- **Harare**: Internal dataset produced by the FCDO project [African Cities Research Consortium](https://www.african-cities.org/) in collaboration with the Global Development Institute (GDI) at The [University of Manchester](https://www.gdi.manchester.ac.uk/).
+- **Harare**: Internal dataset produced by the FCDO project [African Cities Research Consortium](https://www.african-cities.org/) in collaboration with the [Global Development Institute (GDI)](https://www.gdi.manchester.ac.uk/) at The University of Manchester.
 
 - **Abuja**: Based on data from the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) repository, supplemented by field validation from the IDEAMAPS local expert team.
 
