@@ -87,6 +87,16 @@ Thresholds for primary healthcare accessibility differ across cities due to vari
 | Medium (1)        | fewer than 1 facility                  | and fewer than 3 facilities   |
 | Low (0)           | at least 1 facility                    | or at least 3 facilities      |
 
+- ### Harare, Zimbabwe
+
+[Functional Urban Area (FUA)](https://human-settlement.emergency.copernicus.eu/): ~ 1521 km², FUA population: approximately 2906,612 (2015)
+
+| Deprivation level | Walking access (1 km)                  | Vehicle access (3.3 km)       |
+|-------------------|----------------------------------------|-------------------------------|
+| High (2)          | no facilities                          | no facilities                 |
+| Medium (1)        | fewer than 1 facility                  | and no more than 3 facilities |
+| Low (0)           | at least 1 facility                    | or more than 3 facilities     |
+
 - ### Abuja, Nigeria
 
 [Functional Urban Area (FUA)](https://human-settlement.emergency.copernicus.eu/): ~ 1027 km², FUA population: approximately 2,578,150 (2015)
@@ -178,6 +188,8 @@ The model relies on the following datasets:
 - **Nairobi**: The data were scraped from the [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities) which is an application with all health facilities and community units in Kenya, supplemented by field validation from the IDEAMAPS local expert team.
 
 - **Accra**: The healthcare facilities data was extracted from [an official government data set of health care facilities for all of Ghana](https://data.gov.gh/dataset/health-facilities) , the classification for facilities is determined by ownership and type.
+
+- **Harare**: Internal dataset produced by the FCDO project [African Cities Research Consortium](https://www.african-cities.org/) in collaboration with the Global Development Institute (GDI) at The [University of Manchester](https://www.gdi.manchester.ac.uk/).
 
 - **Abuja**: Based on data from the [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) repository, supplemented by field validation from the IDEAMAPS local expert team.
 
