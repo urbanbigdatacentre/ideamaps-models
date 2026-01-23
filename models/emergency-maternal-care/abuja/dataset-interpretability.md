@@ -80,6 +80,16 @@ If you require further information about the data sources and methodology used t
 | Medium (1)        | 0.005 < score ≤ 0.02      |
 | Low (0)           | score > 0.02              |
 
+- ### Harare, Zimbabwe
+
+[Functional Urban Area (FUA)](https://human-settlement.emergency.copernicus.eu/): ~ 1521 km², FUA population: approximately 2,906,612 (2015)
+
+| Deprivation level | Accessibility Score Range    |
+|-------------------|------------------------------|
+| High (2)          | 0 ≤ score ≤ 0.0000026        |
+| Medium (1)        | 0.0000026 < score ≤ 0.0053046|
+| Low (0)           | score > 0.0053046            |
+
 - ### Abuja, Nigeria
 
 [Functional Urban Area (FUA)](https://human-settlement.emergency.copernicus.eu/): ~ 1027 km², FUA population: approximately 2,578,150 (2015)
@@ -153,6 +163,7 @@ The following table summarises the data sources considered to identify health ca
 | Lagos     | [GRID3 NGA - Health Facilities v2.0](https://data.grid3.org/datasets/a0ed9627a8b240ff8b315a84575754a4_0/explore) and [Macharia et al., 2023](https://doi.org/10.1038/s41597-023-02651-9) | Local validation from IDEAMAPS local expert team|
 | Nairobi   | [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities)| Local validation from IDEAMAPS local expert team|
 | Accra     | [Official Government Data for Ghana](https://data.gov.gh/dataset/health-facilities)| Initial classification carried out within IDEAMAPS team|
+| Harare    | Internal dataset produced by the FCDO project [African Cities Research Consortium](https://www.african-cities.org/) in collaboration with the [Global Development Institute (GDI)](https://www.gdi.manchester.ac.uk/) at The University of Manchester| Local experts classified the facilities based on the criteria defined by the IDEAMAPS team|
 | Abuja     | [Macharia et al., 2023](https://doi.org/10.1038/s41597-023-02651-9)| Local validation from IDEAMAPS local expert team|
 | Pereira   | [Registro Especial de Prestadores y Sedes de Servicios de Salud](https://www.datos.gov.co/d/c36g-9fc2)| Initial classification carried out within IDEAMAPS team|
 | Kisumu    | [Kenya Master Health Facility Registry (KMHFR)](https://kmhfr.health.go.ke/public/facilities)| Local validation from IDEAMAPS local expert team|
