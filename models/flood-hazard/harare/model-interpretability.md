@@ -7,7 +7,9 @@ tags: [hazard, flood, datasets]
 
 # Flood Hazard (Version 1)
 
-Flood Hazard is a dataset that maps the potential risk of flooding across urban areas in cities such as Nairobi and Lagos. It is derived using the **FastFlood** hydrodynamic model, which simulates water accumulation from intense rainfall events. Flood risk is classified into **Low**, **Medium**, or **High** hazard levels, and reflects predicted water depth based on high-resolution topographic and rainfall data.
+Flood Hazard is a dataset that maps the potential risk of flooding across urban areas in cities such as Nairobi and Lagos. It is derived using the **FastFlood** hydrodynamic model, which simulates water accumulation from intense rainfall events. Flood risk is classified into **Low**, **Medium**, or **High** hazard levels, and reflects predicted water depth typically based on high-resolution topographic and rainfall data.
+
+The flood hazard layer for Harare was generated using the FastFlood Global model under a simplified configuration. Due to the unavailability of locally calibrated precipitation measurements at the time of analysis, the model was run without parameterisation, using default platform inputs and assuming a 1-in-100 year return period rainfall event. While this approach does not fully capture local rainfall variability, it provides a feasible first-order assessment of flood hazard for short-term analysis and comparative purposes.
 
 <aside>
 💡 This page will help you understand more about how the classifications of Low - Medium - High are predicted in our flood hazard model.
