@@ -1,7 +1,7 @@
 {
   "name": "Accra-Flood-Hazard-V1",
-  "notes": "The field survey for validation was done only in specific deprived communities. It is important to validate the performance of the model in other DUAs. Also, extra validation for areas reported in the workshops as misclassified would be great.",
-  "focus_area_notes": "The focus areas represent a random sample of grid cells (300 per category). Validating these areas will help us to have representative samples that we will use to improve our classifications",
+  "notes": "The flood hazard shows the potential risk of flooding across urban areas. It is derived using the FastFlood hydrodynamic model, which simulates water accumulation from intense rainfall events. The hazard levels reflect predicted water depth based on high-resolution topographic and rainfall data.",
+  "focus_area_notes": "The focus areas represent a random sample of grid cells. Validating these areas will help us to have representative samples that we will use to improve our classifications",
   "city": "Accra",
   "subdomain": "Flood Hazard",
   "output_keys": {
