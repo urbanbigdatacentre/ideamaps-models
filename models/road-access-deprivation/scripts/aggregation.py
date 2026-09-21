@@ -40,6 +40,8 @@ def aggregate_parameters(buildings_file: str, grid_file: str, out_file: str):
     # Drop buildings with no grid id
     buildings = buildings[buildings['grid_id'].notna()]
 
+    assert (buildings['buildings_in_between'] >= 0).all(), 'buildings_in_between must not be negative'
+
     # Use in between building count 10 for large distances to nearest road (250 m)
     buildings.loc[buildings['nearest_road_distance'] > 250, 'buildings_in_between'] = 10
 

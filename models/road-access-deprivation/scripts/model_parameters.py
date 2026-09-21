@@ -39,7 +39,7 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
     roads = gpd.read_parquet(str(roads_file)) if roads_file.suffix == '.parquet' else gpd.read_file(str(roads_file))
     roads = roads[['geometry', road_type_attribute]]
     roads['nID'] = range(len(roads))
-    roads['paved'] = roads[road_type_attribute].apply(lambda x: 0 if x == road_type_key else 1)
+    roads['paved'] = roads[road_type_attribute].apply(lambda x: 1 if x == road_type_key else 0)
 
     # Reproject to UTM zone
     roads = roads.to_crs(epsg=4326)
@@ -87,7 +87,7 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
 
     # Count the number of buildings intersecting a line
     def count_buildings_dask(row, buildings):
-        return buildings[buildings.geometry.intersects(row.nearest_road_line)].shape[0] - 1
+        return buildings[buildings.geometry.intersects(row.nearest_road_line) & (buildings.uID != row.uID)].shape[0]
 
     # Loop over buildings in batches to compute number of buildings in between each building and its nearest road
     batches = []

@@ -9,8 +9,8 @@ def argument_parser():
     parser = argparse.ArgumentParser(description="Experiment Args")
     parser.add_argument('-p', "--param-file", dest='param_file', required=True)
     parser.add_argument('-t', dest='thresh', required=True, type=float)
-    parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
-                        help="path to output directory")
+    parser.add_argument('-o', "--out-file", dest='out_file', required=True,
+                        help='output file (.parquet)')
 
     parser.add_argument(
         "opts",
@@ -38,4 +38,7 @@ if __name__ == '__main__':
 
     gdf['ra'] = gdf.apply(model_logic, axis=1)
 
-    gdf[['ra', 'geometry']].to_parquet(Path(args.output_dir) / 'output.parquet')
+    out_file = Path(args.out_file)
+    assert out_file.suffix == '.parquet'
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+    gdf[['ra', 'geometry']].to_parquet(out_file)
