@@ -78,5 +78,10 @@ Follow these steps to obtain lack of road accessibility levels (low, medium, hig
 If you find this work useful, please cite:
 
 ```
-
+@article{hafner2025towards,
+  title={Towards Modeling Road Access Deprivation in Sub-Saharan Africa Based on a New Accessibility Metric and Road Quality},
+  author={Hafner, Sebastian and Zhao, Qunshan and Alugbin, Bunmi and Baruwa, Kehinde and Cheruiyot, Caleb and Da'u, Sabitu Sa'adu and Du, Xingyi and Elias, Peter and Elsey, Helen and Engstrom, Ryan and others},
+  journal={arXiv preprint arXiv:2512.02190},
+  year={2025}
+}
 ```
