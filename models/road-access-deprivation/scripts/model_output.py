@@ -40,5 +40,4 @@ if __name__ == '__main__':
 
     out_file = Path(args.out_file)
     assert out_file.suffix == '.parquet'
-    out_file.parent.mkdir(parents=True, exist_ok=True)
     gdf[['ra', 'geometry']].to_parquet(out_file)

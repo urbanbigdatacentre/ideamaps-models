@@ -65,7 +65,7 @@ Follow these steps to obtain lack of road accessibility levels (low, medium, hig
    ```
    python model_output.py -p *aggregated grid file (.parquet)* -t *threshold* -o *output file (.parquet)*
    ```
-   The parameter file is the output of step 2. The threshold is the mean number of buildings between a building and its nearest road at or above which a grid cell is classified as high road access deprivation (`ra = 2`). Below the threshold, the class depends on the mode of the road surface type: predominantly paved roads are low deprivation (`ra = 0`) and predominantly unpaved roads are medium deprivation (`ra = 1`). The preprint uses a threshold of 1. The result is written to the output file (missing parent directories are created) and contains the columns `ra` and `geometry`.
+   The parameter file is the output of step 2. The threshold is the mean number of buildings between a building and its nearest road at or above which a grid cell is classified as high road access deprivation (`ra = 2`). Below the threshold, the class depends on the mode of the road surface type: predominantly paved roads are low deprivation (`ra = 0`) and predominantly unpaved roads are medium deprivation (`ra = 1`). The preprint uses a threshold of 1. The result is written to the output file and contains the columns `ra` and `geometry`.
 
 
 4. **Postprocessing (optional)**
