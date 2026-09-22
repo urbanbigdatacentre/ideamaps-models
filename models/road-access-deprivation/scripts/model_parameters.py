@@ -1,10 +1,7 @@
 from pathlib import Path
-import pandas as pd
 import geopandas as gpd
-from shapely.ops import nearest_points
-from shapely.geometry import LineString
+import shapely
 import momepy as mm
-import dask_geopandas
 import utm
 import argparse
 
@@ -68,22 +65,13 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
     buildings['nearest_road'] = mm.get_nearest_street(buildings, roads)
     buildings = buildings.merge(roads[['nID', 'paved']], how='left', left_on='nearest_road', right_index=True)
 
-    # Find the nearest point on road w.r.t for a building centroid
-    def get_nearest_road_point(building_centroid, road):
-        nearest_point = nearest_points(building_centroid, road.geometry)[1]  # Get nearest point on the road
-        return nearest_point
-
-    # Iterate over buildings and compute nearest road points
-    nearest_road_points = []
-    for i in range(len(buildings)):
-        building = buildings.iloc[i]
-        road = roads.iloc[building['nID']]
-        nearest_road_points.append(get_nearest_road_point(building['centroid'], road))
-    buildings['nearest_road_point'] = nearest_road_points
-
-    # Create a straight line from each building centroid to the closest road point
-    buildings['nearest_road_line'] = buildings.apply(
-        lambda row: LineString([row['centroid'], row['nearest_road_point']]), axis=1)
+    # Vectorized: shortest line from each building centroid to its nearest road geometry
+    # (nID was assigned as range(len(roads)), so it doubles as a positional index into roads)
+    nearest_road_geom = roads.geometry.to_numpy()[buildings['nID'].to_numpy()]
+    nearest_road_line = shapely.shortest_line(buildings['centroid'].to_numpy(), nearest_road_geom)
+    buildings['nearest_road_line'] = gpd.GeoSeries(nearest_road_line, index=buildings.index, crs=utm_epsg)
+    nearest_road_point = shapely.get_point(nearest_road_line, -1)
+    buildings['nearest_road_point'] = gpd.GeoSeries(nearest_road_point, index=buildings.index, crs=utm_epsg)
     buildings['nearest_road_distance'] = buildings['nearest_road_line'].length
 
     # Intermediate save of nearest road points and nearest road lines
@@ -93,24 +81,15 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
     nearest_road_line = buildings[['uID', 'nearest_road_line']].set_geometry('nearest_road_line').set_crs(utm_epsg)
     nearest_road_line.to_parquet(out_file.parent / f'{out_file.stem}_nearest_road_line.parquet')
 
-    # Count the number of buildings intersecting a line
-    def count_buildings_dask(row, buildings):
-        return buildings[buildings.geometry.intersects(row.nearest_road_line) & (buildings.uID != row.uID)].shape[0]
-
-    # Loop over buildings in batches to compute number of buildings in between each building and its nearest road
-    batches = []
-    batch_size = 10_000
-    for i_batch in range(0, len(buildings), batch_size):
-        ddf = dask_geopandas.from_geopandas(buildings.iloc[i_batch:i_batch + batch_size], npartitions=8)
-
-        ddf['buildings_in_between'] = ddf.map_partitions(
-            lambda df: df.apply(lambda row: count_buildings_dask(row, buildings), axis=1))
-
-        buildings_batch = ddf.compute()
-        buildings_batch = buildings_batch[['uID', 'buildings_in_between', 'nearest_road_distance', 'paved', 'geometry']]
-        batches.append(buildings_batch)
-        print(f'Processed batch: {i_batch} - {i_batch + batch_size} ({len(buildings)}).')
-    buildings = pd.concat(batches)
+    # Count the number of buildings intersecting each building's nearest-road line, using a spatial
+    # join so only nearby candidates (via the buildings' spatial index) are tested, instead of
+    # testing every line against every building.
+    lines = buildings[['uID', 'nearest_road_line']].set_geometry('nearest_road_line').set_crs(utm_epsg)
+    hits = gpd.sjoin(lines, buildings[['uID', 'geometry']], predicate='intersects', how='inner',
+                      lsuffix='line', rsuffix='building')
+    hits = hits[hits['uID_line'] != hits['uID_building']]  # exclude a building intersecting its own line
+    counts = hits.groupby('uID_line').size()
+    buildings['buildings_in_between'] = buildings['uID'].map(counts).fillna(0).astype(int)
 
     # Save the parameters
     buildings.set_geometry('geometry')
