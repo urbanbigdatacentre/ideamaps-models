@@ -31,12 +31,20 @@ def argument_parser():
     return parser
 
 
+def read_geodata(file: Path) -> gpd.GeoDataFrame:
+    gdf = gpd.read_parquet(str(file)) if file.suffix == '.parquet' else gpd.read_file(str(file))
+    # Data providers name the geometry column differently (e.g., 'geom'), so normalize it
+    if gdf.geometry.name != 'geometry':
+        gdf = gdf.rename_geometry('geometry')
+    return gdf
+
+
 def compute_model_parameters(roads_file: str, road_type_attribute: str, road_type_key: str, buildings_file: str,
                              out_file: str):
 
     # Load roads data
     roads_file = Path(roads_file)
-    roads = gpd.read_parquet(str(roads_file)) if roads_file.suffix == '.parquet' else gpd.read_file(str(roads_file))
+    roads = read_geodata(roads_file)
     roads = roads[['geometry', road_type_attribute]]
     roads['nID'] = range(len(roads))
     roads['paved'] = roads[road_type_attribute].apply(lambda x: 1 if x == road_type_key else 0)
@@ -51,7 +59,7 @@ def compute_model_parameters(roads_file: str, road_type_attribute: str, road_typ
 
     # Load buildings data
     build_file = Path(buildings_file)
-    buildings = gpd.read_parquet(str(build_file)) if build_file.suffix == '.parquet' else gpd.read_file(str(build_file))
+    buildings = read_geodata(build_file)
     buildings = buildings[['geometry']].to_crs(epsg=utm_epsg)
     buildings['uID'] = range(len(buildings))
     buildings['centroid'] = buildings.geometry.centroid
