@@ -49,12 +49,22 @@ def aggregate_parameters(buildings_file: str, grid_file: str, out_file: str):
     mean_buildings_in_between = buildings.groupby('grid_id')[['buildings_in_between']].mean().add_prefix('mean_')
     # Compute grid cell mode for road type (paved/unpaved)
     mode_surface_type = buildings.groupby('grid_id')[['paved']].agg(lambda x: x.mode().iloc[0]).add_prefix('mode_')
+    # Compute grid cell building count
+    building_count = buildings.groupby('grid_id').size().rename('building_count')
 
     # Combine grid-level parameters
     merge_stats = pd.merge(mean_buildings_in_between, mode_surface_type, on='grid_id', how='inner')
+    merge_stats = pd.merge(merge_stats, building_count, on='grid_id', how='inner')
 
-    # Join parameters to reference grid
-    df_stats = pd.merge(merge_stats, grid[['grid_id', 'geometry']], on='grid_id', how='left')
+    # Join parameters to the full reference grid, so grid cells without buildings are kept too
+    df_stats = pd.merge(grid[['grid_id', 'geometry']], merge_stats, on='grid_id', how='left')
+
+    # Grid cells without buildings: no obstruction and treated as predominantly paved, so that
+    # they are consistently classified as low deprivation in model_output.py
+    df_stats['building_count'] = df_stats['building_count'].fillna(0).astype(int)
+    df_stats['mean_buildings_in_between'] = df_stats['mean_buildings_in_between'].fillna(0)
+    df_stats['mode_paved'] = df_stats['mode_paved'].fillna(1).astype(int)
+
     gdf_stats = gpd.GeoDataFrame(df_stats, geometry='geometry', crs=grid.crs)
 
     # Save grid-level parameters

@@ -28,7 +28,12 @@ if __name__ == '__main__':
     gdf = gpd.read_parquet(param_file) if param_file.suffix == '.parquet' else gpd.read_file(param_file)
     thresh = float(args.thresh)
 
+    assert 'building_count' in gdf.columns, (
+        "'building_count' column not found. Rerun aggregation.py to regenerate the parameter file.")
+
     def model_logic(row):
+        if row['building_count'] == 0:
+            return 0  # No buildings: low deprivation (paper Definition 1)
         road_type = row['mode_paved']
         building_between = row['mean_buildings_in_between']
         if building_between < thresh:

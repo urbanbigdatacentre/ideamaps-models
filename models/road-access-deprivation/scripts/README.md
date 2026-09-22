@@ -59,13 +59,15 @@ Follow these steps to obtain lack of road accessibility levels (low, medium, hig
 
     **Maximum distance cap:** Buildings whose nearest road is more than 250 m away are considered to have no reliable access to a road. For these buildings, the number of buildings in between (`buildings_in_between`) is set to a fixed value of 10 before averaging within each grid cell. The value 10 lies well above any threshold of practical interest, so such buildings push the cell mean towards high deprivation (`ra = 2`) without a distance measure entering the metric otherwise.
 
+    **Grid cells without buildings:** The output contains one row per grid cell, including cells with no buildings (previously these were dropped). Such cells are assigned a `building_count` of 0, a placeholder `mean_buildings_in_between` of 0, and a placeholder `mode_paved` of 1 (paved).
+
 
 3. **Classify the grid cells**
 
    ```
    python model_output.py -p *aggregated grid file (.parquet)* -t *threshold* -o *output file (.parquet)*
    ```
-   The parameter file is the output of step 2. The threshold is the mean number of buildings between a building and its nearest road at or above which a grid cell is classified as high road access deprivation (`ra = 2`). Below the threshold, the class depends on the mode of the road surface type: predominantly paved roads are low deprivation (`ra = 0`) and predominantly unpaved roads are medium deprivation (`ra = 1`). The preprint uses a threshold of 1. The result is written to the output file and contains the columns `ra` and `geometry`.
+   The parameter file is the output of step 2. Grid cells with no buildings (`building_count = 0`) are assigned low deprivation (`ra = 0`), regardless of threshold. For the remaining cells, the threshold is the mean number of buildings between a building and its nearest road at or above which a grid cell is classified as high road access deprivation (`ra = 2`). Below the threshold, the class depends on the mode of the road surface type: predominantly paved roads are low deprivation (`ra = 0`) and predominantly unpaved roads are medium deprivation (`ra = 1`). The preprint uses a threshold of 1. The result is written to the output file and contains the columns `ra` and `geometry`.
 
 
 4. **Postprocessing (optional)**
