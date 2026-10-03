@@ -3,6 +3,7 @@ from geopandas import GeoDataFrame
 import momepy as mm
 from pathlib import Path
 import argparse
+import shapely
 import utm
 
 
@@ -51,12 +52,26 @@ def get_morphological_tessellation(buildings: GeoDataFrame, identifier: str) -> 
     return tess
 
 
+def clean_geometries(buildings: GeoDataFrame) -> GeoDataFrame:
+    # Keep only the polygonal parts of GeometryCollections (e.g., artefacts from GEE exports)
+    is_gc = buildings.geom_type == 'GeometryCollection'
+    if is_gc.any():
+        print(f'Extracting polygons from {is_gc.sum()} GeometryCollection(s).')
+        buildings.loc[is_gc, 'geometry'] = [
+            shapely.unary_union([g for g in geom.geoms if g.geom_type in ('Polygon', 'MultiPolygon')])
+            for geom in buildings.geometry[is_gc]
+        ]
+    return buildings
+
+
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
 
     # Loading preprocessed buildings
     building_file = Path(args.building_file)
     buildings = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
+    buildings = clean_geometries(buildings)
+    buildings = buildings.sort_values(by='uID').reset_index(drop=True)
 
     # Morphological tessellation
     tess = get_morphological_tessellation(buildings, 'uID')
@@ -66,23 +81,19 @@ if __name__ == '__main__':
     tess_ids = set(tess['uID'])
     missing_ids = list(set(building_ids) - set(tess_ids))
     if len(missing_ids) > 0:
+        print(f'Removing {len(missing_ids)} buildings without tessellation cell.')
         # Remove ids of missing tessellation cells from buildings
         buildings = buildings[~buildings['uID'].isin(missing_ids)]
         assert len(buildings) == len(tess)
 
         # reindex
-        buildings = buildings.sort_values(by='uID')
-        tess = tess.sort_values(by='uID')
-        buildings = buildings.reset_index()
-        tess = tess.reset_index()
+        buildings = buildings.sort_values(by='uID').reset_index(drop=True)
+        tess = tess.sort_values(by='uID').reset_index(drop=True)
         buildings['uID'] = range(len(buildings))
         tess['uID'] = range(len(tess))
-        buildings[['uID', 'geometry']].to_parquet(Path(args.output_dir) / 'buildings.parquet')
 
+    # Write buildings and tessellation with aligned, contiguous indices (keeping all building attributes)
+    buildings.index.name = None
+    buildings.to_parquet(Path(args.output_dir) / 'buildings.parquet')
     tess.index.name = None
     tess.to_parquet(Path(args.output_dir) / 'tessellation.parquet')
-
-
-
-
-

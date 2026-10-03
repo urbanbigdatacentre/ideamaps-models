@@ -37,7 +37,6 @@ def argument_parser():
     parser = argparse.ArgumentParser(description="Experiment Args")
     parser.add_argument('-r', '--roi-file', dest='roi_file', required=True)
     parser.add_argument('-b', '--building-file', dest='building_file', required=True)
-    parser.add_argument('-t', '--tessellation-file', dest='tessellation_file', required=True)
     parser.add_argument('-e', '--edge-file', dest='edge_file', required=True)
     parser.add_argument('-o', '--output-dir', dest='output_dir', default='outputs/', required=False,
                         help="path to output directory")
@@ -77,19 +76,6 @@ def preprocess_edges(edges: GeoDataFrame, extent: GeoDataFrame) -> GeoDataFrame:
     return edges
 
 
-def get_blocks(buildings: GeoDataFrame, tess: GeoDataFrame, edges: GeoDataFrame) -> GeoDataFrame:
-    # Extend the edges if necessary to avoid issues
-    snapped = mm.extend_lines(edges, tolerance=40, target=tess, barrier=buildings)
-
-    # Generate blocks
-    blocks, _ = mm.generate_blocks(tess, snapped, buildings)
-
-    # Assign block ID
-    blocks['bID'] = range(len(blocks))
-
-    return blocks
-
-
 if __name__ == '__main__':
     args = argument_parser().parse_known_args()[0]
     assert Path(args.output_dir).exists()
@@ -101,10 +87,6 @@ if __name__ == '__main__':
     building_file = Path(args.building_file)
     buildings = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
 
-    # Tessellation
-    tess_file = Path(args.tessellation_file)
-    tess = gpd.read_parquet(tess_file) if tess_file.suffix == '.parquet' else gpd.read_file(tess_file)
-
     # Roads
     edge_file = Path(args.edge_file)
     edges = gpd.read_parquet(edge_file) if edge_file.suffix == '.parquet' else gpd.read_file(edge_file)
@@ -112,36 +94,7 @@ if __name__ == '__main__':
     edges = edges[['nID', 'geometry']]
     edges.to_parquet(Path(args.output_dir) / 'edges.parquet')
 
-    # Blocks
-    blocks = get_blocks(buildings, tess, edges)
-    blocks.to_parquet(Path(args.output_dir) / 'blocks.parquet')
-
-    # Reload buildings
-    buildings = gpd.read_parquet(building_file) if building_file.suffix == '.parquet' else gpd.read_file(building_file)
-
-    # Add network ID of closest road to buildings
+    # Add network ID of closest road (within 500 m) to buildings
     buildings['nID'] = mm.get_nearest_street(buildings, edges, max_distance=500)
 
-    # Determining the block id for each building based on their location
-    n_buildings = len(buildings)
-    buildings['centroid'] = buildings.geometry.centroid
-    buildings = buildings.set_geometry('centroid')
-    buildings = gpd.sjoin(buildings, blocks[['bID', 'geometry']], how='left', predicate='within')
-    buildings = buildings.drop_duplicates(subset=['uID'], keep='first')
-    assert len(buildings) == n_buildings
-
-    # Handeling buildings located outside of blocks by assigning the nearest block id
-    if buildings['bID'].isna().sum() > 0:
-        buildings_out = buildings[buildings['bID'].isna()]
-        buildings_nearest_block = gpd.sjoin_nearest(buildings_out[['uID', 'nID', 'centroid']],
-                                                    blocks[['bID', 'geometry']],
-                                                    how='left', distance_col='distance')
-        for index, row in buildings_nearest_block.iterrows():
-            buildings.loc[index, 'bID'] = row['bID']
-    assert buildings['bID'].isna().sum() == 0
-
-    buildings[['uID', 'nID', 'bID', 'geometry']].to_parquet(Path(args.output_dir) / 'buildings.parquet')
-
-    tess = gpd.read_parquet(tess_file) if tess_file.suffix == '.parquet' else gpd.read_file(tess_file)
-    tess = tess.merge(buildings[['uID', 'bID']], on='uID', how='left')
-    tess.to_parquet(Path(args.output_dir) / 'tessellation.parquet')
+    buildings[['uID', 'nID', 'geometry']].to_parquet(Path(args.output_dir) / 'buildings.parquet')

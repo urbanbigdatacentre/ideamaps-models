@@ -1,12 +1,13 @@
 import geopandas as gpd
 import pandas as pd
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler
 from pathlib import Path
 import argparse
+import pickle
 
 
 def argument_parser():
@@ -16,6 +17,9 @@ def argument_parser():
     parser.add_argument('-o', "--output-dir", dest='output_dir', default='outputs/', required=False,
                         help="path to output directory")
     parser.add_argument('-s', "--seed", dest='seed', default=7, required=False, help="seed for clustering")
+    parser.add_argument('-a', "--apply-model", dest='apply_model', default=None, required=False,
+                        help="path to a kmeans_models.pkl from a previous (e.g., city-wide) run; if given, its fitted "
+                             "scalers and cluster centroids are applied to the morphometrics instead of fitting new ones")
 
     parser.add_argument(
         "opts",
@@ -40,16 +44,29 @@ if __name__ == '__main__':
     morph_sds = ['sum_sdbAre', 'bcount', 'md_sdbAre', 'md_mtbNDi_log', 'md_sicCAR', 'md_mtcWNe']
 
     criterion = gdf['bcount'] >= 3
+
+    if args.apply_model is not None:
+        # Assign each grid cell to the nearest centroid of the previously fitted clusters
+        with open(args.apply_model, 'rb') as f:
+            models = pickle.load(f)
+        for name, features in [('isl', morph_isl), ('sds', morph_sds)]:
+            for k, (scaler, km) in models[name].items():
+                gdf[f'{name}_c{k}'] = -1
+                if criterion.any():
+                    gdf.loc[criterion, f'{name}_c{k}'] = km.predict(scaler.transform(gdf.loc[criterion, features]))
+        gdf.to_parquet(output_dir / 'clusters.parquet')
+        raise SystemExit(0)
+
     gdf_train = gdf[criterion]
     gdf_isl = gdf_train[morph_isl]
     gdf_sds = gdf_train[morph_sds]
 
-    # Initialize the StandardScaler object
-    scaler = StandardScaler()
-
-    # Scale the data
-    data_isl = scaler.fit_transform(gdf_isl)
-    data_sds = scaler.fit_transform(gdf_sds)
+    # Scale the data (separate scalers so that they can be stored and re-applied)
+    scaler_isl = StandardScaler()
+    data_isl = scaler_isl.fit_transform(gdf_isl)
+    scaler_sds = StandardScaler()
+    data_sds = scaler_sds.fit_transform(gdf_sds)
+    models = {'isl': {}, 'sds': {}}
 
     # Define cluster values
     cluster_range = range(1, 16)
@@ -71,6 +88,7 @@ if __name__ == '__main__':
             # Save centroids as CSV
             centroids_isl = pd.DataFrame(km_isl.cluster_centers_, columns=gdf_isl.columns)
             centroids_isl.to_csv(output_dir / f'centroids_isl_k{k}.csv', index=False)
+            models['isl'][k] = (scaler_isl, km_isl)
 
         # Small, Dense Structures
         km_sds = KMeans(n_clusters=k, random_state=int(args.seed))
@@ -82,6 +100,7 @@ if __name__ == '__main__':
             # Save centroids as CSV
             centroids_sds = pd.DataFrame(km_sds.cluster_centers_, columns=gdf_sds.columns)
             centroids_sds.to_csv(output_dir / f'centroids_sds_k{k}.csv', index=False)
+            models['sds'][k] = (scaler_sds, km_sds)
 
     # Plot the elbow curves
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
@@ -100,4 +119,6 @@ if __name__ == '__main__':
     plt.savefig(Path(args.output_dir) / 'elbow.png', dpi=300, bbox_inches='tight')
 
     gdf.to_parquet(Path(args.output_dir) / 'clusters.parquet')
+    with open(output_dir / 'kmeans_models.pkl', 'wb') as f:
+        pickle.dump(models, f)
 

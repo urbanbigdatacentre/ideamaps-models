@@ -41,17 +41,7 @@ def get_utm_epsg(gdf: GeoDataFrame) -> int:
 
     return epsg_code
 
-def compute_entropy(series, areas=None):
-    if areas is not None:
-        relevant_buildings = areas >= 50
-        if relevant_buildings.sum() < 2:
-            return 0
-        series = series[areas >= 50]
-    probs = series.value_counts(normalize=True)  # Get probability distribution
-    return entropy(probs, base=2)  # Compute Shannon entropy (bits)
-
-
-def kde_entropy(series, areas=None, bandwidth='scott', num_bins=100):
+def kde_entropy(series, bandwidth='scott', num_bins=100):
     """
     Compute entropy of building orientation deviations using Kernel Density Estimation (KDE).
 
@@ -65,15 +55,6 @@ def kde_entropy(series, areas=None, bandwidth='scott', num_bins=100):
     """
     if series.isna().sum() == len(series) or series.nunique() < 2:
         return 0  # Return 0 if there's not enough unique data
-
-    if areas is not None:
-        relevant_buildings = areas >= 50
-        if relevant_buildings.sum() < 2:
-            return 0
-        series = series[areas >= 50]
-
-        if series.isna().sum() == len(series) or series.nunique() < 2:
-            return 0  # Return 0 if there's not enough unique data
 
     # Convert to NumPy array
     angles_deg = series.dropna().to_numpy()
@@ -103,7 +84,7 @@ if __name__ == '__main__':
     bmm = bmm[['uID', 'geometry']]
 
     # Loading Urban Morphometrics (UMM)
-    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi_log', 'sicCAR', 'mtcWNe', 'mdcAre', 'stcOri', 'strAli']
+    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi_log', 'sicCAR', 'mtcWNe', 'stcOri', 'strAli']
 
     for metric in building_metrics:
         metric_values = pd.read_parquet(Path(args.morphometrics_dir) / f'{metric}.parquet')
@@ -146,8 +127,6 @@ if __name__ == '__main__':
         for metric in variation:
             skde_value = kde_entropy(values[metric])
             variation_dict[f'kdes_{metric}'].append(skde_value)
-            skder_value = kde_entropy(values[metric], areas=values['sdbAre'])
-            variation_dict[f'kdesr_{metric}'].append(skder_value)
     variation_values = pd.DataFrame(variation_dict)
     building_counts = grouped_bmm_grid.size().rename('bcount')
 

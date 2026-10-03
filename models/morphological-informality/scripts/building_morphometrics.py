@@ -41,11 +41,13 @@ def compute_queen_graph(tessellation: GeoDataFrame, order: int, out_path: Path):
     return queen_graph
 
 
-def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFrame, out_path: Path) -> DataFrame:
-    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi', 'ltbIBD', 'mtbNDi_log', 'strAli']
+def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFrame, out_path: Path,
+                   edge_file: str = None) -> DataFrame:
+    building_metrics = ['sdbAre', 'stbOri', 'mtbAli', 'mtbNDi', 'mtbNDi_log', 'strAli']
     tessellation_metrics = ['sdcAre', 'stcOri', 'sicCAR', 'mtcWNe']
     assert metric in building_metrics or metric in tessellation_metrics
     building_metric = True if metric in building_metrics else False
+    buildings, tessellation = buildings.copy(), tessellation.copy()
 
     # Load from file if already exists
     out_file = out_path / f'{metric}.parquet'
@@ -69,9 +71,9 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         values = values['sdbAre'] / values['sdcAre']
     elif metric == 'mtbAli':
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
-        # TODO: Key error with 'all' when running it for the first time
         stbOri = compute_metric('stbOri', buildings, tessellation, out_path)
-        buildings = buildings.merge(stbOri[['stbOri', 'uID']], on='uID')
+        buildings = buildings.merge(stbOri[['stbOri', 'uID']], on='uID', how='left')
+        buildings.index = tessellation.index  # graph ids refer to the tessellation index
         values = mm.alignment(buildings['stbOri'], queen_1)
     elif metric == 'mtbNDi':
         # TODO: UserWarning: The indices of the two GeoSeries are different. (geoms.distance(geometry.geometry, align=True)).groupby(level=0).mean()
@@ -85,15 +87,17 @@ def compute_metric(metric: str, buildings: GeoDataFrame, tessellation: GeoDataFr
         queen_1 = compute_queen_graph(tessellation, 1, out_path)
         values = mm.neighbors(tessellation, queen_1, weighted=True)
     elif metric == 'strAli':
-        assert args.edge_file is not None
-        roads = gpd.read_parquet(args.edge_file)
+        assert edge_file is not None
+        roads = gpd.read_parquet(edge_file)
+        # nID of buildings refers to the nID of the edges
+        roads = roads.set_index(roads['nID'].astype(int))
         roads_orient = mm.orientation(roads)
         blg_orient = compute_metric('stbOri', buildings, tessellation, out_path)
         buildings = buildings.merge(blg_orient[['uID', 'stbOri']], on='uID', how='left')
         notna = buildings['nID'].notna()
         buildings['strAli'] = 45.
         buildings.loc[notna, 'strAli'] = mm.street_alignment(buildings.loc[notna, 'stbOri'], roads_orient,
-                                                             buildings.loc[notna, 'nID']).astype(float)
+                                                             buildings.loc[notna, 'nID'].astype(int)).astype(float)
         values = buildings['strAli']
     else:
         raise Exception('Unkown metric.')
@@ -116,20 +120,17 @@ if __name__ == '__main__':
     tess = gpd.read_parquet(args.tessellation_file)
 
     assert blg['uID'].is_unique
-    blg = blg.sort_values(by='uID')
+    blg = blg.sort_values(by='uID').reset_index(drop=True)
     assert tess['uID'].is_unique
-    tess = tess.sort_values(by='uID')
+    tess = tess.sort_values(by='uID').reset_index(drop=True)
+    # Graph-based metrics rely on buildings and tessellation cells sharing the same index
+    assert (blg['uID'].values == tess['uID'].values).all()
 
     metrics = ['sdbAre', 'stbOri', 'mtbNDi_log', 'sdcAre', 'stcOri', 'sicCAR', 'mtcWNe', 'strAli', 'mtbAli']
 
     if args.metric == 'all':
         for metric in metrics:
             print(metric)
-            compute_metric(metric, blg, tess, Path(args.output_dir))
-    elif args.metric == 'combine':
-        for metric in metrics:
-            values = compute_metric(metric, blg, tess, Path(args.output_dir))
-            blg = blg.merge(values, on='uID')
-        blg[metrics + ['geometry']].to_parquet(Path(args.output_dir) / 'buildings_primary.parquet')
+            compute_metric(metric, blg, tess, Path(args.output_dir), args.edge_file)
     else:
-        compute_metric(args.metric, blg, tess, Path(args.output_dir))
+        compute_metric(args.metric, blg, tess, Path(args.output_dir), args.edge_file)

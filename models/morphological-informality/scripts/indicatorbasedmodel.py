@@ -14,6 +14,8 @@ def argument_parser():
                         help="path to output directory")
     parser.add_argument('--isl-n-clusters', dest='isl_n_clusters', required=False, default=10, type=int)
     parser.add_argument('--sds-n-clusters', dest='sds_n_clusters', required=False, default=10, type=int)
+    parser.add_argument('-g', '--grid-file', dest='grid_file', required=False, default=None,
+                        help='optional grid; cells without clusters (no buildings) are added as low (0)')
 
     parser.add_argument(
         "opts",
@@ -48,4 +50,17 @@ if __name__ == '__main__':
 
     gdf['mi'] = gdf.apply(model_logic, axis=1)
 
-    gdf[['isl', 'sds', 'mi', 'geometry']].to_parquet(Path(args.output_dir) / 'model.parquet')
+    gdf = gdf[['isl', 'sds', 'mi', 'geometry']]
+
+    if args.grid_file is not None:
+        grid_file = Path(args.grid_file)
+        grid = gpd.read_parquet(grid_file) if grid_file.suffix == '.parquet' else gpd.read_file(grid_file)
+        grid = grid[['geometry']].reset_index(drop=True)
+        # Match grid cells to cluster cells via their representative points
+        pts = gpd.GeoDataFrame(geometry=gdf.to_crs(grid.crs).representative_point(), index=gdf.index)
+        joined = gpd.sjoin(pts, grid, how='inner', predicate='within')
+        grid[['isl', 'sds', 'mi']] = 0
+        grid.loc[joined['index_right'].values, ['isl', 'sds', 'mi']] = gdf.loc[joined.index, ['isl', 'sds', 'mi']].values
+        gdf = grid[['isl', 'sds', 'mi', 'geometry']]
+
+    gdf.to_parquet(Path(args.output_dir) / 'model.parquet')
