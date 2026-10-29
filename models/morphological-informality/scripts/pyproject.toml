@@ -1,0 +1,25 @@
+[project]
+name = "morphological-informality"
+version = "2.0.0"
+description = "Morphological informality model (V2) of the IDEAMAPS data ecosystem"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fiona==1.10.1",
+    "geopandas==0.14.4",
+    "libpysal==4.12.1",
+    "matplotlib==3.10.*",
+    "momepy==0.8.1",
+    "numpy==1.26.4",
+    "osmnx==1.9.4",
+    "pandas==2.2.3",
+    "pyarrow==18.0.0",
+    "pyproj==3.7.0",
+    "scikit-learn==1.5.2",
+    "scipy==1.14.1",
+    "shapely==2.0.7",
+    "tqdm==4.67.1",
+    "utm==0.7.0",
+]
+
+[tool.uv]
+package = false
